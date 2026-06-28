@@ -1,0 +1,41 @@
+lang:
+  code: "en"
+  name: "English"
+auth:
+  login:
+    brand: "AltTeam"
+    subtitle: "Admin Panel"
+    email_hint: "Email"
+    password_hint: "Password"
+    button: "Log In"
+    fill_all_fields: "Please fill in all fields"
+    access_denied: "Access denied: role {role} does not have permission"
+
+theme:
+  system: "System"
+  light: "Light"
+  dark: "Dark"
+
+welcome:
+  greeting: "Hello, {name}!"
+  greeting_anon: "Hello!"
+
+profile:
+  title: "Profile"
+  role:
+    member: "Member"
+    staff: "Staff"
+    moderator: "Moderator"
+    admin: "Administrator"
+    feed: "Feed"
+    system: "System"
+    platform_staff: "Project Team"
+  team_badge: "Team"
+  no_bio: "Bio has not been filled out yet"
+  info:
+    created: "Registered"
+    modified: "Last Active"
+  language: "Language"
+  theme: "Theme"
+  settings: "Settings"
+  logout: "Log Out"

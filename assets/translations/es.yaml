@@ -1,0 +1,41 @@
+lang:
+  code: "es"
+  name: "Español"
+auth:
+  login:
+    brand: "AltTeam"
+    subtitle: "Panel de administración"
+    email_hint: "Correo electrónico"
+    password_hint: "Contraseña"
+    button: "Iniciar sesión"
+    fill_all_fields: "Por favor, complete todos los campos"
+    access_denied: "Acceso denegado: el rol {role} no tiene permisos"
+
+theme:
+  system: "Sistema"
+  light: "Claro"
+  dark: "Oscuro"
+
+welcome:
+  greeting: "¡Hola, {name}!"
+  greeting_anon: "¡Hola!"
+
+profile:
+  title: "Perfil"
+  role:
+    member: "Miembro"
+    staff: "Personal"
+    moderator: "Moderador"
+    admin: "Administrador"
+    feed: "Feed"
+    system: "Sistema"
+    platform_staff: "Equipo del Proyecto"
+  team_badge: "Equipo"
+  no_bio: "La biografía aún no se ha completado"
+  info:
+    created: "Registro"
+    modified: "Última actividad"
+  language: "Idioma"
+  theme: "Tema"
+  settings: "Ajustes"
+  logout: "Cerrar sesión"

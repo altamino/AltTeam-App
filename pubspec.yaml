@@ -22,7 +22,7 @@ dependencies:
   # navigation
   go_router: ^14.2.7
 
-  # network
+  # network a
   dio: ^5.4.3
   crypto: ^3.0.3
 

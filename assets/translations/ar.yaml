@@ -1,0 +1,41 @@
+lang:
+  code: "ar"
+  name: "العربية"
+auth:
+  login:
+    brand: "AltTeam"
+    subtitle: "لوحة التحكم"
+    email_hint: "البريد الإلكتروني"
+    password_hint: "كلمة المرور"
+    button: "تسجيل الدخول"
+    fill_all_fields: "يرجى ملء جميع الحقول"
+    access_denied: "تم رفض الدخول: الدور {role} لا يملك صلاحية"
+
+theme:
+  system: "تلقائي"
+  light: "مضيء"
+  dark: "مظلم"
+
+welcome:
+  greeting: "مرحباً، {name}!"
+  greeting_anon: "مرحباً!"
+
+profile:
+  title: "الملف الشخصي"
+  role:
+    member: "عضو"
+    staff: "طاقم العمل"
+    moderator: "مشرف"
+    admin: "مدير"
+    feed: "الخلاصة"
+    system: "النظام"
+    platform_staff: "فريق المشروع"
+  team_badge: "فريق"
+  no_bio: "النبذة الشخصية غير مكتوبة بعد"
+  info:
+    created: "التسجيل"
+    modified: "آخر نشاط"
+  language: "اللغة"
+  theme: "المظهر"
+  settings: "الإعدادات"
+  logout: "تسجيل الخروج"

@@ -1,0 +1,43 @@
+lang:
+  code: "ru"
+  name: "Русский"
+auth:
+  login:
+    brand: "AltTeam"
+    subtitle: "Панель администратора"
+    email_hint: "Email"
+    password_hint: "Пароль"
+    button: "Войти"
+    fill_all_fields: "Заполните все поля"
+    access_denied: "Доступ запрещён: роль {role} не имеет прав"
+
+theme:
+  system: "Системная"
+  light: "Светлая"
+  dark: "Тёмная"
+
+welcome:
+  greeting: "Привет, {name}!"
+  greeting_anon: "Привет!"
+
+profile:
+  title: "Профиль"
+  role:
+    member: "Участник"
+    staff: "Персонал"
+    
+    moderator: "Модератор"
+    admin: "Администратор"
+    feed: "Лента?"
+    system: "Система"
+    platform_staff: "Команда проекта"
+  team_badge: "Команда"
+  no_bio: "Описание пока не заполнено"
+  info:
+    created: "Регистрация"
+    modified: "Последняя активность"
+  language: "Язык"
+  theme: "Тема"
+  settings: "Настройки"
+
+  logout: "Выйти"

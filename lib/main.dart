@@ -1,26 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'core/router.dart';
+import 'core/l10n/app_localizations.dart';
+import 'core/storage.dart';
+import 'core/api/network/api.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Storage.init();
+  await Api.init();
+  await AppLocalizations.load(Storage.locale);
   runApp(const AltTeamApp());
 }
 
 class AltTeamApp extends StatefulWidget {
   const AltTeamApp({super.key});
-
   @override
   State<AltTeamApp> createState() => _AltTeamAppState();
 }
 
 class _AltTeamAppState extends State<AltTeamApp> {
-  ThemeMode _themeMode = ThemeMode.system;
-  Locale _locale = const Locale('en');
+  late ThemeMode _themeMode;
+  late Locale _locale;
 
-  void _setTheme(ThemeMode mode) => setState(() => _themeMode = mode);
-  void _setLocale(Locale locale) => setState(() => _locale = locale);
+
+  late final GoRouter _router = buildRouter(
+    onSetTheme: _setTheme,
+    onSetLocale: _setLocale,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+
+    _themeMode = Storage.themeMode;
+    _locale = Locale(Storage.locale);
+  }
+
+  void _setTheme(ThemeMode mode) {
+    setState(() => _themeMode = mode);
+    Storage.setThemeMode(mode);
+  }
+
+  void _setLocale(Locale locale) {
+    setState(() => _locale = locale);
+    Storage.setLocale(locale.languageCode);
+    AppLocalizations.load(locale.languageCode);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'AltTeam',
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
@@ -31,123 +65,12 @@ class _AltTeamAppState extends State<AltTeamApp> {
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 27, 32, 100),
+          seedColor: Colors.deepPurple,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
       ),
-      home: LoginPage(onSetTheme: _setTheme, onSetLocale: _setLocale),
-    );
-  }
-}
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, required this.onSetTheme, required this.onSetLocale});
-
-  final void Function(ThemeMode) onSetTheme;
-  final void Function(Locale) onSetLocale;
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  ThemeMode _themeMode = ThemeMode.system;
-  String _lang = 'en';
-
-  void _login() {
-    // TODO
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'AltTeam',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Administration Panel',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 32),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _login,
-                  child: const Text('Log in'),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  DropdownButton<String>(
-                    value: _lang,
-                    items: const [
-                      DropdownMenuItem(value: 'en', child: Text('🇬🇧 EN')),
-                      DropdownMenuItem(value: 'ru', child: Text('🇷🇺 RU')),
-                    ],
-                    onChanged: (val) {
-                      if (val == null) return;
-                      setState(() => _lang = val);
-                      widget.onSetLocale(Locale(val));
-                    },
-                  ),
-                  const SizedBox(width: 16),
-                  DropdownButton<ThemeMode>(
-                    value: _themeMode,
-                    items: const [
-                      DropdownMenuItem(value: ThemeMode.system, child: Text('🖥 System')),
-                      DropdownMenuItem(value: ThemeMode.light, child: Text('☀️ Light')),
-                      DropdownMenuItem(value: ThemeMode.dark, child: Text('🌙 Dark')),
-                    ],
-                    onChanged: (val) {
-                      if (val == null) return;
-                      setState(() => _themeMode = val);
-                      widget.onSetTheme(val);
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+      routerConfig: _router,
     );
   }
 }

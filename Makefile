@@ -2,7 +2,7 @@
         apk appbundle ios macos windows linux \
         build-all package
 
-PROJECT := alt_team
+PROJECT := .
 OUT := builds
 
 help:
