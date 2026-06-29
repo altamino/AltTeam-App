@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/api/repositories/users.dart';
-import '../core/api/constants.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/storage.dart';
 import '../core/theme/app_colors.dart';
@@ -9,6 +8,7 @@ import '../core/widgets/app_drawer.dart';
 import '../core/widgets/coming_soon_placeholder.dart';
 import '../core/api/repositories/blogs.dart';
 import 'main/announcement_details.dart';
+import '../core/api/objects/args/roles.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -89,9 +89,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       key: _scaffoldKey,
       drawer: AppDrawer(
         nickname: nickname,
+        aminoId: Storage.aminoId ?? 'null',
         iconUrl: iconUrl,
         isTeamMember: isTeamMember,
         role: role,
+        isTelegramLinked: Storage.telegramId != null,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -151,7 +153,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Widget _buildContent(AppPalette colors) {
-    final canCreate = rolesOfAnnouncements.contains(Storage.role);
+    final canCreate = RoleTypes.isAnnouncementsRole(Storage.role);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),

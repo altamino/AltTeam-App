@@ -5,7 +5,7 @@ lang:
 auth:
   login:
     brand: "AltTeam"
-    subtitle: "لوحة التحكم للمشرفين"
+    subtitle: "لوحة التحكم"
     email_hint: "البريد الإلكتروني"
     password_hint: "كلمة المرور"
     button: "تسجيل الدخول"
@@ -13,9 +13,9 @@ auth:
     access_denied: "تم رفض الوصول"
 
 theme:
-  system: "تلقائي (النظام)"
-  light: "مضيء"
-  dark: "مظلم"
+  system: "النظام"
+  light: "فاتح"
+  dark: "داكن"
 
 welcome:
   greeting: "مرحباً، {name}!"
@@ -26,15 +26,15 @@ profile:
   role:
     member: "عضو"
     staff: "طاقم العمل"
-    moderator: "منسق"
-    admin: "قائد"
-    feed: "الخلاصة"
+    moderator: "مشرف"
+    admin: "مدير"
+    feed: "خلاصة؟"
     system: "النظام"
     platform_staff: "فريق المشروع"
   team_badge: "الفريق"
-  no_bio: "لا توجد سيرة ذاتية مكتوبة بعد"
+  no_bio: "لم يتم ملء الوصف بعد"
   info:
-    created: "تاريخ التسجيل"
+    created: "التسجيل"
     modified: "آخر نشاط"
   language: "اللغة"
   theme: "المظهر"
@@ -43,52 +43,63 @@ profile:
 
 drawer:
   profile: "الملف الشخصي"
-  admin: "لوحة التحكم"
+  admin: "الإدارة"
   team: "الفريق"
+  chats: "المحادثات"
+  link_telegram: "ربط تيليجرام"
+  unlink_telegram: "إلغاء ربط تيليجرام"
+  errors:
+    fail_open_telegram: "فشل في فتح تيليجرام"
 
 admin:
   title: "الإدارة"
   section:
     reports: "البلاغات"
-    reports_desc: "عرض بلاغات وشكاوى المستخدمين"
-    links: "إدارة الروابط"
-    links_desc: "أدخل رابطاً لتطبيق الإجراءات على المورد"
+    reports_desc: "عرض بلاغات المستخدمين"
+    links: "إشراف الروابط"
+    links_desc: "أدخل الرابط وتطبيق الإجراء على المورد"
     password_reset: "إعادة تعيين كلمة المرور"
     password_reset_desc: "إصدار كلمة مرور جديدة عبر البريد"
     roles: "الأدوار"
-    roles_desc: "إدارة أدوار ورتب الفريق"
+    roles_desc: "إدارة أدوار الفريق"
     search: "البحث"
-    search_desc: "البحث عن المستخدمين والمنتديات"
+    search_desc: "البحث عن المستخدمين والمجتمعات"
   reports:
     title: "البلاغات"
     filter_open: "مفتوحة"
     filter_resolved: "محلولة"
     empty: "ستظهر قائمة البلاغات قريباً"
   links:
-    title: "إدارة الروابط"
+    title: "إشراف الروابط"
     hint: "أدخل الرابط"
-    check: "التحقق"
-    not_ready: "غير متوفر حالياً"
+    check: "تحقق"
+    not_ready: "لم يتم تنفيذه بعد"
     empty: "ستظهر إجراءات المورد هنا"
   password_reset:
     title: "إعادة تعيين كلمة المرور"
-    label: "البريد الإلكتروني للمستخدم"
+    label: "بريد المستخدم"
     hint: "name@example.com"
     send: "إرسال كلمة مرور جديدة"
-    not_ready: "غير متوفر حالياً"
+    not_ready: "لم يتم تنفيذه بعد"
   roles:
     title: "الأدوار"
     empty: "ستتوفر إدارة الأدوار قريباً"
   search:
     title: "البحث"
     tab_users: "المستخدمين"
-    tab_communities: "المنتديات"
-    hint_users: "ابحث باللقب أو المعرف..."
-    hint_communities: "ابحث بالاسم أو المعرف..."
+    tab_communities: "المجتمعات"
+    hint_users: "البحث بالاسم، المعرف..."
+    hint_communities: "البحث بالعنوان، المعرف..."
     empty: "ستظهر نتائج البحث قريباً"
   team:
     title: "الفريق"
     empty: "لا يوجد أعضاء في الفريق بعد"
+    action:
+      telegram: "تيليجرام"
+      amino: "AltAmino"
+    errors:
+      open_tg: "فشل في تشغيل تيليجرام"
+      open_amino: "فشل في فتح ملف AltAmino"
 
 notifications:
   title: "الإشعارات"
@@ -102,19 +113,19 @@ announcements:
     no_title: "بدون عنوان"
     system_author: "النظام"
     delete_dialog_title: "حذف"
-    delete_dialog_message: "هل أنت متأكد من رغبتك في حذف هذا الإعلان؟"
+    delete_dialog_message: "هل أنت متأكد أنك تريد حذف هذا الإعلان؟"
     cancel: "إلغاء"
     delete: "حذف"
-    deleted_success: "تم حذف الإعلان بنجاح"
-    delete_error: "خطأ أثناء الحذف: {error}"
-    edit_success: "تم حفظ التعديلات بنجاح"
+    deleted_success: "تم حذف الإعلان"
+    delete_error: "خطأ في الحذف: {error}"
+    edit_success: "تم حفظ التغييرات بنجاح"
   create:
     title: "إعلان جديد"
     edit_title: "تعديل الإعلان"
     title_label: "العنوان"
     title_hint: "عنوان الإعلان"
     body_label: "النص"
-    body_hint: "محتوى ونص الإعلان"
+    body_hint: "نص الإعلان"
     publish: "نشر"
     save: "حفظ التغييرات"
     publish_error: "فشلت العملية: {error}"
@@ -125,6 +136,6 @@ announcements:
       link: "رابط"
     background:
       add: "إضافة صورة خلفية"
-      attached: "تم إرفاق الخلفية (اضغط للاستبدال)"
-      uploaded_success: "تم رفع صورة الخلفية بنجاح"
-      upload_error: "خطأ أثناء رفع الملف: {error}"
+      attached: "تم إرفاق الخلفية (انقر للاستبدال)"
+      uploaded_success: "تم تحميل صورة الخلفية بنجاح"
+      upload_error: "خطأ في تحميل الوسائط: {error}"

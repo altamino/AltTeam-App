@@ -11,14 +11,14 @@ class AuthRepository {
       'action': 'normal',
     });
     if (res['sid'] != null) {
-      Api.setSid(res['sid'], res['auid'], res['userProfile']?['role']);
+      Api.setSid(res['sid'], res['auid'], res['userProfile']?['role'], res['userProfile']?['aminoId'], res['userProfile']?['telegramId']);
     }
     return res;
   }
 
   Future<void> logout() async {
     try {
-      await Api.post('/g/s/auth/logout');
+      await Api.delete('/g/s/auth/logout');
     } catch (e) {
       
     } finally {

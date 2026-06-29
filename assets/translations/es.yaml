@@ -28,11 +28,11 @@ profile:
     staff: "Personal"
     moderator: "Moderador"
     admin: "Administrador"
-    feed: "Feed"
+    feed: "¿Feed?"
     system: "Sistema"
     platform_staff: "Equipo del Proyecto"
   team_badge: "Equipo"
-  no_bio: "Aún no hay descripción disponible"
+  no_bio: "Descripción aún no completada"
   info:
     created: "Registro"
     modified: "Última actividad"
@@ -43,8 +43,13 @@ profile:
 
 drawer:
   profile: "Perfil"
-  admin: "Panel de Admin"
+  admin: "Admin"
   team: "Equipo"
+  chats: "Chats"
+  link_telegram: "Vincular Telegram"
+  unlink_telegram: "Desvincular Telegram"
+  errors:
+    fail_open_telegram: "No se pudo abrir Telegram"
 
 admin:
   title: "Admin"
@@ -52,11 +57,11 @@ admin:
     reports: "Reportes"
     reports_desc: "Ver quejas de los usuarios"
     links: "Moderación de enlaces"
-    links_desc: "Inserta un enlace y aplica acciones al recurso"
+    links_desc: "Inserta un enlace y aplica una acción al recurso"
     password_reset: "Restablecer contraseña"
     password_reset_desc: "Emitir una nueva contraseña por correo"
     roles: "Roles"
-    roles_desc: "Administrar roles del equipo"
+    roles_desc: "Gestionar roles del equipo"
     search: "Buscar"
     search_desc: "Buscar usuarios y comunidades"
   reports:
@@ -69,55 +74,61 @@ admin:
     hint: "Inserta el enlace"
     check: "Comprobar"
     not_ready: "Aún no implementado"
-    empty: "Las acciones del recurso aparecerán aquí"
+    empty: "Las acciones sobre el recurso aparecerán aquí"
   password_reset:
     title: "Restablecer contraseña"
     label: "Correo del usuario"
-    hint: "nombre@example.com"
+    hint: "name@example.com"
     send: "Enviar nueva contraseña"
     not_ready: "Aún no implementado"
   roles:
     title: "Roles"
-    empty: "La gestión de roles aparecerá pronto"
+    empty: "La gestión de roles estará disponible pronto"
   search:
     title: "Buscar"
     tab_users: "Usuarios"
     tab_communities: "Comunidades"
-    hint_users: "Buscar por alias, ID..."
+    hint_users: "Buscar por nick, ID..."
     hint_communities: "Buscar por título, ID..."
-    empty: "Los resultados de búsqueda aparecerán pronto"
+    empty: "Los resultados de la búsqueda aparecerán pronto"
   team:
     title: "Equipo"
     empty: "Aún no hay miembros en el equipo"
+    action:
+      telegram: "Telegram"
+      amino: "AltAmino"
+    errors:
+      open_tg: "No se pudo iniciar Telegram"
+      open_amino: "No se pudo abrir el perfil de AltAmino"
 
 notifications:
   title: "Notificaciones"
-  empty: "No tienes notificaciones"
+  empty: "No hay notificaciones aún"
 
 announcements:
   title: "Anuncios"
-  empty: "No hay anuncios disponibles"
+  empty: "No hay anuncios aún"
   details:
     title: "Anuncio"
     no_title: "Sin título"
     system_author: "Sistema"
     delete_dialog_title: "Eliminar"
-    delete_dialog_message: "¿Estás seguro de que deseas eliminar este anuncio?"
+    delete_dialog_message: "¿Está seguro de que desea eliminar este anuncio?"
     cancel: "Cancelar"
     delete: "Eliminar"
     deleted_success: "Anuncio eliminado"
     delete_error: "Error al eliminar: {error}"
     edit_success: "Cambios guardados con éxito"
   create:
-    title: "Nuevo anuncio"
-    edit_title: "Editar anuncio"
+    title: "Nuevo Anuncio"
+    edit_title: "Editar Anuncio"
     title_label: "Título"
     title_hint: "Título del anuncio"
     body_label: "Texto"
-    body_hint: "Contenido del anuncio"
+    body_hint: "Texto del anuncio"
     publish: "Publicar"
     save: "Guardar cambios"
-    publish_error: "Error al realizar la operación: {error}"
+    publish_error: "Error en la operación: {error}"
     format:
       bold: "Negrita"
       italic: "Cursiva"
@@ -125,6 +136,6 @@ announcements:
       link: "Enlace"
     background:
       add: "Añadir imagen de fondo"
-      attached: "Fondo adjunto (toca para cambiar)"
-      uploaded_success: "Imagen de fondo cargada con éxito"
-      upload_error: "Error al cargar el archivo multimedia: {error}"
+      attached: "Fondo adjunto (haz clic para reemplazar)"
+      uploaded_success: "Imagen de fondo subida con éxito"
+      upload_error: "Error al subir archivo multimedia: {error}"

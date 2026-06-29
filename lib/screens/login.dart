@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:ui';
-import '../core/api/constants.dart';
+import '../core/api/objects/args/roles.dart';
 import '../core/api/repositories/auth.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/storage.dart';
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final res = await _authRepo.login(email, password);
       final role = res['userProfile']?['role'] as int? ?? 0;
-      if (!adminRoles.contains(role)) {
+      if (!RoleTypes.isStaffRole(role)) {
         await _authRepo.logout();
         setState(() => _error = AppLocalizations.t('auth.login.access_denied'));
         return;

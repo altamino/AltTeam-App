@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/admin_header.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../../core/api/repositories/users.dart';
-
-const int _roleAltAminoMod = 200;
-const int _roleAltAminoAdmin = 201;
-const int _roleFeed = 253;
-const int _roleSystem = 254;
-const int _roleAltAminoStaff = 555;
+import '../../core/api/objects/args/roles.dart';
+import '../../core/api/constants.dart';
 
 class AdminTeamScreen extends StatefulWidget {
   const AdminTeamScreen({super.key});
@@ -53,15 +50,15 @@ class _AdminTeamScreenState extends State<AdminTeamScreen> {
 
   String _roleLabel(int role) {
     switch (role) {
-      case _roleAltAminoStaff:
+      case RoleTypes.roleAltAminoStaff:
         return AppLocalizations.t('profile.role.platform_staff');
-      case _roleAltAminoAdmin:
+      case RoleTypes.roleAltAminoAdmin:
         return AppLocalizations.t('profile.role.admin');
-      case _roleAltAminoMod:
+      case RoleTypes.roleAltAminoMod:
         return AppLocalizations.t('profile.role.moderator');
-      case _roleFeed:
+      case RoleTypes.roleFeed:
         return AppLocalizations.t('profile.role.feed');
-      case _roleSystem:
+      case RoleTypes.roleSystem:
         return AppLocalizations.t('profile.role.system');
       case 0:
         return AppLocalizations.t('profile.role.member');
@@ -72,20 +69,49 @@ class _AdminTeamScreenState extends State<AdminTeamScreen> {
 
   Color? _roleColor(int role, AppPalette colors) {
     switch (role) {
-      case _roleAltAminoStaff:
+      case RoleTypes.roleAltAminoStaff:
         return Colors.redAccent;
-      case _roleAltAminoAdmin:
+      case RoleTypes.roleAltAminoAdmin:
         return Colors.amber.shade700;
-      case _roleAltAminoMod:
+      case RoleTypes.roleAltAminoMod:
         return Colors.green;
-      case _roleFeed:
+      case RoleTypes.roleFeed:
         return Colors.blue;
-      case _roleSystem:
+      case RoleTypes.roleSystem:
         return Colors.deepPurpleAccent;
       case 0:
         return null;
       default:
         return colors.accentPrimary;
+    }
+  }
+
+  void _openTelegram(int telegramId, BuildContext context) async {
+    final url = Uri.parse('tg://user?id=$telegramId');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      final webUrl = Uri.parse('https://t.me/user?id=$telegramId');
+      if (await canLaunchUrl(webUrl)) {
+        await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+      } else {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.t('admin.team.errors.open_tg'))),
+        );
+      }
+    }
+  }
+
+  void _openAltAmino(String aminoId, BuildContext context) async {
+    final url = Uri.parse('$baseAltAminoUrl/u/$aminoId');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.t('admin.team.errors.open_amino'))),
+      );
     }
   }
 
@@ -153,70 +179,125 @@ class _AdminTeamScreenState extends State<AdminTeamScreen> {
       backgroundColor: colors.glassFill,
       onRefresh: _load,
       child: ListView.separated(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         itemCount: _members.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, i) => _memberTile(colors, _members[i]),
       ),
     );
   }
 
-  Widget _memberTile(AppPalette colors, _TeamMember m) {
+Widget _memberTile(AppPalette colors, _TeamMember m) {
+    final hasTelegram = m.telegramId != null;
+    final hasAmino = m.aminoId.isNotEmpty;
+    final hasActions = hasTelegram || hasAmino;
+
     return Container(
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: colors.glassFill,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colors.glassBorder),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          UserAvatar(nickname: m.nickname, iconUrl: m.iconUrl, size: 40),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  m.nickname,
-                  style: TextStyle(color: colors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+                UserAvatar(nickname: m.nickname, iconUrl: m.iconUrl, size: 46),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _badge(colors, _roleLabel(m.role), customColor: _roleColor(m.role, colors)),
-                      ...m.tagList.map((tag) => Padding(
-                            padding: const EdgeInsets.only(left: 6),
-                            child: _badge(colors, tag, customColor: colors.accentPrimary),
-                          )),
+                      Text(
+                        m.nickname,
+                        style: TextStyle(color: colors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          _badge(colors, _roleLabel(m.role), customColor: _roleColor(m.role, colors)),
+                          ...m.tagList.map((tag) => _badge(colors, tag, customColor: colors.accentPrimary)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: colors.glassFillStrong,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: colors.glassBorder),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.star_rounded, size: 16, color: colors.accentPrimary),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${m.reputation}',
+                        style: TextStyle(color: colors.textPrimary, fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.star_rounded, size: 16, color: colors.accentPrimary),
-              const SizedBox(height: 2),
-              Text(
-                '${m.reputation}',
-                style: TextStyle(color: colors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
+          if (hasActions) ...[
+            Divider(color: colors.glassBorder, height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              child: Row(
+                children: [
+                  if (hasTelegram)
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: TextButton.icon(
+                          onPressed: () => _openTelegram(m.telegramId!, context),
+                          icon: const Icon(Icons.telegram, size: 18),
+                          label: Text(AppLocalizations.t('admin.team.action.telegram'), style: const TextStyle(fontSize: 12)),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.blue.shade400,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (hasAmino)
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: TextButton.icon(
+                          onPressed: () => _openAltAmino(m.aminoId, context),
+                          icon: const Icon(Icons.link, size: 18),
+                          label: Text(AppLocalizations.t('admin.team.action.amino'), style: const TextStyle(fontSize: 12)),
+                          style: TextButton.styleFrom(
+                            foregroundColor: colors.accentPrimary,
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ],
       ),
     );
   }
-
   Widget _badge(AppPalette colors, String text, {Color? customColor}) {
     final hasCustomColor = customColor != null;
 
@@ -241,6 +322,8 @@ class _AdminTeamScreenState extends State<AdminTeamScreen> {
 
 class _TeamMember {
   final String id;
+  final String aminoId;
+  final int? telegramId;
   final String nickname;
   final String? iconUrl;
   final int role;
@@ -249,6 +332,8 @@ class _TeamMember {
 
   const _TeamMember({
     required this.id,
+    required this.aminoId,
+    this.telegramId,
     required this.nickname,
     this.iconUrl,
     required this.role,
@@ -262,6 +347,8 @@ class _TeamMember {
 
     return _TeamMember(
       id: json['id'] as String? ?? '',
+      aminoId: json['aminoId'] as String? ?? '',
+      telegramId: json['telegramId'] as int?,
       nickname: json['nickname'] as String? ?? '—',
       iconUrl: json['icon'] as String?,
       role: json['role'] as int? ?? 0,

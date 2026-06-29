@@ -45,6 +45,12 @@ drawer:
   profile: "Профиль"
   admin: "Админка"
   team: "Команда"
+  chats: "Чаты"
+  link_telegram: "Привязать Telegram"
+  unlink_telegram: "Отвязать Telegram"
+
+  errors:
+    fail_open_telegram: "Не удалось открыть Telegram"
 
 admin:
   title: "Админка"
@@ -89,7 +95,12 @@ admin:
   team:
     title: "Команда"
     empty: "Пока нет участников команды"
-
+    action:
+      telegram: "Telegram"
+      amino: "AltAmino"
+    errors:
+      open_tg: "Не удалось запустить Telegram"
+      open_amino: "Не удалось открыть профиль AltAmino"
 notifications:
   title: "Уведомления"
   empty: "Уведомлений пока нет"

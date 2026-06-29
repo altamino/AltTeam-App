@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../core/api/repositories/auth.dart';
-import '../core/api/repositories/users.dart';
-import '../core/l10n/app_localizations.dart';
-import '../core/storage.dart';
-import '../core/theme/app_colors.dart';
-import '../core/widgets/glass_dropdown.dart';
-import '../core/widgets/user_avatar.dart';
-import '../core/storage.dart';
-
-const int _roleAltAminoMod = 200;
-const int _roleAltAminoAdmin = 201;
-const int _roleFeed = 253;
-const int _roleSystem = 254;
-const int _roleAltAminoStaff = 555;
+import '../../core/api/repositories/auth.dart';
+import '../../core/api/repositories/users.dart';
+import '../../core/l10n/app_localizations.dart';
+import '../../core/storage.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/widgets/glass_dropdown.dart';
+import '../../core/widgets/user_avatar.dart';
+import '../../core/api/objects/args/roles.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.onSetTheme, required this.onSetLocale});
@@ -86,15 +80,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _roleLabel(int role) {
     switch (role) {
-      case _roleAltAminoStaff:
+      case RoleTypes.roleAltAminoStaff:
         return AppLocalizations.t('profile.role.platform_staff');
-      case _roleAltAminoAdmin:
+      case RoleTypes.roleAltAminoAdmin:
         return AppLocalizations.t('profile.role.admin');
-      case _roleAltAminoMod:
+      case RoleTypes.roleAltAminoMod:
         return AppLocalizations.t('profile.role.moderator');
-      case _roleFeed:
+      case RoleTypes.roleFeed:
         return AppLocalizations.t('profile.role.feed');
-      case _roleSystem:
+      case RoleTypes.roleSystem:
         return AppLocalizations.t('profile.role.system');
       case 0:
         return AppLocalizations.t('profile.role.member');
@@ -105,15 +99,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Color? _roleColor(int role, AppPalette colors) {
     switch (role) {
-      case _roleAltAminoStaff:
+      case RoleTypes.roleAltAminoStaff:
         return Colors.redAccent;
-      case _roleAltAminoAdmin:
+      case RoleTypes.roleAltAminoAdmin:
         return Colors.amber.shade700;
-      case _roleAltAminoMod:
+      case RoleTypes.roleAltAminoMod:
         return Colors.green;
-      case _roleFeed:
+      case RoleTypes.roleFeed:
         return Colors.blue;
-      case _roleSystem:
+      case RoleTypes.roleSystem:
         return Colors.deepPurpleAccent;
       case 0:
         return null;
@@ -121,8 +115,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return colors.accentPrimary;
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -176,10 +168,15 @@ Widget _buildBody(AppPalette colors) {
       return Center(child: CircularProgressIndicator(color: colors.accentPrimary));
     }
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(_error!, style: TextStyle(color: colors.error, fontSize: 13), textAlign: TextAlign.center),
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(24, 40, 24, 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(_error!, style: TextStyle(color: colors.error, fontSize: 13), textAlign: TextAlign.center),
+            const SizedBox(height: 32),
+            _logoutButton(colors),
+          ],
         ),
       );
     }
@@ -189,6 +186,7 @@ Widget _buildBody(AppPalette colors) {
     final iconUrl = p['icon'] as String?;
     final isTeamMember = (p['extensions'] as Map<String, dynamic>?)?['isMemberOfTeamAmino'] as bool? ?? false;
     final role = Storage.role ?? p['role'] as int? ?? 0;
+    final reputation = p['reputation'] as int? ?? 0;
     final createdTime = _formatDate(p['createdTime'] as String?);
     final modifiedTime = _formatDate(p['modifiedTime'] as String?);
 
@@ -202,11 +200,32 @@ Widget _buildBody(AppPalette colors) {
             nickname.isNotEmpty ? nickname : '—',
             style: TextStyle(color: colors.textPrimary, fontSize: 20, fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
+            runSpacing: 6,
             alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colors.accentPrimary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: colors.accentPrimary.withOpacity(0.35)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.star_rounded, size: 13, color: colors.accentPrimary),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$reputation',
+                      style: TextStyle(color: colors.accentPrimary, fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
               _badge(
                 colors, 
                 _roleLabel(role), 
@@ -235,7 +254,6 @@ Widget _buildBody(AppPalette colors) {
       ),
     );
   }
-  
   Widget _settingsSection(AppPalette colors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -348,7 +366,8 @@ Widget _buildBody(AppPalette colors) {
       ),
     );
   }
-Widget _badge(AppPalette colors, String text, {Color? customColor}) {
+
+  Widget _badge(AppPalette colors, String text, {Color? customColor}) {
     final hasCustomColor = customColor != null;
 
     return Container(

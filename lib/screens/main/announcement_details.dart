@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/api/constants.dart'; 
 import '../../core/storage.dart';
 import '../../core/api/repositories/blogs.dart'; 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/widgets/admin_header.dart';
 import 'create_announcement.dart';
+import '../../core/api/objects/args/roles.dart';
 
 class AnnouncementDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> announcement;
@@ -123,7 +123,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     final title = _currentAnnouncement['title'] as String? ?? AppLocalizations.t('announcements.details.no_title');
     final rawContent = _currentAnnouncement['content'] as String? ?? '';
 
-    final hasAdminRights = rolesOfAnnouncements.contains(Storage.role);
+    final hasAdminRights = RoleTypes.isAnnouncementsRole(Storage.role);
 
     return Scaffold(
       body: Container(
@@ -167,7 +167,6 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Автор
                       Row(
                         children: [
                           CircleAvatar(

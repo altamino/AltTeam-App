@@ -36,6 +36,9 @@ class Storage {
   static String? get userId => _prefs?.getString('userId');
   static String? get deviceId => _prefs?.getString('deviceId');
   static int? get role => _prefs?.getInt('role');
+  static String? get aminoId => _prefs?.getString('aminoId');
+  static int? get telegramId => _prefs?.getInt('telegramId');
+
 
   static Future<void> setSid(String sid) => 
       _prefs?.setString('sid', sid) ?? Future.value();
@@ -45,10 +48,21 @@ class Storage {
       _prefs?.setString('deviceId', id) ?? Future.value();
   static Future<void> setRole(int role) => 
       _prefs?.setInt('role', role) ?? Future.value();
-
+  static Future<void> setTelegramId(int? telegramId) async {
+    if (telegramId != null) {
+      await _prefs?.setInt('telegramId', telegramId);
+    } else {
+      await _prefs?.remove('telegramId');
+    }
+  }
+  static Future<void> setAminoId(String aminoId) => 
+      _prefs?.setString('aminoId', aminoId) ?? Future.value();
+      
   static Future<void> clearSession() async {
     await _prefs?.remove('sid');
     await _prefs?.remove('userId');
     await _prefs?.remove('role');
+    await _prefs?.remove('aminoId');
+    await _prefs?.remove('telegramId');
   }
 }

@@ -48,10 +48,12 @@ class Api {
   }) =>
       _requester.delete(endpoint, body: body, headers: headers);
 
-  static void setSid(String sid, userId, role) {
+  static void setSid(String sid, userId, int role,  String aminoId, int? telegramId) {
     Storage.setSid(sid);
     Storage.setUserId(userId);
     Storage.setRole(role);
+    Storage.setAminoId(aminoId);
+    Storage.setTelegramId(telegramId);
     _requester.sid = sid;
     _requester.userId = userId;
   }
