@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-/// Generic "not implemented yet" empty state used by admin stub screens.
 class ComingSoonPlaceholder extends StatelessWidget {
   const ComingSoonPlaceholder({super.key, required this.icon, required this.text});
   final IconData icon;

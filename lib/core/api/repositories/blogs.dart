@@ -22,16 +22,7 @@ class BlogsRepository {
     return await Api.get(uri.toString());
   }
 
-  /// Создать новый блог/пост
-  /// [ndcId] - ID сообщества (если 0 или null, подставится глобальный поиск/создание)
-  /// [title] - Заголовок поста
-  /// [content] - Текст поста
-  /// [language] - Язык контента (по умолчанию 'en')
-  /// [mediaUrl] - Ссылка на прикрепленное изображение (опционально)
-  /// [mediaFileName] - Имя файла прикрепленного изображения (опционально)
-  /// [backgroundColor] - HEX-цвет фона в формате '#000000' (опционально)
-  /// [bgMediaUrl] - Ссылка на фоновое изображение поста (опционально)
-  /// [bgMediaFileName] - Имя фонового файла (опционально)
+
   Future<Map<String, dynamic>> createBlog({
     int? ndcId,
     required String title,
@@ -44,15 +35,14 @@ class BlogsRepository {
     String? bgMediaFileName,
   }) async {
     
-    // Безопасный сбор пути с учетом ndcId
     final path = '/x${ndcId ?? 0}/s/blog';
 
-    // Формируем структуру mediaList, если передана ссылка
+
     List<dynamic>? formattedMediaList;
     if (mediaUrl != null) {
       formattedMediaList = [
         [
-          100, // Константный маркер типа медиа у Amino
+          100,
           mediaUrl,
           null,
           null,
@@ -62,7 +52,7 @@ class BlogsRepository {
       ];
     }
 
-    // Формируем структуру backgroundMediaList
+  
     List<dynamic>? formattedBgMediaList;
     if (bgMediaUrl != null) {
       formattedBgMediaList = [
@@ -77,7 +67,6 @@ class BlogsRepository {
       ];
     }
 
-    // Собираем всё тело POST-запроса (payload)
     final Map<String, dynamic> requestBody = {
       'title': title,
       'content': content,
@@ -89,20 +78,19 @@ class BlogsRepository {
       'promotedFrom': null,
       'eventSource': 'GlobalComposeMenu',
       'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'mediaList': formattedMediaList, // Подставит null или массив
+      'mediaList': formattedMediaList,
       'extensions': {
         'fansOnly': false,
         'style': {
-          'backgroundColor': backgroundColor, // Подставит null или строку формата '#000000'
+          'backgroundColor': backgroundColor,
           'backgroundMediaList': formattedBgMediaList,
         }
       },
     };
 
-    // Отправляем POST запрос через ваш Api класс
+
     return await Api.post(path, body: requestBody); 
-    // Примечание: Если ваш Api.post принимает body вторым позиционным аргументом, 
-    // измените на: await Api.post(path, requestBody);
+
   }
 
 
@@ -117,18 +105,18 @@ Future<Map<String, dynamic>> editBlog({
     String? bgMediaFileName,
     int? commentAllowance,
   }) async {
-    // Формируем путь: если ndcId нет или он 0, шлем на глобальный /g/s/...
+
     final isGlobal = ndcId == null || ndcId == 0;
     final path = isGlobal ? '/g/s/blog/$blogId' : '/x$ndcId/s/blog/$blogId';
 
-    // Собираем только измененные данные (payload)
+
     final Map<String, dynamic> requestBody = {};
 
     if (title != null) requestBody['title'] = title;
     if (content != null) requestBody['content'] = content;
     if (mediaList != null) requestBody['mediaList'] = mediaList;
 
-    // Сбор вложенного объекта extensions и style, если они переданы
+
     final Map<String, dynamic> extensions = {};
     final Map<String, dynamic> style = {};
 
@@ -151,7 +139,7 @@ Future<Map<String, dynamic>> editBlog({
     }
 
     if (commentAllowance != null) {
-      // Сервер бэкенда мапит 'privilegeOfCommentOnPost' в 'commentAllowance'
+
       extensions['privilegeOfCommentOnPost'] = commentAllowance;
     }
 
@@ -159,13 +147,11 @@ Future<Map<String, dynamic>> editBlog({
       requestBody['extensions'] = extensions;
     }
 
-    // Отправляем POST-запрос на редактирование
+
     return await Api.post(path, body: requestBody);
   }
 
-  /// Удалить блог/пост
-  /// [blogId] - ID удаляемого поста
-  /// [ndcId] - ID сообщества (если 0 или null, запрос пойдет в глобальный /g/s/blog)
+
   Future<Map<String, dynamic>> deleteBlog({
     required String blogId,
     int? ndcId,
@@ -173,7 +159,6 @@ Future<Map<String, dynamic>> editBlog({
     final isGlobal = ndcId == null || ndcId == 0;
     final path = isGlobal ? '/g/s/blog/$blogId' : '/x$ndcId/s/blog/$blogId';
 
-    // Вызываем метод DELETE через Api класс
     return await Api.delete(path);
   }
 

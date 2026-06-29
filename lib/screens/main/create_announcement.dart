@@ -8,7 +8,7 @@ import '../../core/api/repositories/blogs.dart';
 import 'announcement_details.dart';
 
 class AdminCreateAnnouncementScreen extends StatefulWidget {
-  // Добавляем опциональный параметр для редактирования
+
   final Map<String, dynamic>? announcement;
 
   const AdminCreateAnnouncementScreen({super.key, this.announcement});
@@ -28,19 +28,19 @@ class _AdminCreateAnnouncementScreenState extends State<AdminCreateAnnouncementS
   String? _uploadedBgUrl;
   String? _uploadedBgFileName;
 
-  // Флаг: редактируем мы или создаем с нуля
+
   bool get _isEditing => widget.announcement != null;
 
   @override
   void initState() {
     super.initState();
-    // Если передан пост для редактирования, заполняем поля
+
     if (_isEditing) {
       final blog = widget.announcement!;
       _titleController.text = blog['title'] as String? ?? '';
       _bodyController.text = blog['content'] as String? ?? '';
 
-      // Вытаскиваем существующий фон, если он есть
+   
       final extensions = blog['extensions'] as Map<String, dynamic>? ?? {};
       final style = extensions['style'] as Map<String, dynamic>? ?? {};
       final bgList = style['backgroundMediaList'] as List<dynamic>?;
@@ -114,7 +114,7 @@ class _AdminCreateAnnouncementScreenState extends State<AdminCreateAnnouncementS
       Map<String, dynamic> response;
 
       if (_isEditing) {
-        // Логика СОХРАНЕНИЯ изменений при РЕДАКТИРОВАНИИ
+
         final blogId = widget.announcement!['blogId'] as String;
         final ndcId = widget.announcement!['ndcId'] as int? ?? 0;
 
@@ -127,7 +127,7 @@ class _AdminCreateAnnouncementScreenState extends State<AdminCreateAnnouncementS
           bgMediaFileName: _uploadedBgFileName,
         );
       } else {
-        // Логика СОЗДАНИЯ нового поста
+   
         response = await _blogsRepo.createBlog(
           ndcId: 0,
           title: title,
@@ -145,10 +145,10 @@ class _AdminCreateAnnouncementScreenState extends State<AdminCreateAnnouncementS
 
       if (resultBlog != null) {
         if (_isEditing) {
-          // Если редактировали — возвращаем обновленный блог на экран деталей
+
           Navigator.pop(context, resultBlog);
         } else {
-          // Если создавали — открываем экран деталей
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -286,7 +286,7 @@ class _AdminCreateAnnouncementScreenState extends State<AdminCreateAnnouncementS
             colors: colors,
             text: '⚡ ${AppLocalizations.t('announcements.create.format.link')}',
             hint: AppLocalizations.t('announcements.create.format.link'),
-            onTap: () => _insertFormatTag('[Текст|https://]'),
+            onTap: () => _insertFormatTag('[${AppLocalizations.t('announcements.create.format.link')}|https://]'),
           ),
         ],
       ),

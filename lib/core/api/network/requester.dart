@@ -1,6 +1,6 @@
-// lib/core/network/requester.dart
+
 import 'dart:convert';
-import 'dart:typed_data'; // Добавлено для работы с Uint8List
+import 'dart:typed_data'; 
 import 'package:dio/dio.dart';
 import '../helpers/generator.dart';
 import 'exceptions.dart';
@@ -30,7 +30,7 @@ class Requester {
     ));
   }
 
-  // Изменили dynamic data и добавили кастомные заголовки для проверки Content-Type
+
   Map<String, String> _buildHeaders({dynamic data, Map<String, String>? extraHeaders}) {
     final headers = Map<String, String>.from(basicHeaders);
 
@@ -40,11 +40,9 @@ class Requester {
 
     if (data != null) {
       if (data is Uint8List) {
-        // Логика для бинарных данных (медиафайлы)
+
         headers['Content-Length'] = data.length.toString();
-        // Если ваш генератор подписей принимает только строки, 
-        // возможно, для файлов Amino требует подпись от HEX или вовсе её не требует.
-        // Обычно для медиа используется: Generator.signature(data) или подпись опускается.
+
         headers['NDC-MSG-SIG'] = Generator.signature(data); 
       } else {
         // Логика для обычного JSON/Текста
@@ -61,8 +59,7 @@ class Requester {
       headers['NDCAUTH'] = 'sid=$sid';
     }
 
-    // Накладываем extraHeaders ПЕРЕД тем как Dio сделает запрос,
-    // чтобы кастомный Content-Type не затерся.
+
     if (extraHeaders != null) headers.addAll(extraHeaders);
 
     return headers;
@@ -71,16 +68,16 @@ class Requester {
   Future<Map<String, dynamic>> request(
     String method,
     String endpoint, {
-    dynamic body, // Изменено с Map<String, dynamic>? на dynamic
+    dynamic body,
     Map<String, String>? extraHeaders,
     List<int> allowedCodes = const [200],
   }) async {
-    // Внедряем timestamp только если это JSON-карта
+
     if (body is Map<String, dynamic>) {
       body['timestamp'] = Generator.reqTime();
     }
 
-    // Передаем extraHeaders прямо в билдер заголовков
+
     final headers = _buildHeaders(data: body, extraHeaders: extraHeaders);
 
     final url = '$apiUrl$endpoint';
@@ -94,12 +91,12 @@ class Requester {
     }
 
     try {
-      // Подготавливаем данные для Dio
+
       dynamic requestData;
       if (body is Uint8List) {
-        requestData = body; // Для файлов передаем чистые байты
+        requestData = body;
       } else if (body != null) {
-        requestData = body is String ? body : jsonEncode(body); // Для JSON — строку
+        requestData = body is String ? body : jsonEncode(body);
       }
 
       final response = await _dio.request(
@@ -141,10 +138,6 @@ class Requester {
       statusCode: response.statusCode,
     );
   }
-
-  // ─── Shortcuts ───────────────────────────────────────────────────────────
-
-  // Обновляем сигнатуры шорткатов для поддержки динамических типов и кастомных хедеров
 
   Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? headers}) =>
       request('GET', endpoint, extraHeaders: headers);

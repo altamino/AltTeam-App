@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/api/repositories/users.dart';
-import '../core/api/constants.dart'; // rolesOfAnnouncements
+import '../core/api/constants.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/storage.dart';
 import '../core/theme/app_colors.dart';
@@ -59,7 +59,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
   }
 
-  // Этот метод теперь возвращает Future, чтобы RefreshIndicator понимал, когда анимация должна закончиться
   Future<void> _loadAnnouncements() async {
     try {
       final response = await _blogsRepo.getAnnouncements(
@@ -152,8 +151,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Widget _buildContent(AppPalette colors) {
-    // Тот же источник прав, что у редактирования/удаления на экране деталей —
-    // чтобы кнопка создания и кнопки управления постом были консистентны.
     final canCreate = rolesOfAnnouncements.contains(Storage.role);
 
     return Padding(
@@ -172,10 +169,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 IconButton(
                   icon: Icon(Icons.add_circle_rounded, color: colors.accentPrimary, size: 24),
                   onPressed: () async {
-                    // Ждем, пока пользователь создаст пост и вернется (или перейдет на детали)
-                    // Поскольку create_screen делает pushReplacement, мы отследим обновление через детали
                     await context.push('/admin/announcements/create');
-                    // На всякий случай обновляем список после закрытия экрана создания
                     _loadAnnouncements();
                   },
                 ),
@@ -183,13 +177,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
           const SizedBox(height: 10),
           Expanded(
-            // Добавляем обновление по свайпу вниз (Pull-to-Refresh)
             child: RefreshIndicator(
               color: colors.accentPrimary,
               backgroundColor: colors.glassFill,
-              onRefresh: _loadAnnouncements, // Вызывает метод подгрузки постов
+              onRefresh: _loadAnnouncements,
               child: _announcements.isEmpty
-                  ? ListView( // Используем ListView, чтобы свайп работал даже на пустом экране
+                  ? ListView(
                       children: [
                         SizedBox(
                           height: MediaQuery.of(context).size.height * 0.6,
@@ -234,7 +227,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () async {
-          // Ждем результат закрытия экрана деталей (например, если пост удалили или изменили)
           final result = await Navigator.push<bool>(
             context,
             MaterialPageRoute(
@@ -242,7 +234,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           );
 
-          // Если вернулось true (был вызван делит или эдит) — дёргаем обновление списка
           if (result == true) {
             _loadAnnouncements();
           }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/api/constants.dart'; // Здесь лежат роли админов / rolesOfAnnouncements
+import '../../core/api/constants.dart'; 
 import '../../core/storage.dart';
-import '../../core/api/repositories/blogs.dart'; // Репозиторий для вызова delete/edit
+import '../../core/api/repositories/blogs.dart'; 
 import '../../core/l10n/app_localizations.dart';
 import '../../core/widgets/admin_header.dart';
 import 'create_announcement.dart';
@@ -28,7 +28,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     _currentAnnouncement = widget.announcement;
   }
 
-  // Функция удаления поста
+
   Future<void> _deletePost() async {
     final colors = AppColors.of(context);
 
@@ -81,7 +81,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
         SnackBar(content: Text(AppLocalizations.t('announcements.details.deleted_success'))),
       );
 
-      // Возвращаемся назад и сигнализируем WelcomeScreen, что нужно обновить список
+
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
@@ -92,9 +92,9 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     }
   }
 
-  // Функция полноценного редактирования на отдельном экране
+
   Future<void> _editPost() async {
-    // Открываем экран создания в режиме редактирования и ждем результат
+
     final Map<String, dynamic>? updatedBlog = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
@@ -102,7 +102,7 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
       ),
     );
 
-    // Если вернулись с обновленными данными, перерисовываем страницу деталей
+
     if (updatedBlog != null) {
       setState(() {
         _currentAnnouncement = updatedBlog;
@@ -123,7 +123,6 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
     final title = _currentAnnouncement['title'] as String? ?? AppLocalizations.t('announcements.details.no_title');
     final rawContent = _currentAnnouncement['content'] as String? ?? '';
 
-    // Проверка прав: если роль пользователя содержится в списке разрешенных для объявлений
     final hasAdminRights = rolesOfAnnouncements.contains(Storage.role);
 
     return Scaffold(
@@ -186,14 +185,12 @@ class _AnnouncementDetailsScreenState extends State<AnnouncementDetailsScreen> {
                       ),
                       Divider(height: 30, thickness: 1, color: colors.glassBorder),
 
-                      // Заголовок
                       Text(
                         title.trim(),
                         style: TextStyle(color: colors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
 
-                      // Содержимое с поддержкой форматирования строк
                       _buildFormattedContent(rawContent, colors),
                     ],
                   ),

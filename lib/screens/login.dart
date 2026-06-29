@@ -139,7 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 28),
 
-                          // email
                           _glassField(
                             colors: colors,
                             controller: _emailController,

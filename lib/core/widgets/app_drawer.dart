@@ -5,8 +5,6 @@ import '../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import 'user_avatar.dart';
 
-/// Side drawer / menu. Shows the admin panel entry only for staff-level
-/// roles (see core/constants/admin_roles.dart).
 class AppDrawer extends StatelessWidget {
   const AppDrawer({
     super.key,

@@ -1,4 +1,4 @@
-import 'dart:typed_data'; // Добавлено для поддержки отправки байтов (медиа)
+import 'dart:typed_data';
 import '../helpers/generator.dart';
 import 'requester.dart';
 import '../../storage.dart';
@@ -27,14 +27,12 @@ class Api {
     }
   }
 
-  // GET теперь принимает опциональные заголовки
   static Future<Map<String, dynamic>> get(
     String endpoint, {
     Map<String, String>? headers,
   }) =>
       _requester.get(endpoint, headers: headers);
 
-  // В POST изменен тип body на dynamic (чтобы слать Map или Uint8List) и добавлены headers
   static Future<Map<String, dynamic>> post(
     String endpoint, {
     dynamic body,
@@ -42,7 +40,7 @@ class Api {
   }) =>
       _requester.post(endpoint, body: body, headers: headers);
 
-  // В DELETE добавлены опциональные заголовки
+
   static Future<Map<String, dynamic>> delete(
     String endpoint, {
     Map<String, dynamic>? body,

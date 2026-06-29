@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
 
-/// Shared back-button + title header used across all admin screens,
-/// so each one doesn't have to re-implement it. Optional [actions]
-/// render on the right edge, after the title (e.g. edit/delete buttons).
 class AdminHeader extends StatelessWidget {
   const AdminHeader({super.key, required this.title, this.actions});
   final String title;

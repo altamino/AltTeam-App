@@ -37,10 +37,8 @@ class _AdminTeamScreenState extends State<AdminTeamScreen> {
       final list = await _usersRepo.getAltTeam();
       if (!mounted) return;
       
-      // Парсим участников из JSON
       final parsedMembers = list.map<_TeamMember>(_TeamMember.fromJson).toList();
       
-      // Сортировка по репутации: от большего к меньшему
       parsedMembers.sort((a, b) => b.reputation.compareTo(a.reputation));
 
       setState(() {
@@ -186,13 +184,11 @@ class _AdminTeamScreenState extends State<AdminTeamScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
-                // Строка системной роли и кастомных тегов (wrap/scrollable)
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
                       _badge(colors, _roleLabel(m.role), customColor: _roleColor(m.role, colors)),
-                      // Рендерим теги из tagList бэкенда, если они есть
                       ...m.tagList.map((tag) => Padding(
                             padding: const EdgeInsets.only(left: 6),
                             child: _badge(colors, tag, customColor: colors.accentPrimary),
@@ -249,7 +245,7 @@ class _TeamMember {
   final String? iconUrl;
   final int role;
   final int reputation;
-  final List<String> tagList; // Поле для кастомных тегов
+  final List<String> tagList; 
 
   const _TeamMember({
     required this.id,
@@ -261,12 +257,11 @@ class _TeamMember {
   });
 
   factory _TeamMember.fromJson(Map<String, dynamic> json) {
-    // Безопасно парсим tagList из JSON в List<String>
     final tagsRaw = json['tagList'] as List<dynamic>? ?? [];
     final List<String> tags = tagsRaw.map((e) => e.toString()).toList();
 
     return _TeamMember(
-      id: json['id'] as String? ?? '', // Скорректировано под ваш новый JSON ('id' вместо 'uid')
+      id: json['id'] as String? ?? '',
       nickname: json['nickname'] as String? ?? '—',
       iconUrl: json['icon'] as String?,
       role: json['role'] as int? ?? 0,
