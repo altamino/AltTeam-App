@@ -1,6 +1,7 @@
 lang:
   code: "en"
   name: "English"
+
 auth:
   login:
     brand: "AltTeam"
@@ -27,11 +28,11 @@ profile:
     staff: "Staff"
     moderator: "Moderator"
     admin: "Administrator"
-    feed: "Feed"
+    feed: "Feed?"
     system: "System"
     platform_staff: "Project Team"
   team_badge: "Team"
-  no_bio: "Bio has not been filled out yet"
+  no_bio: "No bio written yet"
   info:
     created: "Registered"
     modified: "Last Active"
@@ -39,3 +40,68 @@ profile:
   theme: "Theme"
   settings: "Settings"
   logout: "Log Out"
+
+drawer:
+  profile: "Profile"
+  admin: "Admin Panel"
+  team: "Team"
+
+admin:
+  title: "Admin Panel"
+  section:
+    reports: "Reports"
+    reports_desc: "Review user reports"
+    links: "Link Moderation"
+    links_desc: "Paste a link and apply action to the resource"
+    password_reset: "Password Reset"
+    password_reset_desc: "Issue a new password via email"
+    roles: "Roles"
+    roles_desc: "Manage team roles"
+    search: "Search"
+    search_desc: "Find users and communities"
+  reports:
+    title: "Reports"
+    filter_open: "Open"
+    filter_resolved: "Resolved"
+    empty: "Reports list — coming soon"
+  links:
+    title: "Link Moderation"
+    hint: "Paste a link"
+    check: "Check"
+    not_ready: "Not implemented yet"
+    empty: "Resource actions will appear here"
+  password_reset:
+    title: "Password Reset"
+    label: "User Email"
+    hint: "name@example.com"
+    send: "Send New Password"
+    not_ready: "Not implemented yet"
+  roles:
+    title: "Roles"
+    empty: "Role management — coming soon"
+  search:
+    title: "Search"
+    tab_users: "Users"
+    tab_communities: "Communities"
+    hint_users: "Search by nickname, ID..."
+    hint_communities: "Search by name, ID..."
+    empty: "Search results — coming soon"
+  team:
+    title: "Team"
+    empty: "No team members yet"
+
+notifications:
+  title: "Notifications"
+  empty: "No notifications yet"
+
+announcements:
+  title: "Announcements"
+  empty: "No announcements yet"
+  create:
+    title: "New Announcement"
+    title_label: "Title"
+    title_hint: "Announcement title"
+    body_label: "Body text"
+    body_hint: "Announcement content"
+    publish: "Publish"
+    not_ready: "Not implemented yet"

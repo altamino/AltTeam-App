@@ -55,9 +55,9 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final res = await _authRepo.login(email, password);
       final role = res['userProfile']?['role'] as int? ?? 0;
-      if (!allowedRoles.contains(role)) {
+      if (!adminRoles.contains(role)) {
         await _authRepo.logout();
-        setState(() => _error = AppLocalizations.t('auth.login.access_denied', args: {'role': '$role'}));
+        setState(() => _error = AppLocalizations.t('auth.login.access_denied'));
         return;
       }
       if (!mounted) return;

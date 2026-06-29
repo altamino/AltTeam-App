@@ -1,6 +1,7 @@
 lang:
   code: "ru"
   name: "Русский"
+
 auth:
   login:
     brand: "AltTeam"
@@ -25,7 +26,6 @@ profile:
   role:
     member: "Участник"
     staff: "Персонал"
-    
     moderator: "Модератор"
     admin: "Администратор"
     feed: "Лента?"
@@ -39,5 +39,92 @@ profile:
   language: "Язык"
   theme: "Тема"
   settings: "Настройки"
-
   logout: "Выйти"
+
+drawer:
+  profile: "Профиль"
+  admin: "Админка"
+  team: "Команда"
+
+admin:
+  title: "Админка"
+  section:
+    reports: "Репорты"
+    reports_desc: "Просмотр жалоб пользователей"
+    links: "Модерация ссылок"
+    links_desc: "Вставь ссылку и примени действие к ресурсу"
+    password_reset: "Сброс пароля"
+    password_reset_desc: "Выдать новый пароль по почте"
+    roles: "Роли"
+    roles_desc: "Управление ролями команды"
+    search: "Поиск"
+    search_desc: "Поиск юзеров и сообществ"
+  reports:
+    title: "Репорты"
+    filter_open: "Открытые"
+    filter_resolved: "Решённые"
+    empty: "Список репортов скоро появится"
+  links:
+    title: "Модерация ссылок"
+    hint: "Вставь ссылку"
+    check: "Проверить"
+    not_ready: "Пока не реализовано"
+    empty: "Здесь появятся действия над ресурсом"
+  password_reset:
+    title: "Сброс пароля"
+    label: "Почта пользователя"
+    hint: "name@example.com"
+    send: "Отправить новый пароль"
+    not_ready: "Пока не реализовано"
+  roles:
+    title: "Роли"
+    empty: "Управление ролями скоро появится"
+  search:
+    title: "Поиск"
+    tab_users: "Юзеры"
+    tab_communities: "Сообщества"
+    hint_users: "Поиск по нику, ID..."
+    hint_communities: "Поиск по названию, ID..."
+    empty: "Результаты поиска скоро появится"
+  team:
+    title: "Команда"
+    empty: "Пока нет участников команды"
+
+notifications:
+  title: "Уведомления"
+  empty: "Уведомлений пока нет"
+
+announcements:
+  title: "Объявления"
+  empty: "Объявлений пока нет"
+  details:
+    title: "Объявление"
+    no_title: "Без заголовка"
+    system_author: "Система"
+    delete_dialog_title: "Удаление"
+    delete_dialog_message: "Вы уверены, что хотите удалить это объявление?"
+    cancel: "Отмена"
+    delete: "Удалить"
+    deleted_success: "Объявление удалено"
+    delete_error: "Ошибка удаления: {error}"
+    edit_success: "Изменения успешно сохранены"
+  create:
+    title: "Новое объявление"
+    edit_title: "Редактировать объявление"
+    title_label: "Заголовок"
+    title_hint: "Заголовок объявления"
+    body_label: "Текст"
+    body_hint: "Текст объявления"
+    publish: "Опубликовать"
+    save: "Сохранить изменения"
+    publish_error: "Ошибка выполнения операции: {error}"
+    format:
+      bold: "Жирный"
+      italic: "Курсив"
+      center: "Центр"
+      link: "Ссылка"
+    background:
+      add: "Добавить фоновое изображение"
+      attached: "Фон прикреплён (нажмите для замены)"
+      uploaded_success: "Фоновое изображение успешно загружено"
+      upload_error: "Ошибка загрузки медиа: {error}"

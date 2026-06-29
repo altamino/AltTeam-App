@@ -32,6 +32,8 @@ dependencies:
 
   # utils
   yaml: ^3.1.2
+  image_picker: ^1.1.2
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:
@@ -59,7 +61,7 @@ flutter_launcher_icons:
 
   image_path: "assets/icon/icon.png"
 
-  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_background: "#151f29"
   adaptive_icon_foreground: "assets/icon/icon_foreground.png"
 
   min_sdk_android: 21

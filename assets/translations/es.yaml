@@ -1,10 +1,11 @@
 lang:
   code: "es"
   name: "Español"
+
 auth:
   login:
     brand: "AltTeam"
-    subtitle: "Panel de administración"
+    subtitle: "Panel de Administración"
     email_hint: "Correo electrónico"
     password_hint: "Contraseña"
     button: "Iniciar sesión"
@@ -27,15 +28,80 @@ profile:
     staff: "Personal"
     moderator: "Moderador"
     admin: "Administrador"
-    feed: "Feed"
+    feed: "¿Feed/Canal?"
     system: "Sistema"
     platform_staff: "Equipo del Proyecto"
   team_badge: "Equipo"
-  no_bio: "La biografía aún no se ha completado"
+  no_bio: "Descripción aún no completada"
   info:
     created: "Registro"
     modified: "Última actividad"
   language: "Idioma"
   theme: "Tema"
-  settings: "Ajustes"
+  settings: "Configuración"
   logout: "Cerrar sesión"
+
+drawer:
+  profile: "Perfil"
+  admin: "Admin"
+  team: "Equipo"
+
+admin:
+  title: "Admin"
+  section:
+    reports: "Reportes"
+    reports_desc: "Revisar reportes de usuarios"
+    links: "Moderación de enlaces"
+    links_desc: "Pega un enlace y aplica una acción al recurso"
+    password_reset: "Restablecer contraseña"
+    password_reset_desc: "Emitir una nueva contraseña por correo"
+    roles: "Roles"
+    roles_desc: "Gestionar roles del equipo"
+    search: "Buscar"
+    search_desc: "Buscar usuarios y comunidades"
+  reports:
+    title: "Reportes"
+    filter_open: "Abiertos"
+    filter_resolved: "Resueltos"
+    empty: "Lista de reportes — próximamente"
+  links:
+    title: "Moderación de enlaces"
+    hint: "Pega un enlace"
+    check: "Comprobar"
+    not_ready: "Aún no implementado"
+    empty: "Las acciones del recurso aparecerán aquí"
+  password_reset:
+    title: "Restablecer contraseña"
+    label: "Correo electrónico del usuario"
+    hint: "nombre@example.com"
+    send: "Enviar nueva contraseña"
+    not_ready: "Aún no implementado"
+  roles:
+    title: "Roles"
+    empty: "Gestión de roles — próximamente"
+  search:
+    title: "Buscar"
+    tab_users: "Usuarios"
+    tab_communities: "Comunidades"
+    hint_users: "Buscar por apodo, ID..."
+    hint_communities: "Buscar por nombre, ID..."
+    empty: "Resultados de búsqueda — próximamente"
+  team:
+    title: "Equipo"
+    empty: "Aún no hay miembros en el equipo"
+
+notifications:
+  title: "Notificaciones"
+  empty: "No hay notificaciones por ahora"
+
+announcements:
+  title: "Anuncios"
+  empty: "No hay anuncios por ahora"
+  create:
+    title: "Nuevo anuncio"
+    title_label: "Título"
+    title_hint: "Título del anuncio"
+    body_label: "Texto"
+    body_hint: "Contenido del anuncio"
+    publish: "Publicar"
+    not_ready: "Aún no implementado"

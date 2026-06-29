@@ -7,6 +7,7 @@ import '../core/storage.dart';
 import '../core/theme/app_colors.dart';
 import '../core/widgets/glass_dropdown.dart';
 import '../core/widgets/user_avatar.dart';
+import '../core/storage.dart';
 
 const int _roleAltAminoMod = 200;
 const int _roleAltAminoAdmin = 201;
@@ -187,8 +188,7 @@ Widget _buildBody(AppPalette colors) {
     final nickname = p['nickname'] as String? ?? '';
     final iconUrl = p['icon'] as String?;
     final isTeamMember = (p['extensions'] as Map<String, dynamic>?)?['isMemberOfTeamAmino'] as bool? ?? false;
-    final role = p['role'] as int? ?? 0;
-    final content = (p['content'] as String?)?.trim() ?? '';
+    final role = Storage.role ?? p['role'] as int? ?? 0;
     final createdTime = _formatDate(p['createdTime'] as String?);
     final modifiedTime = _formatDate(p['modifiedTime'] as String?);
 
@@ -225,18 +225,6 @@ Widget _buildBody(AppPalette colors) {
             _InfoRow(AppLocalizations.t('profile.info.created'), createdTime),
             _InfoRow(AppLocalizations.t('profile.info.modified'), modifiedTime),
           ]),
-          const SizedBox(height: 20),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              content.isNotEmpty ? content : AppLocalizations.t('profile.no_bio'),
-              style: TextStyle(
-                color: content.isNotEmpty ? colors.textSecondary : colors.textMuted,
-                fontSize: 14,
-                height: 1.4,
-              ),
-            ),
-          ),
           const SizedBox(height: 28),
           Divider(color: colors.glassBorder),
           const SizedBox(height: 20),
@@ -253,7 +241,7 @@ Widget _buildBody(AppPalette colors) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Align(
-          alignment: Alignment.centerLeft,
+          alignment: Alignment.center,
           child: Text(
             AppLocalizations.t('profile.settings'),
             style: TextStyle(color: colors.textMuted, fontSize: 12, fontWeight: FontWeight.w600),
@@ -299,7 +287,7 @@ Widget _buildBody(AppPalette colors) {
   Widget _settingRow(AppPalette colors, {required String label, required Widget child}) {
     return Expanded(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(label, style: TextStyle(color: colors.textMuted, fontSize: 11)),
           const SizedBox(height: 6),

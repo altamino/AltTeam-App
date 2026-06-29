@@ -20,4 +20,20 @@ const Map<String, String> basicHeaders = {
 };
 
 
-const List<int> allowedRoles = [200, 201, 254, 555];
+
+
+const int roleAltAminoMod = 200;
+const int roleAltAminoAdmin = 201;
+const int roleFeed = 253;
+const int roleSystem = 254;
+const int roleAltAminoStaff = 555;
+
+const int roleUser = 0;
+const int roleCurator = 101;
+const int roleLeader = 100;
+const int roleAgent = 102;
+
+
+const List<int> rolesOfAnnouncements = [roleFeed, roleSystem, roleAltAminoStaff];
+const List<int> adminRoles = [roleAltAminoMod, roleAltAminoAdmin, roleFeed, roleSystem, roleAltAminoStaff];
+const List<int> ndcAdminRoles = [roleCurator, roleLeader, roleAgent];

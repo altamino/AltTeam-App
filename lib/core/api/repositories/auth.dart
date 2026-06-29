@@ -11,7 +11,7 @@ class AuthRepository {
       'action': 'normal',
     });
     if (res['sid'] != null) {
-      Api.setSid(res['sid'], res['auid']);
+      Api.setSid(res['sid'], res['auid'], res['userProfile']?['role']);
     }
     return res;
   }

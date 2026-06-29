@@ -1,5 +1,6 @@
 // lib/core/network/requester.dart
 import 'dart:convert';
+import 'dart:typed_data'; // Добавлено для работы с Uint8List
 import 'package:dio/dio.dart';
 import '../helpers/generator.dart';
 import 'exceptions.dart';
@@ -29,7 +30,8 @@ class Requester {
     ));
   }
 
-  Map<String, String> _buildHeaders({dynamic data}) {
+  // Изменили dynamic data и добавили кастомные заголовки для проверки Content-Type
+  Map<String, String> _buildHeaders({dynamic data, Map<String, String>? extraHeaders}) {
     final headers = Map<String, String>.from(basicHeaders);
 
     headers['NDCLANG'] = language;
@@ -37,9 +39,19 @@ class Requester {
     headers['NDCDEVICEID'] = deviceId;
 
     if (data != null) {
-      final encoded = data is String ? data : jsonEncode(data);
-      headers['NDC-MSG-SIG'] = Generator.signature(encoded);
-      headers['Content-Length'] = utf8.encode(encoded).length.toString();
+      if (data is Uint8List) {
+        // Логика для бинарных данных (медиафайлы)
+        headers['Content-Length'] = data.length.toString();
+        // Если ваш генератор подписей принимает только строки, 
+        // возможно, для файлов Amino требует подпись от HEX или вовсе её не требует.
+        // Обычно для медиа используется: Generator.signature(data) или подпись опускается.
+        headers['NDC-MSG-SIG'] = Generator.signature(data); 
+      } else {
+        // Логика для обычного JSON/Текста
+        final encoded = data is String ? data : jsonEncode(data);
+        headers['NDC-MSG-SIG'] = Generator.signature(encoded);
+        headers['Content-Length'] = utf8.encode(encoded).length.toString();
+      }
     }
 
     if (sid != null) {
@@ -49,32 +61,50 @@ class Requester {
       headers['NDCAUTH'] = 'sid=$sid';
     }
 
+    // Накладываем extraHeaders ПЕРЕД тем как Dio сделает запрос,
+    // чтобы кастомный Content-Type не затерся.
+    if (extraHeaders != null) headers.addAll(extraHeaders);
+
     return headers;
   }
 
-Future<Map<String, dynamic>> request(
+  Future<Map<String, dynamic>> request(
     String method,
     String endpoint, {
-    Map<String, dynamic>? body,
+    dynamic body, // Изменено с Map<String, dynamic>? на dynamic
     Map<String, String>? extraHeaders,
     List<int> allowedCodes = const [200],
   }) async {
-    if (body != null) {
+    // Внедряем timestamp только если это JSON-карта
+    if (body is Map<String, dynamic>) {
       body['timestamp'] = Generator.reqTime();
     }
 
-    final headers = _buildHeaders(data: body);
-    if (extraHeaders != null) headers.addAll(extraHeaders);
+    // Передаем extraHeaders прямо в билдер заголовков
+    final headers = _buildHeaders(data: body, extraHeaders: extraHeaders);
 
     final url = '$apiUrl$endpoint';
     debugPrint('[HTTP][REQ] $method $url');
     debugPrint('[HTTP][REQ] Headers: $headers');
-    if (body != null) debugPrint('[REQ] Body: ${jsonEncode(body)}');
+    
+    if (body != null && body is! Uint8List) {
+      debugPrint('[REQ] Body: ${body is String ? body : jsonEncode(body)}');
+    } else if (body is Uint8List) {
+      debugPrint('[REQ] Body: <Binary Data: ${body.length} bytes>');
+    }
 
     try {
+      // Подготавливаем данные для Dio
+      dynamic requestData;
+      if (body is Uint8List) {
+        requestData = body; // Для файлов передаем чистые байты
+      } else if (body != null) {
+        requestData = body is String ? body : jsonEncode(body); // Для JSON — строку
+      }
+
       final response = await _dio.request(
         endpoint,
-        data: body != null ? jsonEncode(body) : null,
+        data: requestData,
         options: Options(method: method, headers: headers),
       );
 
@@ -114,12 +144,14 @@ Future<Map<String, dynamic>> request(
 
   // ─── Shortcuts ───────────────────────────────────────────────────────────
 
-  Future<Map<String, dynamic>> get(String endpoint) =>
-      request('GET', endpoint);
+  // Обновляем сигнатуры шорткатов для поддержки динамических типов и кастомных хедеров
 
-  Future<Map<String, dynamic>> post(String endpoint, {Map<String, dynamic>? body}) =>
-      request('POST', endpoint, body: body ?? {});
+  Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? headers}) =>
+      request('GET', endpoint, extraHeaders: headers);
 
-  Future<Map<String, dynamic>> delete(String endpoint, {Map<String, dynamic>? body}) =>
-      request('DELETE', endpoint, body: body);
+  Future<Map<String, dynamic>> post(String endpoint, {dynamic body, Map<String, String>? headers}) =>
+      request('POST', endpoint, body: body, extraHeaders: headers);
+
+  Future<Map<String, dynamic>> delete(String endpoint, {dynamic body, Map<String, String>? headers}) =>
+      request('DELETE', endpoint, body: body, extraHeaders: headers);
 }

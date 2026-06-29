@@ -5,4 +5,5 @@ class UsersRepository {
     final res = await Api.get('/x${ndcId}/s/user-profile/${userId}');
     return (res['userProfile'] as Map<String, dynamic>?) ?? <String, dynamic>{};
   }
+
 }
