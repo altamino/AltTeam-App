@@ -84,7 +84,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     final nickname = _profile?['nickname'] as String? ?? '';
     final iconUrl = _profile?['icon'] as String?;
     final isTeamMember = (_profile?['extensions'] as Map<String, dynamic>?)?['isMemberOfTeamAmino'] as bool? ?? false;
-    final role = _profile?['role'] as int? ?? 0;
+    final role = Storage.role ?? _profile?['role'] as int? ?? 0;
 
     return Scaffold(
       key: _scaffoldKey,

@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
 // Constants
-const String apiUrl = "https://service.altamino.top/api/v1";
+const String apiUrl = "https://dev-service.altamino.top/api/v1";
 const String UserAgent = 'Apple iPhone16,1 iOS v15.0 Main/3.22.0';
-
+const String AppVersion = '1.0.0';
 
 final Uint8List Prefix = Uint8List.fromList([0x19]);
 final String SigKey = "DFA5ED192DDA6E88A12FE12130DC6206B1251E44";

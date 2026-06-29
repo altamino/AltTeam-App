@@ -10,7 +10,7 @@ auth:
     password_hint: "Пароль"
     button: "Войти"
     fill_all_fields: "Заполните все поля"
-    access_denied: "Доступ запрещён: роль {role} не имеет прав"
+    access_denied: "Доступ запрещён"
 
 theme:
   system: "Системная"

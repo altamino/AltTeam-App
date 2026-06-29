@@ -19,6 +19,8 @@ class AuthRepository {
   Future<void> logout() async {
     try {
       await Api.post('/g/s/auth/logout');
+    } catch (e) {
+      
     } finally {
       Api.clearSession();
     }

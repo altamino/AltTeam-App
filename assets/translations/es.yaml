@@ -10,7 +10,7 @@ auth:
     password_hint: "Contraseña"
     button: "Iniciar sesión"
     fill_all_fields: "Por favor, complete todos los campos"
-    access_denied: "Acceso denegado: el rol {role} no tiene permisos"
+    access_denied: "Acceso denegado"
 
 theme:
   system: "Sistema"
@@ -28,11 +28,11 @@ profile:
     staff: "Personal"
     moderator: "Moderador"
     admin: "Administrador"
-    feed: "¿Feed/Canal?"
+    feed: "Feed"
     system: "Sistema"
     platform_staff: "Equipo del Proyecto"
   team_badge: "Equipo"
-  no_bio: "Descripción aún no completada"
+  no_bio: "Aún no hay descripción disponible"
   info:
     created: "Registro"
     modified: "Última actividad"
@@ -43,65 +43,88 @@ profile:
 
 drawer:
   profile: "Perfil"
-  admin: "Admin"
+  admin: "Panel de Admin"
   team: "Equipo"
 
 admin:
   title: "Admin"
   section:
     reports: "Reportes"
-    reports_desc: "Revisar reportes de usuarios"
+    reports_desc: "Ver quejas de los usuarios"
     links: "Moderación de enlaces"
-    links_desc: "Pega un enlace y aplica una acción al recurso"
+    links_desc: "Inserta un enlace y aplica acciones al recurso"
     password_reset: "Restablecer contraseña"
     password_reset_desc: "Emitir una nueva contraseña por correo"
     roles: "Roles"
-    roles_desc: "Gestionar roles del equipo"
+    roles_desc: "Administrar roles del equipo"
     search: "Buscar"
     search_desc: "Buscar usuarios y comunidades"
   reports:
     title: "Reportes"
     filter_open: "Abiertos"
     filter_resolved: "Resueltos"
-    empty: "Lista de reportes — próximamente"
+    empty: "La lista de reportes aparecerá pronto"
   links:
     title: "Moderación de enlaces"
-    hint: "Pega un enlace"
+    hint: "Inserta el enlace"
     check: "Comprobar"
     not_ready: "Aún no implementado"
     empty: "Las acciones del recurso aparecerán aquí"
   password_reset:
     title: "Restablecer contraseña"
-    label: "Correo electrónico del usuario"
+    label: "Correo del usuario"
     hint: "nombre@example.com"
     send: "Enviar nueva contraseña"
     not_ready: "Aún no implementado"
   roles:
     title: "Roles"
-    empty: "Gestión de roles — próximamente"
+    empty: "La gestión de roles aparecerá pronto"
   search:
     title: "Buscar"
     tab_users: "Usuarios"
     tab_communities: "Comunidades"
-    hint_users: "Buscar por apodo, ID..."
-    hint_communities: "Buscar por nombre, ID..."
-    empty: "Resultados de búsqueda — próximamente"
+    hint_users: "Buscar por alias, ID..."
+    hint_communities: "Buscar por título, ID..."
+    empty: "Los resultados de búsqueda aparecerán pronto"
   team:
     title: "Equipo"
     empty: "Aún no hay miembros en el equipo"
 
 notifications:
   title: "Notificaciones"
-  empty: "No hay notificaciones por ahora"
+  empty: "No tienes notificaciones"
 
 announcements:
   title: "Anuncios"
-  empty: "No hay anuncios por ahora"
+  empty: "No hay anuncios disponibles"
+  details:
+    title: "Anuncio"
+    no_title: "Sin título"
+    system_author: "Sistema"
+    delete_dialog_title: "Eliminar"
+    delete_dialog_message: "¿Estás seguro de que deseas eliminar este anuncio?"
+    cancel: "Cancelar"
+    delete: "Eliminar"
+    deleted_success: "Anuncio eliminado"
+    delete_error: "Error al eliminar: {error}"
+    edit_success: "Cambios guardados con éxito"
   create:
     title: "Nuevo anuncio"
+    edit_title: "Editar anuncio"
     title_label: "Título"
     title_hint: "Título del anuncio"
     body_label: "Texto"
     body_hint: "Contenido del anuncio"
     publish: "Publicar"
-    not_ready: "Aún no implementado"
+    save: "Guardar cambios"
+    publish_error: "Error al realizar la operación: {error}"
+    format:
+      bold: "Negrita"
+      italic: "Cursiva"
+      center: "Centrado"
+      link: "Enlace"
+    background:
+      add: "Añadir imagen de fondo"
+      attached: "Fondo adjunto (toca para cambiar)"
+      uploaded_success: "Imagen de fondo cargada con éxito"
+      upload_error: "Error al cargar el archivo multimedia: {error}"
