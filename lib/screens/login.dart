@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:ui';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/api/objects/args/roles.dart';
 import '../core/api/repositories/auth.dart';
 import '../core/l10n/app_localizations.dart';
 import '../core/storage.dart';
+import '../core/api/constants.dart';
 import '../core/theme/app_colors.dart';
 import '../core/widgets/glass_dropdown.dart';
+import 'package:flutter/services.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onSetTheme, required this.onSetLocale});
@@ -44,7 +47,14 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> _login() async {
+  void _openUrl(String urlString) async {
+    final uri = Uri.parse(urlString);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
+Future<void> _login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     if (email.isEmpty || password.isEmpty) {
@@ -55,12 +65,15 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final res = await _authRepo.login(email, password);
       final role = res['userProfile']?['role'] as int? ?? 0;
-      if (!RoleTypes.isStaffRole(role)) {
+      if (!RoleTypes.isStaffRole(role) && adminsOnly) {
         await _authRepo.logout();
         setState(() => _error = AppLocalizations.t('auth.login.access_denied'));
         return;
       }
       if (!mounted) return;
+
+      TextInput.finishAutofillContext(); 
+
       context.go('/welcome');
     } catch (e) {
       setState(() => _error = e.toString());
@@ -68,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) setState(() => _loading = false);
     }
   }
-
   Future<void> _onLocaleChanged(String code) async {
     if (code == _lang || _loading) return;
     setState(() => _lang = code);
@@ -113,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Container(
                       width: 360,
                       decoration: colors.glassCard(radius: 20),
-                      padding: const EdgeInsets.fromLTRB(32, 40, 32, 28),
+                      padding: const EdgeInsets.fromLTRB(32, 40, 32, 24),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -139,31 +151,39 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 28),
 
-                          _glassField(
-                            colors: colors,
-                            controller: _emailController,
-                            hint: AppLocalizations.t('auth.login.email_hint'),
-                            icon: Icons.mail_outline,
-                            enabled: !_loading,
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                          const SizedBox(height: 12),
-
-
-                          _glassField(
-                            colors: colors,
-                            controller: _passwordController,
-                            hint: AppLocalizations.t('auth.login.password_hint'),
-                            icon: Icons.lock_outline,
-                            obscure: _obscure,
-                            enabled: !_loading,
-                            suffix: IconButton(
-                              icon: Icon(
-                                _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                                size: 18,
-                                color: colors.textMuted,
-                              ),
-                              onPressed: () => setState(() => _obscure = !_obscure),
+                          AutofillGroup(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _glassField(
+                                  colors: colors,
+                                  controller: _emailController,
+                                  hint: AppLocalizations.t('auth.login.email_hint'),
+                                  icon: Icons.mail_outline,
+                                  enabled: !_loading,
+                                  keyboardType: TextInputType.emailAddress,
+                                  autofillHints: const [AutofillHints.email],
+                                ),
+                                const SizedBox(height: 12),
+                                _glassField(
+                                  colors: colors,
+                                  controller: _passwordController,
+                                  hint: AppLocalizations.t('auth.login.password_hint'),
+                                  icon: Icons.lock_outline,
+                                  obscure: _obscure,
+                                  enabled: !_loading,
+                                  keyboardType: TextInputType.visiblePassword,
+                                  autofillHints: const [AutofillHints.password],
+                                  suffix: IconButton(
+                                    icon: Icon(
+                                      _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                      size: 18,
+                                      color: colors.textMuted,
+                                    ),
+                                    onPressed: () => setState(() => _obscure = !_obscure),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
 
@@ -239,6 +259,29 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ],
                           ),
+
+                          const SizedBox(height: 24),
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            spacing: 16,
+                            runSpacing: 4,
+                            children: [
+                              InkWell(
+                                onTap: () => _openUrl(termsUrl),
+                                child: Text(
+                                  AppLocalizations.t('auth.login.terms'),
+                                  style: TextStyle(fontSize: 11, color: colors.textMuted, decoration: TextDecoration.underline),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () => _openUrl(privacyUrl),
+                                child: Text(
+                                  AppLocalizations.t('auth.login.privacy'),
+                                  style: TextStyle(fontSize: 11, color: colors.textMuted, decoration: TextDecoration.underline),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -272,6 +315,7 @@ class _LoginScreenState extends State<LoginScreen> {
     bool enabled = true,
     TextInputType? keyboardType,
     Widget? suffix,
+    Iterable<String>? autofillHints,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -284,6 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
         obscureText: obscure,
         enabled: enabled,
         keyboardType: keyboardType,
+        autofillHints: autofillHints,
         style: TextStyle(color: colors.textPrimary, fontSize: 15),
         decoration: InputDecoration(
           hintText: hint,

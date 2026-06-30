@@ -45,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final profile = await _usersRepo.get_user_profile(Storage.userId ?? '', 0);
+      final profile = await _usersRepo.getUserProfile(Storage.userId ?? '', 0);
       if (!mounted) return;
       setState(() { _profile = profile; _loading = false; });
     } catch (e) {
@@ -231,12 +231,6 @@ Widget _buildBody(AppPalette colors) {
                 _roleLabel(role), 
                 customColor: _roleColor(role, colors),
               ),
-              if (isTeamMember) 
-                _badge(
-                  colors, 
-                  AppLocalizations.t('profile.team_badge'), 
-                  customColor: colors.accentPrimary,
-                ),
             ],
           ),
           const SizedBox(height: 24),

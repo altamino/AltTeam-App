@@ -1,32 +1,56 @@
 import '../network/api.dart';
 
 class AltTemRepository {
-  Future<void> reset_password_by_email(String email) async {
+
+  Future<void> resetPasswordByEmail(String email) async {
     await Api.post('/g/s/altteam/reset-password', body: {
       "email": email
     });
   }
 
-Future<Map<String, dynamic>> getReports({
-  required String segment,
-  required int start,
-  required int size,
-  required String pageToken,
-}) async {
-  final resolvedSegment = segment.isEmpty ? 'all' : segment;
+  Future<Map<String, dynamic>> getReports({
+    required String segment,
+    required int start,
+    required int size,
+    required String pageToken,
+  }) async {
+    final resolvedSegment = segment.isEmpty ? 'all' : segment;
 
-  final path = '/g/s/altteam/reports'
-      '?segment=${Uri.encodeComponent(resolvedSegment)}'
-      '&start=$start'
-      '&size=$size'
-      '&pageToken=${Uri.encodeComponent(pageToken)}';
+    final path = '/g/s/altteam/reports'
+        '?segment=${Uri.encodeComponent(resolvedSegment)}'
+        '&start=$start'
+        '&size=$size'
+        '&pageToken=${Uri.encodeComponent(pageToken)}';
 
-  return await Api.get(path);
-}
+    return await Api.get(path);
+  }
 
-Future<Map<String, dynamic>> getTeam() async {
-  return await Api.get('/g/s/altteam');
-}
+  Future<Map<String, dynamic>> getTeam() async {
+    return await Api.get('/g/s/altteam');
+  }
 
+
+  Future<void> editTeamMember({
+    required String userId,
+    int? role,
+    List<String>? tagList,
+    bool? isMemberOfTeamAmino,
+  }) async {
+    await Api.post('/g/s/altteam/$userId/edit', body: {
+      if (role != null) "role": role,
+      if (tagList != null) "tagList": tagList,
+      if (isMemberOfTeamAmino != null) "isMemberOfTeamAmino": isMemberOfTeamAmino,
+    });
+  }
+
+  Future<void> setUserStatus({required String userId, required int status}) async {
+    await Api.post('/g/s/altteam/user-profile/$userId/status', body: {
+      "status": status,
+    });
+  }
+
+  Future<Map<String, dynamic>> getUserCommunities(String userId) async {
+    return await Api.get('/g/s/altteam/user-profile/$userId/communities');
+  }
 
 }

@@ -4,6 +4,7 @@ import '../../core/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/admin_header.dart';
 import '../../core/widgets/user_avatar.dart';
+import '../../core/widgets/app_snackbar.dart';
 import '../../core/api/repositories/users.dart';
 import '../../core/api/objects/args/roles.dart';
 import '../../core/api/constants.dart';
@@ -87,21 +88,25 @@ class _AdminTeamScreenState extends State<AdminTeamScreen> {
   }
 
   void _openTelegram(int telegramId, BuildContext context) async {
-    final url = Uri.parse('tg://user?id=$telegramId');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
+      final appUrl = Uri.parse('tg://openmessage?user_id=$telegramId');
       final webUrl = Uri.parse('https://t.me/user?id=$telegramId');
-      if (await canLaunchUrl(webUrl)) {
+
+      try {
+        if (await canLaunchUrl(appUrl)) {
+          await launchUrl(appUrl, mode: LaunchMode.externalApplication);
+          return;
+        }
+
         await launchUrl(webUrl, mode: LaunchMode.externalApplication);
-      } else {
+      } catch (_) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.t('admin.team.errors.open_tg'))),
+        AppSnackbar.show(
+          context,
+          AppLocalizations.t('admin.team.errors.open_tg'),
+          type: SnackType.error,
         );
       }
     }
-  }
 
   void _openAltAmino(String aminoId, BuildContext context) async {
     final url = Uri.parse('$baseAltAminoUrl/u/$aminoId');
@@ -109,8 +114,10 @@ class _AdminTeamScreenState extends State<AdminTeamScreen> {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.t('admin.team.errors.open_amino'))),
+      AppSnackbar.show(
+        context,
+        AppLocalizations.t('admin.team.errors.open_amino'),
+        type: SnackType.error,
       );
     }
   }
@@ -342,11 +349,11 @@ class _TeamMember {
   });
 
   factory _TeamMember.fromJson(Map<String, dynamic> json) {
-    final tagsRaw = json['tagList'] as List<dynamic>? ?? [];
+    final tagsRaw = json['extensions']['tagList'] as List<dynamic>? ?? [];
     final List<String> tags = tagsRaw.map((e) => e.toString()).toList();
 
     return _TeamMember(
-      id: json['id'] as String? ?? '',
+      id: json['uid'] as String? ?? '',
       aminoId: json['aminoId'] as String? ?? '',
       telegramId: json['telegramId'] as int?,
       nickname: json['nickname'] as String? ?? '—',

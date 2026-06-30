@@ -6,7 +6,7 @@ import 'package:path/path.dart' as p;
 class LinksRepository {
 
 
-  Future<Map<String, dynamic>> get_from_id(String objectId, int objectType, ndcId) async {
+  Future<Map<String, dynamic>> getFromId(String objectId, int objectType, ndcId) async {
     return await Api.post('/g/s-x${ndcId}/link-resolution', body:{
 			"objectId": objectId,
 			"targetCode": 1,
@@ -15,7 +15,7 @@ class LinksRepository {
 );
   }
 
-  Future<Map<String, dynamic>> get_from_link(String link) async {
+  Future<Map<String, dynamic>> getFromLink(String link) async {
     return await Api.get('/g/s/link-resolution?q=${link}"');
   }
 

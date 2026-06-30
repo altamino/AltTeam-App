@@ -1,141 +1,185 @@
-lang:
-  code: "ru"
-  name: "Русский"
-
-auth:
-  login:
-    brand: "AltTeam"
-    subtitle: "Панель администратора"
-    email_hint: "Email"
-    password_hint: "Пароль"
-    button: "Войти"
-    fill_all_fields: "Заполните все поля"
-    access_denied: "Доступ запрещён"
-
-theme:
-  system: "Системная"
-  light: "Светлая"
-  dark: "Тёмная"
-
-welcome:
-  greeting: "Привет, {name}!"
-  greeting_anon: "Привет!"
-
-profile:
-  title: "Профиль"
-  role:
-    member: "Участник"
-    staff: "Персонал"
-    moderator: "Модератор"
-    admin: "Администратор"
-    feed: "Лента?"
-    system: "Система"
-    platform_staff: "Команда проекта"
-  team_badge: "Команда"
-  no_bio: "Описание пока не заполнено"
-  info:
-    created: "Регистрация"
-    modified: "Последняя активность"
-  language: "Язык"
-  theme: "Тема"
-  settings: "Настройки"
-  logout: "Выйти"
-
-drawer:
-  profile: "Профиль"
-  admin: "Админка"
-  team: "Команда"
-  chats: "Чаты"
-  link_telegram: "Привязать Telegram"
-  unlink_telegram: "Отвязать Telegram"
-
-  errors:
-    fail_open_telegram: "Не удалось открыть Telegram"
-
 admin:
-  title: "Админка"
-  section:
-    reports: "Репорты"
-    reports_desc: "Просмотр жалоб пользователей"
-    links: "Модерация ссылок"
-    links_desc: "Вставь ссылку и примени действие к ресурсу"
-    password_reset: "Сброс пароля"
-    password_reset_desc: "Выдать новый пароль по почте"
-    roles: "Роли"
-    roles_desc: "Управление ролями команды"
+  title: "Админ-панель"
+  community:
+    create: "Создать сообщество"
+    create_success: "Сообщество успешно создано!"
+    create_title: "Новое сообщество"
+    denied_title: "Доступ запрещен"
+    empty: "Сообщества не найдены"
+    err_empty: "Это поле не может быть пустым"
+    error_select_user: "Пожалуйста, выберите агента сообщества"
+    field_amino_id: "Amino ID"
+    field_amino_id_hint: "например, altamino"
+    field_lang: "Язык"
+    field_name: "Название сообщества"
+    field_name_hint: "Введите название сообщества"
+    field_user: "Агент (Владелец)"
+    members: "участников"
+    my: "Мои сообщества"
     search: "Поиск"
-    search_desc: "Поиск юзеров и сообществ"
+    search_hint: "Поиск сообществ..."
   reports:
-    title: "Репорты"
+    title: "Управление жалобами"
+    empty: "Жалобы не найдены"
     filter_open: "Открытые"
-    filter_resolved: "Решённые"
-    empty: "Список репортов скоро появится"
-  links:
-    title: "Модерация ссылок"
-    hint: "Вставь ссылку"
-    check: "Проверить"
-    not_ready: "Пока не реализовано"
-    empty: "Здесь появятся действия над ресурсом"
-  password_reset:
-    title: "Сброс пароля"
-    label: "Почта пользователя"
-    hint: "name@example.com"
-    send: "Отправить новый пароль"
-    not_ready: "Пока не реализовано"
+    filter_resolved: "Решенные"
   roles:
-    title: "Роли"
-    empty: "Управление ролями скоро появится"
-  search:
-    title: "Поиск"
-    tab_users: "Юзеры"
-    tab_communities: "Сообщества"
-    hint_users: "Поиск по нику, ID..."
-    hint_communities: "Поиск по названию, ID..."
-    empty: "Результаты поиска скоро появится"
+    title: "Управление ролями"
+    assign_title: "Назначить роль"
+    edit_title: "Редактировать роль"
+    denied_title: "Доступ ограничен"
+    denied_subtitle: "У вас нет прав для управления ролями"
+    empty_team: "Участники команды не найдены"
+    field_role: "Роль"
+    field_tags: "Теги"
+    field_team_member: "Участник команды"
+    role_label: "Выбранная роль"
+    role_administrator: "Администратор"
+    role_moderator: "Модератор"
+    role_staff: "Стафф"
+    role_user: "Пользователь"
+    role_not_editable: "Эту роль нельзя редактировать"
+    search_hint: "Поиск пользователей..."
+    search_empty_placeholder: "Пользователи не найдены"
+    success: "Роль успешно обновлена!"
+    tab_current: "Текущий стафф"
+    tab_search: "Назначить нового"
+    tags_label: "Теги пользователя"
+    tags_hint: "Разделяйте теги запятыми"
   team:
-    title: "Команда"
-    empty: "Пока нет участников команды"
+    title: "Наша команда"
+    empty: "Список команды пуст"
     action:
-      telegram: "Telegram"
-      amino: "AltAmino"
+      amino: "Профиль Amino"
+      telegram: "Написать в Telegram"
     errors:
-      open_tg: "Не удалось запустить Telegram"
-      open_amino: "Не удалось открыть профиль AltAmino"
-notifications:
-  title: "Уведомления"
-  empty: "Уведомлений пока нет"
+      open_amino: "Не удалось открыть профиль Amino"
+      open_tg: "Не удалось открыть чат Telegram"
+  section:
+    reports: "Жалобы"
+    reports_desc: "Разбор жалоб от пользователей и задачи модерации"
+    roles: "Права доступа"
+    roles_desc: "Управление ролями, тегами и правами стаффа"
 
 announcements:
   title: "Объявления"
   empty: "Объявлений пока нет"
-  details:
-    title: "Объявление"
-    no_title: "Без заголовка"
-    system_author: "Система"
-    delete_dialog_title: "Удаление"
-    delete_dialog_message: "Вы уверены, что хотите удалить это объявление?"
-    cancel: "Отмена"
-    delete: "Удалить"
-    deleted_success: "Объявление удалено"
-    delete_error: "Ошибка удаления: {error}"
-    edit_success: "Изменения успешно сохранены"
   create:
-    title: "Новое объявление"
+    title: "Создать объявление"
     edit_title: "Редактировать объявление"
     title_label: "Заголовок"
-    title_hint: "Заголовок объявления"
-    body_label: "Текст"
-    body_hint: "Текст объявления"
+    title_hint: "Введите заголовок объявления"
+    body_label: "Содержимое"
+    body_hint: "Напишите текст здесь..."
     publish: "Опубликовать"
-    save: "Сохранить изменения"
-    publish_error: "Ошибка выполнения операции: {error}"
+    save: "Сохранить черновик"
+    background:
+      add: "Добавить фон"
+      attached: "Фон добавлен"
+      uploaded_success: "Изображение успешно загружено!"
     format:
       bold: "Жирный"
+      center: "По центру"
       italic: "Курсив"
-      center: "Центр"
-      link: "Ссылка"
-    background:
-      add: "Добавить фоновое изображение"
-      attached: "Фон прикреплён (нажмите для замены)"
-      uploaded_success: "Фоновое изображение успешно загружено"
-      upload_error: "Ошибка загрузки медиа: {error}"
+      link: "Вставить ссылку"
+  details:
+    title: "Детали объявления"
+    no_title: "Без заголовка"
+    system_author: "Система"
+    edit_success: "Объявление обновлено!"
+    delete: "Удалить"
+    cancel: "Отмена"
+    delete_dialog_title: "Удалить объявление"
+    delete_dialog_message: "Вы уверены, что хотите удалить это объявление? Это действие нельзя отменить."
+    deleted_success: "Объявление успешно удалено."
+
+auth:
+  login:
+    brand: "AltAmino"
+    subtitle: "С возвращением! Войдите в свой аккаунт"
+    email_hint: "Электронная почта"
+    password_hint: "Пароль"
+    button: "Войти"
+    fill_all_fields: "Пожалуйста, заполните все поля"
+    access_denied: "Доступ запрещен"
+    terms: "Условия использования"
+    privacy: "Политика конфиденциальности"
+
+common:
+  cancel: "Отмена"
+  error: "Произошла ошибка"
+  save: "Сохранить"
+
+drawer:
+  profile: "Профиль"
+  admin: "Админ-панель"
+  alt_acm: "AltACM"
+  chats: "Чаты"
+  reports: "Жалобы и предложения"
+  team: "Команда"
+  about_app: "О приложении"
+  link_telegram: "Привязать Telegram"
+  unlink_telegram: "Отвязать Telegram"
+  about:
+    version: "Версия {version}"
+    title: "О приложении"
+    description: "Альтернативный клиент, созданный для управления сообществами и расширенной модерации."
+    developer_link: "Канал разработчика"
+    close: "Закрыть"
+  errors:
+    fail_open_telegram: "Не удалось запустить Telegram"
+
+notifications:
+  title: "Уведомления"
+  empty: "Уведомлений пока нет"
+
+profile:
+  title: "Мой профиль"
+  settings: "Настройки"
+  language: "Язык"
+  theme: "Тема"
+  logout: "Выйти из аккаунта"
+  info:
+    created: "Регистрация"
+    modified: "Обновлено"
+  role:
+    system: "Система"
+    platform_staff: "Стафф платформы"
+    admin: "Администратор"
+    moderator: "Модератор"
+    staff: "Стафф"
+    feed: "Модератор ленты"
+    member: "Участник"
+
+reports:
+  tab_sent: "Отправленные жалобы"
+  tab_write: "Написать жалобу"
+  sent:
+    title: "Мои жалобы"
+    empty: "Вы еще не отправляли жалоб"
+  write:
+    title: "Создать жалобу"
+    description: "Пожалуйста, предоставляйте только реальные доказательства. Ложные жалобы могут привести к блокировке."
+    target_label: "Объект жалобы"
+    target_hint: "ID пользователя, ссылка на блог или чат"
+    reason_label: "Причина"
+    reason_hint: "Подробно опишите нарушение..."
+    fill_required: "Пожалуйста, заполните обязательные поля"
+    not_ready: "Форма заполнена не полностью"
+    submit: "Отправить жалобу"
+
+theme:
+  light: "Светлая"
+  dark: "Тёмная"
+  system: "Системная"
+
+
+
+
+
+ndc:
+  details:
+      delete: "Удалить"
+      delete_dialog_title: "Удалить сообщество"
+      delete_dialog_message: "Вы уверены, что хотите удалить это сообщество? Это действие нельзя отменить."
+      deleted_success: "Сообщество успешно удалено."

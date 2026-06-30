@@ -1,6 +1,6 @@
 import '../network/api.dart';
 
-class UsersRepository {
+class SearchRepository {
 Future<Map<String, dynamic>> searchUser({
   int? ndcId,
   String? lang,
@@ -49,5 +49,11 @@ Future<Map<String, dynamic>> searchCommunity({
 
   return await Api.get(uri.toString());
 }
+
+
+Future<Map<String, dynamic>> getAvailableLanguages() async {
+  return await Api.get("/g/s/community-collection/supported-languages");
+}
+
 
 }

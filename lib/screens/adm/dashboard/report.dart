@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/l10n/app_localizations.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/widgets/admin_header.dart';
-import '../../core/widgets/coming_soon_placeholder.dart';
+import '../../../core/l10n/app_localizations.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/admin_header.dart';
+import '../../../core/widgets/coming_soon_placeholder.dart';
 
 class AdminReportsScreen extends StatefulWidget {
   const AdminReportsScreen({super.key});

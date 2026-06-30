@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/admin_header.dart';
+import '../../core/widgets/app_snackbar.dart';
 import '../../core/api/repositories/links.dart';
 import '../../core/api/repositories/blogs.dart';
 import 'announcement_details.dart';
@@ -90,14 +91,18 @@ class _AdminCreateAnnouncementScreenState extends State<AdminCreateAnnouncementS
       });
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.t('announcements.create.background.uploaded_success'))),
+      AppSnackbar.show(
+        context,
+        AppLocalizations.t('announcements.create.background.uploaded_success'),
+        type: SnackType.success,
       );
     } catch (e) {
       if (!mounted) return;
       setState(() => _publishing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.t('announcements.create.background.upload_error', args: {'error': '$e'}))),
+      AppSnackbar.show(
+        context,
+        AppLocalizations.t('announcements.create.background.upload_error', args: {'error': '$e'}),
+        type: SnackType.error,
       );
     }
   }
@@ -162,8 +167,10 @@ class _AdminCreateAnnouncementScreenState extends State<AdminCreateAnnouncementS
     } catch (e) {
       if (!mounted) return;
       setState(() => _publishing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.t('announcements.create.publish_error', args: {'error': '$e'}))),
+      AppSnackbar.show(
+        context,
+        AppLocalizations.t('announcements.create.publish_error', args: {'error': '$e'}),
+        type: SnackType.error,
       );
     }
   }

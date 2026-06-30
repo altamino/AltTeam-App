@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../core/api/repositories/users.dart';
-import '../core/l10n/app_localizations.dart';
-import '../core/storage.dart';
-import '../core/theme/app_colors.dart';
-import '../core/widgets/app_drawer.dart';
-import '../core/widgets/coming_soon_placeholder.dart';
-import '../core/api/repositories/blogs.dart';
-import 'main/announcement_details.dart';
-import '../core/api/objects/args/roles.dart';
+import '../../core/api/repositories/users.dart';
+import '../../core/l10n/app_localizations.dart';
+import '../../core/storage.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/widgets/app_drawer.dart';
+import '../../core/widgets/coming_soon_placeholder.dart';
+import '../../core/api/repositories/blogs.dart';
+import 'announcement_details.dart';
+import '../../core/api/objects/args/roles.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -50,7 +50,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   Future<void> _loadProfile() async {
     try {
-      final profile = await _usersRepo.get_user_profile(Storage.userId ?? '', 0);
+      final profile = await _usersRepo.getUserProfile(Storage.userId ?? '', 0);
       if (!mounted) return;
       setState(() { _profile = profile; _profileLoading = false; });
     } catch (e) {

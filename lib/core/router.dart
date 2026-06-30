@@ -1,22 +1,21 @@
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-
+import '../screens/adm/chats.dart';
+import '../screens/adm/dashboard/admin_dashboard.dart';
+import '../screens/adm/dashboard/report.dart';
+import '../screens/adm/dashboard/roles.dart';
+import '../screens/adm/team.dart';
+import '../screens/altacm/create.dart';
+import '../screens/altacm/main.dart';
+import '../screens/altacm/ndc/community.dart';
 import '../screens/login.dart';
-import '../screens/welcome.dart';
-import  '../screens/main/admin_profile.dart';
-import  '../screens/dashboard/adm_link_mod.dart';
-import  '../screens/dashboard/adm_password_reset.dart';
-import  '../screens/dashboard/adm_report.dart';
-import  '../screens/dashboard/adm_roles.dart';
-import  '../screens/dashboard/adm_search.dart';
-import  '../screens/dashboard/admin_dashboard.dart';
-import  '../screens/main/team.dart';
-import  '../screens/main/create_announcement.dart';
-import  '../screens/main/notification.dart';
-
+import '../screens/main/create_announcement.dart';
+import '../screens/main/notification.dart';
+import '../screens/main/profile.dart';
+import '../screens/main/welcome.dart';
+import '../screens/users/report.dart';
 import 'storage.dart';
-
 
 GoRouter buildRouter({
   required void Function(ThemeMode) onSetTheme,
@@ -24,6 +23,16 @@ GoRouter buildRouter({
 }) {
   return GoRouter(
     initialLocation: '/login',
+    
+    errorBuilder: (context, state) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go('/welcome');
+      });
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    },
+
     redirect: (context, state) {
       final sid = Storage.sid;
       final isLogin = state.matchedLocation == '/login';
@@ -38,27 +47,42 @@ GoRouter buildRouter({
           onSetLocale: onSetLocale,
         ),
       ),
+      GoRoute(path: '/welcome', builder: (context, state) => const WelcomeScreen()),
       GoRoute(
-        path: '/welcome',
-        builder: (context, state) => const WelcomeScreen(),
+        path: '/profile', 
+        builder: (context, state) => ProfileScreen(onSetTheme: onSetTheme, onSetLocale: onSetLocale),
       ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => ProfileScreen(
-          onSetTheme: onSetTheme,
-          onSetLocale: onSetLocale,
-        ),
-      ),
-      GoRoute(path: '/admin', builder: (context, state) => const AdminDashboardScreen()),
-      GoRoute(path: '/admin/reports', builder: (context, state) => const AdminReportsScreen()),
-      GoRoute(path: '/admin/links', builder: (context, state) => const AdminLinkModerationScreen()),
-      GoRoute(path: '/admin/password-reset', builder: (context, state) => const AdminPasswordResetScreen()),
-      GoRoute(path: '/admin/roles', builder: (context, state) => const AdminRolesScreen()),
-      GoRoute(path: '/admin/search', builder: (context, state) => const AdminSearchScreen()),
-      GoRoute(path: '/admin/team', builder: (context, state) => const AdminTeamScreen()),
       GoRoute(path: '/notifications', builder: (context, state) => const NotificationsScreen()),
-      GoRoute(path: '/admin/announcements/create', builder: (context, state) => const AdminCreateAnnouncementScreen()),   
-    
+      GoRoute(path: '/reports', builder: (context, state) => const UserReportsScreen()),
+      
+      GoRoute(
+        path: '/altacm', 
+        builder: (context, state) => const AltAcmMainScreen(),
+        routes: [
+          GoRoute(
+            path: 'community/create',
+            builder: (context, state) => const AltAcmCreateCommunityScreen(),
+          ),
+          GoRoute(
+            path: 'community/:ndcId',
+            builder: (context, state) {
+              final ndcId = state.pathParameters['ndcId'] ?? '0';
+              return AltAcmCommunityScreen(ndcId: ndcId);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/admin', 
+        builder: (context, state) => const AdminDashboardScreen(),
+        routes: [
+          GoRoute(path: 'reports', builder: (context, state) => const AdminReportsScreen()),
+          GoRoute(path: 'roles', builder: (context, state) => const AdminRolesScreen()),
+          GoRoute(path: 'team', builder: (context, state) => const AdminTeamScreen()),
+          GoRoute(path: 'announcements/create', builder: (context, state) => const AdminCreateAnnouncementScreen()),   
+          GoRoute(path: 'chats', builder: (context, state) => const AdminChatsScreen()),
+        ],
+      ),
     ],
   );
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../core/l10n/app_localizations.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/widgets/admin_header.dart';
+import '../../../core/l10n/app_localizations.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/admin_header.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -19,28 +19,10 @@ class AdminDashboardScreen extends StatelessWidget {
         '/admin/reports',
       ),
       _AdminSection(
-        Icons.link,
-        AppLocalizations.t('admin.section.links'),
-        AppLocalizations.t('admin.section.links_desc'),
-        '/admin/links',
-      ),
-      _AdminSection(
-        Icons.lock_reset,
-        AppLocalizations.t('admin.section.password_reset'),
-        AppLocalizations.t('admin.section.password_reset_desc'),
-        '/admin/password-reset',
-      ),
-      _AdminSection(
         Icons.shield_outlined,
         AppLocalizations.t('admin.section.roles'),
         AppLocalizations.t('admin.section.roles_desc'),
         '/admin/roles',
-      ),
-      _AdminSection(
-        Icons.search,
-        AppLocalizations.t('admin.section.search'),
-        AppLocalizations.t('admin.section.search_desc'),
-        '/admin/search',
       ),
     ];
 
