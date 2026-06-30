@@ -184,7 +184,7 @@ Widget _buildBody(AppPalette colors) {
     final p = _profile ?? {};
     final nickname = p['nickname'] as String? ?? '';
     final iconUrl = p['icon'] as String?;
-    final isTeamMember = (p['extensions'] as Map<String, dynamic>?)?['isMemberOfTeamAmino'] as bool? ?? false;
+    final isVerified = p['isNicknameVerified'] as bool? ?? false;
     final role = Storage.role ?? p['role'] as int? ?? 0;
     final reputation = p['reputation'] as int? ?? 0;
     final createdTime = _formatDate(p['createdTime'] as String?);
@@ -194,7 +194,7 @@ Widget _buildBody(AppPalette colors) {
       padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
       child: Column(
         children: [
-          UserAvatar(nickname: nickname, iconUrl: iconUrl, isVerified: isTeamMember, size: 84),
+          UserAvatar(nickname: nickname, iconUrl: iconUrl, isVerified: isVerified, size: 84),
           const SizedBox(height: 14),
           Text(
             nickname.isNotEmpty ? nickname : '—',

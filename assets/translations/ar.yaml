@@ -1,0 +1,182 @@
+admin:
+  title: "لوحة التحكم"
+  community:
+    create: "إنشاء منتدى"
+    create_success: "تم إنشاء المنتدى بنجاح!"
+    create_title: "منتدى جديد"
+    denied_title: "الوصول مرفوض"
+    empty: "لم يتم العثور على منتديات"
+    err_empty: "لا يمكن أن يكون هذا الحقل فارغاً"
+    error_select_user: "يرجى اختيار وكيل للمنتدى"
+    field_amino_id: "معرف أمينو (Amino ID)"
+    field_amino_id_hint: "مثال: altamino"
+    field_lang: "اللغة"
+    field_name: "اسم المنتدى"
+    field_name_hint: "أدخل اسم المنتدى"
+    field_user: "الوكيل (اختياري)"
+    members: "أعضاء"
+    my: "منتدياتي"
+    search: "بحث"
+    search_hint: "البحث عن منتديات..."
+  reports:
+    title: "إدارة البلاغات"
+    empty: "لم يتم العثور على بلاغات"
+    filter_open: "مفتوحة"
+    filter_resolved: "محلولة"
+  roles:
+    title: "إدارة الأدوار"
+    assign_title: "تعيين دور"
+    edit_title: "تعديل الدور"
+    denied_title: "الوصول مقيد"
+    denied_subtitle: "ليس لديك صلاحية لإدارة الأدوار"
+    empty_team: "لم يتم العثور على أعضاء في الفريق"
+    field_role: "الدور"
+    field_tags: "الوسوم (التاغات)"
+    field_team_member: "عضو الفريق"
+    role_label: "الدور المحدد"
+    role_administrator: "مسؤول"
+    role_moderator: "منسق"
+    role_staff: "فريق المشروع"
+    role_user: "عضو"
+    role_not_editable: "لا يمكن تعديل هذا الدور"
+    search_hint: "البحث عن مستخدمين..."
+    search_empty_placeholder: "لم يتم العثور على مستخدمين"
+    success: "تم تحديث الدور بنجاح!"
+    tab_current: "الفريق"
+    tab_search: "تعيين عضو جديد"
+    tags_label: "وسوم المستخدم"
+    tags_hint: "افصل بين الوسوم بفواصل"
+    field_verified: "حساب موثق"
+  team:
+    title: "فريقنا"
+    empty: "قائمة الفريق فارغة"
+    action:
+      amino: "بروفايل أمينو"
+      telegram: "مراسلة عبر تليجرام"
+    errors:
+      open_amino: "فشل في فتح بروفايل أمينو"
+      open_tg: "فشل في فتح محادثة تليجرام"
+  section:
+    reports: "البلاغات"
+    reports_desc: "مراجعة بلاغات المستخدمين ومهام الرقابة"
+    roles: "صلاحيات الوصول"
+    roles_desc: "إدارة الأدوار، الوسوم، وصلاحيات الإدارة"
+
+announcements:
+  title: "الإعلانات"
+  empty: "لا توجد إعلانات بعد"
+  create:
+    title: "إنشاء إعلان"
+    edit_title: "تعديل الإعلان"
+    title_label: "العنوان"
+    title_hint: "أدخل عنوان الإعلان"
+    body_label: "المحتوى"
+    body_hint: "اكتب النص هنا..."
+    publish: "نشر"
+    save: "حفظ"
+    background:
+      add: "إضافة خلفية"
+      attached: "تمت إضافة الخلفية"
+      uploaded_success: "تم رفع الصورة بنجاح!"
+    format:
+      bold: "عريض"
+      center: "توسيط"
+      italic: "مائل"
+      link: "إدراج رابط"
+  details:
+    title: "تفاصيل الإعلان"
+    no_title: "بدون عنوان"
+    system_author: "النظام"
+    edit_success: "تم تحديث الإعلان!"
+    delete: "حذف"
+    cancel: "إلغاء"
+    delete_dialog_title: "حذف الإعلان"
+    delete_dialog_message: "هل أنت متأكد أنك تريد حذف هذا الإعلان؟ لا يمكن التراجع عن هذا الإجراء."
+    deleted_success: "تم حذف الإعلان بنجاح."
+
+auth:
+  login:
+    brand: "AltAmino"
+    subtitle: "مرحباً بعودتك! سجل الدخول إلى حسابك"
+    email_hint: "البريد الإلكتروني"
+    password_hint: "كلمة المرور"
+    button: "تسجيل الدخول"
+    fill_all_fields: "يرجى ملء جميع الحقول"
+    access_denied: "الوصول مرفوض"
+    terms: "شروط الاستخدام"
+    privacy: "سياسة الخصوصية"
+
+common:
+  cancel: "إلغاء"
+  error: "حدث خطأ ما"
+  save: "حفظ"
+
+drawer:
+  profile: "الملف الشخصي"
+  admin: "لوحة الإدارة"
+  alt_acm: "AltACM"
+  chats: "الدردشات"
+  reports: "البلاغات والاقتراحات"
+  team: "الفريق"
+  about_app: "عن التطبيق"
+  link_telegram: "ربط تليجرام"
+  unlink_telegram: "إلغاء ربط تليجرام"
+  about:
+    version: "الإصدار {version}"
+    title: "عن التطبيق"
+    description: "تم تطويره بواسطة alx0rr في عام 2026 خصيصاً لمشروع AltAmino."
+    developer_link: "قناة المطور"
+    close: "إغلاق"
+  errors:
+    fail_open_telegram: "فشل في تشغيل تليجرام"
+
+notifications:
+  title: "الإشعارات"
+  empty: "لا توجد إشعارات بعد"
+
+profile:
+  title: "ملفي الشخصي"
+  settings: "الإعدادات"
+  language: "اللغة"
+  theme: "المظهر"
+  logout: "تسجيل الخروج"
+  info:
+    created: "تاريخ التسجيل"
+    modified: "آخر تحديث"
+  role:
+    system: "النظام"
+    platform_staff: "فريق المشروع"
+    admin: "مسؤول"
+    moderator: "منسق"
+    staff: "إدارة"
+    feed: "الرئيسية"
+    member: "عضو"
+
+reports:
+  tab_sent: "البلاغات المرسلة"
+  tab_write: "كتابة بلاغ"
+  sent:
+    title: "بلاغاتي"
+    empty: "لم تقم بإرسال أي بلاغات بعد"
+  write:
+    title: "إنشاء بلاغ"
+    description: "يرجى تقديم أدلة حقيقية فقط. البلاغات الكاذبة قد تؤدي إلى حظر الحساب."
+    target_label: "الهدف من البلاغ"
+    target_hint: "معرف المستخدم، رابط المدونة أو الدردشة"
+    reason_label: "السبب"
+    reason_hint: "يرجى وصف المخالفة بالتفصيل..."
+    fill_required: "يرجى ملء الحقول المطلوبة"
+    not_ready: "النموذج غير مكتمل بعد"
+    submit: "إرسال البلاغ"
+
+theme:
+  light: "فاتح"
+  dark: "داكن"
+  system: "تلقائي (حسب النظام)"
+
+ndc:
+  details:
+    delete: "حذف"
+    delete_dialog_title: "حذف المنتدى"
+    delete_dialog_message: "هل أنت متأكد أنك تريد حذف هذا المنتدى؟ لا يمكن التراجع عن هذا الإجراء."
+    deleted_success: "تم حذف المنتدى بنجاح."

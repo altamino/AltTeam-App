@@ -13,7 +13,7 @@ admin:
     field_lang: "Язык"
     field_name: "Название сообщества"
     field_name_hint: "Введите название сообщества"
-    field_user: "Агент (Владелец)"
+    field_user: "Агент (Не обязательно)"
     members: "участников"
     my: "Мои сообщества"
     search: "Поиск"
@@ -36,16 +36,17 @@ admin:
     role_label: "Выбранная роль"
     role_administrator: "Администратор"
     role_moderator: "Модератор"
-    role_staff: "Стафф"
-    role_user: "Пользователь"
+    role_staff: "Команда проекта"
+    role_user: "Участник"
     role_not_editable: "Эту роль нельзя редактировать"
     search_hint: "Поиск пользователей..."
     search_empty_placeholder: "Пользователи не найдены"
     success: "Роль успешно обновлена!"
-    tab_current: "Текущий стафф"
+    tab_current: "Команда"
     tab_search: "Назначить нового"
     tags_label: "Теги пользователя"
     tags_hint: "Разделяйте теги запятыми"
+    field_verified: "Верифицированный аккаунт"
   team:
     title: "Наша команда"
     empty: "Список команды пуст"
@@ -72,7 +73,7 @@ announcements:
     body_label: "Содержимое"
     body_hint: "Напишите текст здесь..."
     publish: "Опубликовать"
-    save: "Сохранить черновик"
+    save: "Сохранить"
     background:
       add: "Добавить фон"
       attached: "Фон добавлен"
@@ -123,7 +124,7 @@ drawer:
   about:
     version: "Версия {version}"
     title: "О приложении"
-    description: "Альтернативный клиент, созданный для управления сообществами и расширенной модерации."
+    description: "Создано alx0rr в 2026 году специально для проекта AltAmino."
     developer_link: "Канал разработчика"
     close: "Закрыть"
   errors:
@@ -144,11 +145,11 @@ profile:
     modified: "Обновлено"
   role:
     system: "Система"
-    platform_staff: "Стафф платформы"
+    platform_staff: "Команда проекта"
     admin: "Администратор"
     moderator: "Модератор"
     staff: "Стафф"
-    feed: "Модератор ленты"
+    feed: "Лента"
     member: "Участник"
 
 reports:

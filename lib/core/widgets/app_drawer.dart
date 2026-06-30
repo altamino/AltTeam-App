@@ -16,7 +16,7 @@ class AppDrawer extends StatelessWidget {
     required this.nickname,
     required this.aminoId,
     this.iconUrl,
-    this.isTeamMember = false,
+    this.isVerified = false,
     this.role = 0,
     this.isTelegramLinked = false,
   });
@@ -24,7 +24,7 @@ class AppDrawer extends StatelessWidget {
   final String nickname;
   final String aminoId;
   final String? iconUrl;
-  final bool isTeamMember;
+  final bool isVerified;
   final int role;
   final bool isTelegramLinked;
 
@@ -175,11 +175,11 @@ void _showAboutDialog(BuildContext context, AppPalette colors) {
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
                 child: Row(
                   children: [
-                    UserAvatar(nickname: nickname, iconUrl: iconUrl, isVerified: isTeamMember, size: 44),
+                    UserAvatar(nickname: nickname, iconUrl: iconUrl, isVerified: isVerified, size: 44),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        nickname.isNotEmpty ? nickname : '—',
+                        nickname.isNotEmpty ? nickname : '?',
                         style: TextStyle(color: colors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
                         overflow: TextOverflow.ellipsis,
                       ),

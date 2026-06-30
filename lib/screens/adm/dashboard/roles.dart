@@ -87,7 +87,7 @@ class _AdminRolesScreenState extends State<AdminRolesScreen> {
     }
   }
 
-  Future<void> _openEditDialog(Map<String, dynamic> user, {bool isExistingMember = false}) async {
+Future<void> _openEditDialog(Map<String, dynamic> user, {bool isExistingMember = false}) async {
     final colors = AppColors.of(context);
     final dialogBg = Theme.of(context).dialogTheme.backgroundColor ?? Theme.of(context).scaffoldBackgroundColor;
 
@@ -110,6 +110,7 @@ class _AdminRolesScreenState extends State<AdminRolesScreen> {
       text: (user['extensions']['tagList'] as List?)?.join(', ') ?? '',
     );
     bool isTeamMember = user['extensions']['isMemberOfTeamAmino'] ?? false;
+    bool isVerified = user['isNicknameVerified'] ?? false; 
 
     await showDialog(
       context: context,
@@ -173,6 +174,18 @@ class _AdminRolesScreenState extends State<AdminRolesScreen> {
                     Text(AppLocalizations.t('admin.roles.field_team_member'), style: TextStyle(color: colors.textPrimary)),
                   ],
                 ),
+                // ДОБАВЛЕНО: Чекбокс для верификации
+                Row(
+                  children: [
+                    Checkbox(
+                      value: isVerified,
+                      onChanged: (val) {
+                        if (val != null) setDialogState(() => isVerified = val);
+                      },
+                    ),
+                    Text(AppLocalizations.t('admin.roles.field_verified'), style: TextStyle(color: colors.textPrimary)),
+                  ],
+                ),
               ],
             ),
           ),
@@ -195,6 +208,7 @@ class _AdminRolesScreenState extends State<AdminRolesScreen> {
                     role: (isRoleEditableHere && selectedRole != initialRole) ? selectedRole : null,
                     tagList: tags,
                     isMemberOfTeamAmino: isTeamMember,
+                    isVerified: isVerified, // ДОБАВЛЕНО
                   );
                   if (!context.mounted) return;
                   Navigator.pop(context);
@@ -212,7 +226,6 @@ class _AdminRolesScreenState extends State<AdminRolesScreen> {
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);

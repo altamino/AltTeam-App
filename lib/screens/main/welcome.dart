@@ -82,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     final colors = AppColors.of(context);
     final nickname = _profile?['nickname'] as String? ?? '';
     final iconUrl = _profile?['icon'] as String?;
-    final isTeamMember = (_profile?['extensions'] as Map<String, dynamic>?)?['isMemberOfTeamAmino'] as bool? ?? false;
+    final isVerified = _profile?['isNicknameVerified'] as bool? ?? false;
     final role = Storage.role ?? _profile?['role'] as int? ?? 0;
 
     return Scaffold(
@@ -91,7 +91,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         nickname: nickname,
         aminoId: Storage.aminoId ?? 'null',
         iconUrl: iconUrl,
-        isTeamMember: isTeamMember,
+        isVerified: isVerified,
         role: role,
         isTelegramLinked: Storage.telegramId != null,
       ),

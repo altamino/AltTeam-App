@@ -1,141 +1,182 @@
-lang:
-  code: "es"
-  name: "Español"
+admin:
+  title: "Panel de Administración"
+  community:
+    create: "Crear comunidad"
+    create_success: "¡Comunidad creada con éxito!"
+    create_title: "Nueva comunidad"
+    denied_title: "Acceso denegado"
+    empty: "No se encontraron comunidades"
+    err_empty: "Este campo no puede estar vacío"
+    error_select_user: "Por favor, seleccione un agente de la comunidad"
+    field_amino_id: "Amino ID"
+    field_amino_id_hint: "por ejemplo, altamino"
+    field_lang: "Idioma"
+    field_name: "Nombre de la comunidad"
+    field_name_hint: "Introduzca el nombre de la comunidad"
+    field_user: "Agente (Opcional)"
+    members: "miembros"
+    my: "Mis comunidades"
+    search: "Buscar"
+    search_hint: "Buscar comunidades..."
+  reports:
+    title: "Gestión de reportes"
+    empty: "No se encontraron reportes"
+    filter_open: "Abiertos"
+    filter_resolved: "Resueltos"
+  roles:
+    title: "Gestión de roles"
+    assign_title: "Asignar rol"
+    edit_title: "Editar rol"
+    denied_title: "Acceso restringido"
+    denied_subtitle: "No tiene permisos para gestionar roles"
+    empty_team: "No se encontraron miembros del equipo"
+    field_role: "Rol"
+    field_tags: "Etiquetas"
+    field_team_member: "Miembro del equipo"
+    role_label: "Rol seleccionado"
+    role_administrator: "Administrador"
+    role_moderator: "Moderador"
+    role_staff: "Equipo del proyecto"
+    role_user: "Miembro"
+    role_not_editable: "Este rol no se puede editar"
+    search_hint: "Buscar usuarios..."
+    search_empty_placeholder: "No se encontraron usuarios"
+    success: "¡Rol actualizado con éxito!"
+    tab_current: "Equipo"
+    tab_search: "Asignar nuevo"
+    tags_label: "Etiquetas de usuario"
+    tags_hint: "Separe las etiquetas con comas"
+    field_verified: "Cuenta verificada"
+  team:
+    title: "Nuestro equipo"
+    empty: "La lista del equipo está vacía"
+    action:
+      amino: "Perfil de Amino"
+      telegram: "Enviar mensaje en Telegram"
+    errors:
+      open_amino: "No se pudo abrir el perfil de Amino"
+      open_tg: "No se pudo abrir el chat de Telegram"
+  section:
+    reports: "Reportes"
+    reports_desc: "Revisión de reportes de usuarios y tareas de moderación"
+    roles: "Permisos de acceso"
+    roles_desc: "Gestión de roles, etiquetas y permisos del staff"
+
+announcements:
+  title: "Anuncios"
+  empty: "No hay anuncios todavía"
+  create:
+    title: "Crear anuncio"
+    edit_title: "Editar anuncio"
+    title_label: "Título"
+    title_hint: "Introduzca el título del anuncio"
+    body_label: "Contenido"
+    body_hint: "Escriba el texto aquí..."
+    publish: "Publicar"
+    save: "Guardar"
+    background:
+      add: "Añadir fondo"
+      attached: "Fondo añadido"
+      uploaded_success: "¡Imagen subida con éxito!"
+    format:
+      bold: "Negrita"
+      center: "Centrado"
+      italic: "Cursiva"
+      link: "Insertar enlace"
+  details:
+    title: "Detalles del anuncio"
+    no_title: "Sin título"
+    system_author: "Sistema"
+    edit_success: "¡Anuncio actualizado!"
+    delete: "Eliminar"
+    cancel: "Cancelar"
+    delete_dialog_title: "Eliminar anuncio"
+    delete_dialog_message: "¿Está seguro de que desea eliminar este anuncio? Esta acción no se puede deshacer."
+    deleted_success: "Anuncio eliminado con éxito."
 
 auth:
   login:
-    brand: "AltTeam"
-    subtitle: "Panel de Administración"
+    brand: "AltAmino"
+    subtitle: "¡Bienvenido de nuevo! Inicie sesión en su cuenta"
     email_hint: "Correo electrónico"
     password_hint: "Contraseña"
     button: "Iniciar sesión"
     fill_all_fields: "Por favor, complete todos los campos"
     access_denied: "Acceso denegado"
+    terms: "Términos de uso"
+    privacy: "Política de privacidad"
 
-theme:
-  system: "Sistema"
-  light: "Claro"
-  dark: "Oscuro"
-
-welcome:
-  greeting: "¡Hola, {name}!"
-  greeting_anon: "¡Hola!"
-
-profile:
-  title: "Perfil"
-  role:
-    member: "Miembro"
-    staff: "Personal"
-    moderator: "Moderador"
-    admin: "Administrador"
-    feed: "¿Feed?"
-    system: "Sistema"
-    platform_staff: "Equipo del Proyecto"
-  team_badge: "Equipo"
-  no_bio: "Descripción aún no completada"
-  info:
-    created: "Registro"
-    modified: "Última actividad"
-  language: "Idioma"
-  theme: "Tema"
-  settings: "Configuración"
-  logout: "Cerrar sesión"
+common:
+  cancel: "Cancelar"
+  error: "Ocurrió un error"
+  save: "Guardar"
 
 drawer:
   profile: "Perfil"
-  admin: "Admin"
-  team: "Equipo"
+  admin: "Panel de Admin"
+  alt_acm: "AltACM"
   chats: "Chats"
+  reports: "Reportes y sugerencias"
+  team: "Equipo"
+  about_app: "Acerca de la app"
   link_telegram: "Vincular Telegram"
   unlink_telegram: "Desvincular Telegram"
+  about:
+    version: "Versión {version}"
+    title: "Acerca de la app"
+    description: "Creado por alx0rr en 2026 especialmente para el proyecto AltAmino."
+    developer_link: "Canal del desarrollador"
+    close: "Cerrar"
   errors:
-    fail_open_telegram: "No se pudo abrir Telegram"
-
-admin:
-  title: "Admin"
-  section:
-    reports: "Reportes"
-    reports_desc: "Ver quejas de los usuarios"
-    links: "Moderación de enlaces"
-    links_desc: "Inserta un enlace y aplica una acción al recurso"
-    password_reset: "Restablecer contraseña"
-    password_reset_desc: "Emitir una nueva contraseña por correo"
-    roles: "Roles"
-    roles_desc: "Gestionar roles del equipo"
-    search: "Buscar"
-    search_desc: "Buscar usuarios y comunidades"
-  reports:
-    title: "Reportes"
-    filter_open: "Abiertos"
-    filter_resolved: "Resueltos"
-    empty: "La lista de reportes aparecerá pronto"
-  links:
-    title: "Moderación de enlaces"
-    hint: "Inserta el enlace"
-    check: "Comprobar"
-    not_ready: "Aún no implementado"
-    empty: "Las acciones sobre el recurso aparecerán aquí"
-  password_reset:
-    title: "Restablecer contraseña"
-    label: "Correo del usuario"
-    hint: "name@example.com"
-    send: "Enviar nueva contraseña"
-    not_ready: "Aún no implementado"
-  roles:
-    title: "Roles"
-    empty: "La gestión de roles estará disponible pronto"
-  search:
-    title: "Buscar"
-    tab_users: "Usuarios"
-    tab_communities: "Comunidades"
-    hint_users: "Buscar por nick, ID..."
-    hint_communities: "Buscar por título, ID..."
-    empty: "Los resultados de la búsqueda aparecerán pronto"
-  team:
-    title: "Equipo"
-    empty: "Aún no hay miembros en el equipo"
-    action:
-      telegram: "Telegram"
-      amino: "AltAmino"
-    errors:
-      open_tg: "No se pudo iniciar Telegram"
-      open_amino: "No se pudo abrir el perfil de AltAmino"
+    fail_open_telegram: "No se pudo iniciar Telegram"
 
 notifications:
   title: "Notificaciones"
-  empty: "No hay notificaciones aún"
+  empty: "No hay notificaciones todavía"
 
-announcements:
-  title: "Anuncios"
-  empty: "No hay anuncios aún"
+profile:
+  title: "Mi perfil"
+  settings: "Ajustes"
+  language: "Idioma"
+  theme: "Tema"
+  logout: "Cerrar sesión"
+  info:
+    created: "Registro"
+    modified: "Actualizado"
+  role:
+    system: "Sistema"
+    platform_staff: "Equipo del proyecto"
+    admin: "Administrador"
+    moderator: "Moderador"
+    staff: "Staff"
+    feed: "Feed"
+    member: "Miembro"
+
+reports:
+  tab_sent: "Reportes enviados"
+  tab_write: "Escribir reporte"
+  sent:
+    title: "Mis reportes"
+    empty: "Aún no ha enviado ningún reporte"
+  write:
+    title: "Crear reporte"
+    description: "Por favor, proporcione solo pruebas reales. Los reportes falsos pueden resultar en la expulsión de la cuenta."
+    target_label: "Objeto del reporte"
+    target_hint: "ID de usuario, enlace al blog o chat"
+    reason_label: "Motivo"
+    reason_hint: "Describa la infracción en detalle..."
+    fill_required: "Por favor, complete los campos obligatorios"
+    not_ready: "El formulario está incompleto"
+    submit: "Enviar reporte"
+
+theme:
+  light: "Claro"
+  dark: "Oscuro"
+  system: "Sistémico"
+
+ndc:
   details:
-    title: "Anuncio"
-    no_title: "Sin título"
-    system_author: "Sistema"
-    delete_dialog_title: "Eliminar"
-    delete_dialog_message: "¿Está seguro de que desea eliminar este anuncio?"
-    cancel: "Cancelar"
     delete: "Eliminar"
-    deleted_success: "Anuncio eliminado"
-    delete_error: "Error al eliminar: {error}"
-    edit_success: "Cambios guardados con éxito"
-  create:
-    title: "Nuevo Anuncio"
-    edit_title: "Editar Anuncio"
-    title_label: "Título"
-    title_hint: "Título del anuncio"
-    body_label: "Texto"
-    body_hint: "Texto del anuncio"
-    publish: "Publicar"
-    save: "Guardar cambios"
-    publish_error: "Error en la operación: {error}"
-    format:
-      bold: "Negrita"
-      italic: "Cursiva"
-      center: "Centrado"
-      link: "Enlace"
-    background:
-      add: "Añadir imagen de fondo"
-      attached: "Fondo adjunto (haz clic para reemplazar)"
-      uploaded_success: "Imagen de fondo subida con éxito"
-      upload_error: "Error al subir archivo multimedia: {error}"
+    delete_dialog_title: "Eliminar comunidad"
+    delete_dialog_message: "¿Está seguro de que desea eliminar esta comunidad? Esta acción no se puede deshacer."
+    deleted_success: "Comunidad eliminada con éxito."

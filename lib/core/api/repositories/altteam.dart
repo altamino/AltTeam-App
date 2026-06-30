@@ -35,11 +35,13 @@ class AltTemRepository {
     int? role,
     List<String>? tagList,
     bool? isMemberOfTeamAmino,
+    bool? isVerified,
   }) async {
     await Api.post('/g/s/altteam/$userId/edit', body: {
       if (role != null) "role": role,
       if (tagList != null) "tagList": tagList,
       if (isMemberOfTeamAmino != null) "isMemberOfTeamAmino": isMemberOfTeamAmino,
+      if (isVerified != null) "isVerified": isVerified,
     });
   }
 
