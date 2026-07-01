@@ -61,6 +61,10 @@ admin:
     reports_desc: "Handling user reports and moderation tasks"
     roles: "Access Rights"
     roles_desc: "Managing roles, tags, and staff permissions"
+    usr_moderation: "User Moderation"
+    usr_moderation_desc: "Search users, issue bans, mutes, and warnings"
+    events: "Events"
+    events_desc: "Manage events, contests, and community activities"
 
 announcements:
   title: "Announcements"
@@ -96,7 +100,7 @@ announcements:
 
 auth:
   login:
-    brand: "AltAmino"
+    brand: "AltAmino Team"
     subtitle: "Welcome back! Log in to your account"
     email_hint: "Email"
     password_hint: "Password"

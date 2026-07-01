@@ -136,7 +136,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             icon: Icon(Icons.menu, color: colors.textPrimary, size: 22),
             onPressed: () => _scaffoldKey.currentState?.openDrawer(),
           ),
-          Icon(Icons.shield_outlined, color: colors.accentPrimary, size: 20),
+          Icon(Icons.hub_rounded, color: colors.accentPrimary, size: 20),
           const SizedBox(width: 8),
           Text(
             AppLocalizations.t('auth.login.brand'),

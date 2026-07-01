@@ -65,63 +65,42 @@ class Requester {
     return headers;
   }
 
-  Future<Map<String, dynamic>> request(
-    String method,
-    String endpoint, {
-    dynamic body,
-    Map<String, String>? extraHeaders,
-    List<int> allowedCodes = const [200],
-  }) async {
-
-    if (body is Map<String, dynamic>) {
-      body['timestamp'] = Generator.reqTime();
-    }
-
-
-    final headers = _buildHeaders(data: body, extraHeaders: extraHeaders);
-
-    final url = '$apiUrl$endpoint';
-    debugPrint('[HTTP][REQ] $method $url');
-    debugPrint('[HTTP][REQ] Headers: $headers');
-    
-    if (body != null && body is! Uint8List) {
-      debugPrint('[REQ] Body: ${body is String ? body : jsonEncode(body)}');
-    } else if (body is Uint8List) {
-      debugPrint('[REQ] Body: <Binary Data: ${body.length} bytes>');
-    }
-
-    try {
-
-      dynamic requestData;
-      if (body is Uint8List) {
-        requestData = body;
-      } else if (body != null) {
-        requestData = body is String ? body : jsonEncode(body);
-      }
-
-      final response = await _dio.request(
-        endpoint,
-        data: requestData,
-        options: Options(method: method, headers: headers),
-      );
-
-      debugPrint('[HTTP][RES] ${response.statusCode} $url');
-      debugPrint('[HTTP][RES] Body: ${response.data}');
-
-      if (!allowedCodes.contains(response.statusCode)) {
-        debugPrint('[HTTP][RES] ❌ Unexpected status: ${response.statusCode}');
-        _checkException(response);
-      }
-
-      return response.data is Map<String, dynamic>
-          ? response.data
-          : {'data': response.data};
-    } on DioException catch (e) {
-      debugPrint('[HTTP][ERR] DioException: ${e.message}');
-      debugPrint('[HTTP][ERR] Type: ${e.type}');
-      throw NetworkException(message: e.message ?? 'Network error');
-    }
+Future<Map<String, dynamic>> request(
+  String method,
+  String endpoint, {
+  dynamic body,
+  Map<String, String>? extraHeaders,
+  List<int> allowedCodes = const [200],
+}) async {
+  if (body is Map<String, dynamic>) {
+    body = {
+      ...body,
+      'timestamp': Generator.reqTime(),
+    };
   }
+
+  final encodedBody = body is String
+      ? body
+      : body != null
+          ? jsonEncode(body)
+          : null;
+
+  final headers = _buildHeaders(data: encodedBody, extraHeaders: extraHeaders);
+
+  final response = await _dio.request(
+    endpoint,
+    data: encodedBody,
+    options: Options(method: method, headers: headers),
+  );
+
+  if (!allowedCodes.contains(response.statusCode)) {
+    _checkException(response);
+  }
+
+  return response.data is Map<String, dynamic>
+      ? response.data
+      : {'data': response.data};
+}
 
   void _checkException(Response response) {
     final data = response.data;

@@ -61,42 +61,41 @@ class AppColors {
   AppColors._();
 
   static const AppPalette dark = AppPalette(
-    bgGradient: [Color(0xFF0B0E14), Color(0xFF121826), Color(0xFF0E1420)],
-    ambientGlow: Color(0x1A3D6BFF),
-    glassFill: Color(0x0DFFFFFF),
-    glassFillStrong: Color(0x14FFFFFF),
-    glassBorder: Color(0x1AFFFFFF),
-    surfaceElevated: Color(0xFF1A2233),
-    accentPrimary: Color(0xFF3D6BFF),
-    accentPrimaryDim: Color(0xFF2B4ED6),
-    accentPrimaryGlow: Color(0x593D6BFF),
-    textPrimary: Color(0xFFF4F6FA),
-    textSecondary: Color(0xA6FFFFFF),
-    textMuted: Color(0x61FFFFFF),
-    error: Color(0xFFFF6B6B),
-    errorBg: Color(0x1FFF6B6B),
-    errorBorder: Color(0x47FF6B6B),
-    shadow: Color(0x33000000),
-  );
-
+      bgGradient: [Color(0xFF070A0E), Color(0xFF0D141A), Color(0xFF0A0E12)],
+      ambientGlow: Color(0x1A00E676), // Мятное свечение
+      glassFill: Color(0x0DFFFFFF),
+      glassFillStrong: Color(0x14FFFFFF),
+      glassBorder: Color(0x1AFFFFFF),
+      surfaceElevated: Color(0xFF16222C),
+      accentPrimary: Color(0xFF00BFA5), // Насыщенная бирюза/мята
+      accentPrimaryDim: Color(0xFF00897B),
+      accentPrimaryGlow: Color(0x5900BFA5),
+      textPrimary: Color(0xFFF0F5F5),
+      textSecondary: Color(0xA6FFFFFF),
+      textMuted: Color(0x61FFFFFF),
+      error: Color(0xFFFF5252),
+      errorBg: Color(0x1FFF5252),
+      errorBorder: Color(0x47FF5252),
+      shadow: Color(0x33000000),
+    );
   static const AppPalette light = AppPalette(
-    bgGradient: [Color(0xFFF6F7FB), Color(0xFFEEF1F8), Color(0xFFE7ECF6)],
-    ambientGlow: Color(0x142F5FE0),
-    glassFill: Color(0xCCFFFFFF),
-    glassFillStrong: Color(0xF2FFFFFF),
-    glassBorder: Color(0x14000000),
-    surfaceElevated: Color(0xFFFFFFFF),
-    accentPrimary: Color(0xFF2F5FE0),
-    accentPrimaryDim: Color(0xFF24439C),
-    accentPrimaryGlow: Color(0x402F5FE0),
-    textPrimary: Color(0xFF1A1F2B),
-    textSecondary: Color(0xFF4B5468),
-    textMuted: Color(0xFF8B93A3),
-    error: Color(0xFFD64545),
-    errorBg: Color(0x1AD64545),
-    errorBorder: Color(0x40D64545),
-    shadow: Color(0x14000000),
-  );
+      bgGradient: [Color(0xFFF4F7F6), Color(0xFFEAF0EE), Color(0xFFE0E8E5)],
+      ambientGlow: Color(0x1400BFA5),
+      glassFill: Color(0xCCFFFFFF),
+      glassFillStrong: Color(0xF2FFFFFF),
+      glassBorder: Color(0x14000000),
+      surfaceElevated: Color(0xFFFFFFFF),
+      accentPrimary: Color(0xFF00796B),
+      accentPrimaryDim: Color(0xFF004D40),
+      accentPrimaryGlow: Color(0x4000796B),
+      textPrimary: Color(0xFF0B1412),
+      textSecondary: Color(0xFF42524E),
+      textMuted: Color(0xFF80948F),
+      error: Color(0xFFC62828),
+      errorBg: Color(0x1AC62828),
+      errorBorder: Color(0x40C62828),
+      shadow: Color(0x14051410),
+    );
 
   static AppPalette of(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark ? dark : light;

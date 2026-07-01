@@ -22,7 +22,7 @@ class AltAcmMainScreen extends StatefulWidget {
 class _AltAcmMainScreenState extends State<AltAcmMainScreen>
     with SingleTickerProviderStateMixin {
   late final bool _isStaff = RoleTypes.isStaffRole(Storage.role);
-  TabController? _tabController; // Сделали nullable, так как для не-стаффа он не нужен
+  TabController? _tabController;
   final _altAcm = AltACMRepository();
   final _searchRepo = SearchRepository();
   final _comRepo = CommunitiesRepository();
@@ -41,7 +41,6 @@ class _AltAcmMainScreenState extends State<AltAcmMainScreen>
     super.initState();
     _loadMyCommunities();
     
-    // Инициализируем табы и загружаем языки только если это персонал
     if (_isStaff) {
       _tabController = TabController(length: 2, vsync: this);
       _loadLanguages();
@@ -149,10 +148,8 @@ class _AltAcmMainScreenState extends State<AltAcmMainScreen>
           child: Column(
             children: [
               _buildAppBar(context, colors, AppLocalizations.t('drawer.alt_acm')),
-              // ИСПРАВЛЕНО: Показываем TabBar только для стаффа
               if (_isStaff) _buildTabBar(colors),
               Expanded(
-                // ИСПРАВЛЕНО: Если не стафф, сразу отдаем вкладку "Мои сообщества" без TabBoxView
                 child: _isStaff
                     ? TabBarView(
                         controller: _tabController,
@@ -294,7 +291,6 @@ class _AltAcmMainScreenState extends State<AltAcmMainScreen>
       padding: const EdgeInsets.only(bottom: 12),
       child: GestureDetector(
         onTap: () async {
-          // Если из экрана деталей вернулся true (сообщество удалили), обновляем список
           final refresh = await context.push<bool>('/altacm/community/$ndcId');
           if (refresh == true) _loadMyCommunities();
         },

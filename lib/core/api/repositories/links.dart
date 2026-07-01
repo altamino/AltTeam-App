@@ -16,7 +16,7 @@ class LinksRepository {
   }
 
   Future<Map<String, dynamic>> getFromLink(String link) async {
-    return await Api.get('/g/s/link-resolution?q=${link}"');
+    return await Api.get('/g/s/link-resolution?q=${link}');
   }
 
   Future<Map<String, dynamic>> uploadMedia({

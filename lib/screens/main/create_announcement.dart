@@ -246,6 +246,7 @@ class _AdminCreateAnnouncementScreenState extends State<AdminCreateAnnouncementS
                                   _isEditing
                                       ? AppLocalizations.t('announcements.create.save')
                                       : AppLocalizations.t('announcements.create.publish'),
+                                      style: TextStyle(color: colors.textPrimary),
                                 ),
                         ),
                       ),

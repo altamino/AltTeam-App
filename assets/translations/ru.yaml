@@ -61,6 +61,13 @@ admin:
     reports_desc: "Разбор жалоб от пользователей и задачи модерации"
     roles: "Права доступа"
     roles_desc: "Управление ролями, тегами и правами стаффа"
+    usr_moderation: "Модерация"
+    usr_moderation_desc: "Поиск пользователей, выдача банов, мутов и предупреждений"
+    events: "Ивенты"
+    events_desc: "Управление событиями, конкурсами и активностями сообщества"
+
+    usr_moderation: "Модерация пользователей"
+    usr_moderation_desc: "Поиск по никнейму, @aminoId или ссылке на профиль"
 
 announcements:
   title: "Объявления"
@@ -96,7 +103,7 @@ announcements:
 
 auth:
   login:
-    brand: "AltAmino"
+    brand: "AltAmino Team"
     subtitle: "С возвращением! Войдите в свой аккаунт"
     email_hint: "Электронная почта"
     password_hint: "Пароль"
@@ -174,13 +181,9 @@ theme:
   dark: "Тёмная"
   system: "Системная"
 
-
-
-
-
 ndc:
   details:
-      delete: "Удалить"
-      delete_dialog_title: "Удалить сообщество"
-      delete_dialog_message: "Вы уверены, что хотите удалить это сообщество? Это действие нельзя отменить."
-      deleted_success: "Сообщество успешно удалено."
+    delete: "Удалить"
+    delete_dialog_title: "Удалить сообщество"
+    delete_dialog_message: "Вы уверены, что хотите удалить это сообщество? Это действие нельзя отменить."
+    deleted_success: "Сообщество успешно удалено."

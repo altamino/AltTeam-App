@@ -15,6 +15,8 @@ import '../screens/main/notification.dart';
 import '../screens/main/profile.dart';
 import '../screens/main/welcome.dart';
 import '../screens/users/report.dart';
+import '../screens/adm/dashboard/user_moderation.dart';
+//import '../screens/adm/dashboard/events.dart';
 import 'storage.dart';
 
 GoRouter buildRouter({
@@ -55,6 +57,8 @@ GoRouter buildRouter({
       GoRoute(path: '/notifications', builder: (context, state) => const NotificationsScreen()),
       GoRoute(path: '/reports', builder: (context, state) => const UserReportsScreen()),
       
+
+
       GoRoute(
         path: '/altacm', 
         builder: (context, state) => const AltAcmMainScreen(),
@@ -81,6 +85,8 @@ GoRouter buildRouter({
           GoRoute(path: 'team', builder: (context, state) => const AdminTeamScreen()),
           GoRoute(path: 'announcements/create', builder: (context, state) => const AdminCreateAnnouncementScreen()),   
           GoRoute(path: 'chats', builder: (context, state) => const AdminChatsScreen()),
+          GoRoute(path: 'user/moderation', builder: (context, state) => const UserModerationScreen()),
+          //GoRoute(path: 'events', builder: (context, state) => const EventsModerationScreen()),
         ],
       ),
     ],

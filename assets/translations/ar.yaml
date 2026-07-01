@@ -96,7 +96,7 @@ announcements:
 
 auth:
   login:
-    brand: "AltAmino"
+    brand: "AltAmino Team"
     subtitle: "مرحباً بعودتك! سجل الدخول إلى حسابك"
     email_hint: "البريد الإلكتروني"
     password_hint: "كلمة المرور"
