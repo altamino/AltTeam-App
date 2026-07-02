@@ -75,6 +75,40 @@ admin:
     status_unlisted: "Отсутствует в каталоге (Unlisted)"
     disable_unavailable: "Отключение сообщества временно недоступно"
 
+    # --- Вкладки экрана редактирования ---
+    tab_general: "Основное"
+    tab_media: "Медиа"
+    tab_content: "Контент"
+    tab_theme: "Тема"
+    tab_staff: "Стафф"
+
+    field_cover: "Обложка сообщества"
+
+    field_description: "Описание"
+    field_description_hint: "Расскажите, о чём сообщество"
+    field_guidelines: "Правила сообщества"
+    field_guidelines_hint: "Опишите правила и рекомендации"
+    field_welcome_message: "Приветственное сообщение"
+    field_welcome_message_hint: "Текст, который увидит новый участник"
+
+    field_theme: "Настроить тему"
+    field_theme_background: "Фон сообщества"
+    field_theme_sidebar_logo: "Лого в боковой панели"
+    field_theme_color: "Акцентный цвет"
+    err_invalid_color: "Введите цвет в формате #RRGGBB"
+
+    # --- Вступление и видимость (доступно лидерам, не только стаффу) ---
+    field_join_type: "Тип вступления"
+    join_type_open: "Открытое"
+    join_type_approval_required: "По заявке"
+    join_type_invite_only: "Только по приглашению"
+    field_hidden: "Скрытое сообщество"
+
+
+    staff_only_section: "Только для стаффа"
+    staff_only_hint: "Доступно только глобальному стаффу"
+    field_language: "Язык сообщества"
+
   reports:
     title: "Управление жалобами"
     empty: "Жалобы не найдены"

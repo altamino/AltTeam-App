@@ -7,18 +7,18 @@ admin:
 
   password_reset:
     title: "Reset Password"
-    description: "Enter the user's email to send them recovery instructions and a link to restore access."
-    email_label: "Email Address"
+    description: "Enter the user's email to send them instructions and a recovery link."
+    email_label: "Email"
     button_submit: "Reset Password"
 
   labels:
     unknown_user: "Unknown User"
-    id_undefined: "ID not set"
+    id_undefined: "ID undefined"
     account_actions: "Account Actions"
     user_communities_list: "User Communities"
     communities_not_found: "The user is not a member of any community"
-    no_title: "Untitled"
-    community_staff: "Administration"
+    no_title: "No Title"
+    community_staff: "Staff"
 
   buttons:
     apply_sanctions: "Apply Sanctions"
@@ -32,9 +32,9 @@ admin:
     invalid_profile_link: "Invalid profile link"
     communities_load_failed: "Failed to load user communities"
     invalid_email: "Please enter a valid email"
-    browser_launch_failed: "Failed to open browser"
+    browser_launch_failed: "Failed to launch browser"
     link_open_failed: "Failed to open link"
-    not_implemented: "Feature not implemented yet"
+    not_implemented: "Feature not yet implemented"
 
   success:
     reset_instructions_sent: "Instructions have been sent to"
@@ -69,11 +69,44 @@ admin:
     level: "Level"
     amino_id: "Amino ID"
     primary_lang: "Primary Language"
-    created_at: "Creation Date"
+    created_at: "Created At"
     visibility_status: "Visibility Status"
     status_listed: "Listed"
     status_unlisted: "Unlisted"
-    disable_unavailable: "Disabling community is temporarily unavailable"
+    disable_unavailable: "Disabling the community is temporarily unavailable"
+
+    # --- Edit Screen Tabs ---
+    tab_general: "General"
+    tab_media: "Media"
+    tab_content: "Content"
+    tab_theme: "Theme"
+    tab_staff: "Staff"
+
+    field_cover: "Community Cover"
+
+    field_description: "Description"
+    field_description_hint: "Tell us about the community"
+    field_guidelines: "Guidelines"
+    field_guidelines_hint: "Describe the rules and guidelines"
+    field_welcome_message: "Welcome Message"
+    field_welcome_message_hint: "Text that a new member will see"
+
+    field_theme: "Customize Theme"
+    field_theme_background: "Community Background"
+    field_theme_sidebar_logo: "Sidebar Logo"
+    field_theme_color: "Accent Color"
+    err_invalid_color: "Enter color in #RRGGBB format"
+
+    # --- Join and Visibility ---
+    field_join_type: "Join Type"
+    join_type_open: "Open"
+    join_type_approval_required: "Approval Required"
+    join_type_invite_only: "Invite Only"
+    field_hidden: "Hidden Community"
+
+    staff_only_section: "Staff Only"
+    staff_only_hint: "Available only to global staff"
+    field_language: "Community Language"
 
   reports:
     title: "Report Management"
@@ -108,7 +141,7 @@ admin:
 
   team:
     title: "Our Team"
-    empty: "Team list is empty"
+    empty: "The team list is empty"
     action:
       amino: "Amino Profile"
       telegram: "Message on Telegram"
@@ -118,7 +151,7 @@ admin:
 
   section:
     reports: "Reports"
-    reports_desc: "Review user reports and moderation tasks"
+    reports_desc: "Handling user reports and moderation tasks"
     roles: "Access Rights"
     roles_desc: "Manage roles, tags, and staff permissions"
     usr_moderation: "Moderation"
@@ -135,7 +168,7 @@ announcements:
     title_label: "Title"
     title_hint: "Enter announcement title"
     body_label: "Content"
-    body_hint: "Write your text here..."
+    body_hint: "Write text here..."
     publish: "Publish"
     save: "Save"
     background:
@@ -149,7 +182,7 @@ announcements:
       link: "Insert Link"
   details:
     title: "Announcement Details"
-    no_title: "Untitled"
+    no_title: "No Title"
     system_author: "System"
     edit_success: "Announcement updated!"
     delete: "Delete"
@@ -183,7 +216,7 @@ drawer:
   admin: "Admin Panel"
   alt_acm: "AltACM"
   chats: "Chats"
-  reports: "Reports & Suggestions"
+  reports: "Reports & Feedback"
   team: "Team"
   about_app: "About App"
   link_telegram: "Link Telegram"
@@ -227,7 +260,7 @@ reports:
     empty: "You haven't submitted any reports yet"
   write:
     title: "Create Report"
-    description: "Please provide valid evidence only. False reports may lead to account suspension."
+    description: "Please provide valid evidence only. False reports may lead to an account ban."
     target_label: "Report Object"
     target_hint: "User ID, blog link, or chat link"
     reason_label: "Reason"

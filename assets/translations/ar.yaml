@@ -1,5 +1,5 @@
 admin:
-  title: "لوحة الإدارة"
+  title: "لوحة التحكم"
   
   tabs:
     search_and_manage: "البحث والإدارة"
@@ -7,7 +7,7 @@ admin:
 
   password_reset:
     title: "إعادة تعيين كلمة المرور"
-    description: "أدخل البريد الإلكتروني للمستخدم لإرسال تعليمات ورابط استعادة الوصول."
+    description: "أدخل البريد الإلكتروني للمستخدم لإرسال الإرشادات ورابط استعادة الحساب."
     email_label: "البريد الإلكتروني"
     button_submit: "إعادة تعيين كلمة المرور"
 
@@ -15,65 +15,98 @@ admin:
     unknown_user: "مستخدم غير معروف"
     id_undefined: "المعرف غير محدد"
     account_actions: "إجراءات الحساب"
-    user_communities_list: "مجموعات المستخدم"
-    communities_not_found: "المستخدم ليس عضواً في أي مجتمع"
+    user_communities_list: "منتديات المستخدم"
+    communities_not_found: "المستخدم ليس عضواً في أي منتدى"
     no_title: "بدون عنوان"
     community_staff: "الإدارة"
 
   buttons:
     apply_sanctions: "تطبيق العقوبات"
-    show_communities: "عرض المجموعات"
-    hide_communities: "إخفاء المجموعات"
+    show_communities: "عرض المنتديات"
+    hide_communities: "إخفاء المنتديات"
 
   tooltips:
-    global_profile: "فتح الملف الشخصي العالمي"
+    global_profile: "فتح الملف الشخصي العام"
 
   errors:
-    invalid_profile_link: "رابط الملف الشخصي غير صحيح"
-    communities_load_failed: "فشل تحميل مجموعات المستخدم"
+    invalid_profile_link: "رابط الملف الشخصي غير صالح"
+    communities_load_failed: "فشل تحميل منتديات المستخدم"
     invalid_email: "يرجى إدخال بريد إلكتروني صحيح"
     browser_launch_failed: "فشل فتح المتصفح"
     link_open_failed: "فشل فتح الرابط"
-    not_implemented: "الميزة غير متوفرة بعد"
+    not_implemented: "هذه الميزة لم تتوفر بعد"
 
   success:
-    reset_instructions_sent: "تم إرسال التعليمات إلى العنوان"
+    reset_instructions_sent: "تم إرسال الإرشادات إلى"
   
   community:
-    edit_title: "تعديل المجتمع"
+    edit_title: "تعديل المنتدى"
     field_tagline: "الشعار اللفظي"
     field_tagline_hint: "وصف قصير أو شعار"
     save_success: "تم حفظ التغييرات بنجاح!"
-    create: "إنشاء مجتمع"
-    create_success: "تم إنشاء المجتمع بنجاح!"
-    create_title: "مجتمع جديد"
-    default_title: "معلومات المجتمع"
+    create: "إنشاء منتدى"
+    create_success: "تم إنشاء المنتدى بنجاح!"
+    create_title: "منتدى جديد"
+    default_title: "معلومات المنتدى"
     denied_title: "تم رفض الوصول"
-    empty: "لم يتم العثور على مجموعات"
-    err_empty: "هذا الحقل لا يمكن أن يكون فارغاً"
-    error_select_user: "يرجى اختيار وكيل المجتمع"
-    invalid_id: "معرف المجتمع غير صحيح"
-    field_amino_id: "Amino ID"
+    empty: "لم يتم العثور على منتديات"
+    err_empty: "لا يمكن ترك هذا الحقل فارغاً"
+    error_select_user: "يرجى تحديد وكيل المنتدى"
+    invalid_id: "معرف المنتدى غير صالح"
+    field_amino_id: "معرف Amino ID"
     field_amino_id_hint: "مثال: altamino"
     field_lang: "اللغة"
-    field_name: "اسم المجتمع"
-    field_name_hint: "أدخل اسم المجتمع"
+    field_name: "اسم المنتدى"
+    field_name_hint: "أدخل اسم المنتدى"
     field_user: "الوكيل (اختياري)"
     members: "أعضاء"
-    my: "مجموعاتي"
+    my: "منتدياتي"
     search: "بحث"
-    search_hint: "البحث عن مجموعات..."
+    search_hint: "البحث عن المنتديات..."
     ndc_id: "Ndc ID"
-    agent_title: "وكيل المجتمع"
+    agent_title: "وكيل المنتدى"
     unknown_agent: "وكيل غير معروف"
     level: "المستوى"
     amino_id: "Amino ID"
-    primary_lang: "اللغة الأساسية"
+    primary_lang: "اللغة الرئيسية"
     created_at: "تاريخ الإنشاء"
     visibility_status: "حالة الظهور"
     status_listed: "مدرج في الدليل (Listed)"
     status_unlisted: "غير مدرج في الدليل (Unlisted)"
-    disable_unavailable: "تعطيل المجتمع غير متاح مؤقتاً"
+    disable_unavailable: "تعطيل المنتدى غير متاح مؤقتاً"
+
+    # --- علامات تبويب شاشة التعديل ---
+    tab_general: "العام"
+    tab_media: "الوسائط"
+    tab_content: "المحتوى"
+    tab_theme: "المظهر"
+    tab_staff: "الإدارة"
+
+    field_cover: "غلاف المنتدى"
+
+    field_description: "الوصف"
+    field_description_hint: "أخبرنا عن هذا المنتدى"
+    field_guidelines: "قوانين المنتدى"
+    field_guidelines_hint: "اكتب القوانين والإرشادات"
+    field_welcome_message: "رسالة الترحيب"
+    field_welcome_message_hint: "النص الذي سيراه العضو الجديد"
+
+    field_theme: "تخصيص المظهر"
+    field_theme_background: "خلفية المنتدى"
+    field_theme_sidebar_logo: "شعار الشريط الجانبي"
+    field_theme_color: "اللون الأساسي"
+    err_invalid_color: "أدخل اللون بصيغة #RRGGBB"
+
+    # --- الانضمام والظهور ---
+    field_join_type: "نوع الانضمام"
+    join_type_open: "مفتوح"
+    join_type_approval_required: "بناءً على طلب"
+    join_type_invite_only: "بدعوة فقط"
+    field_hidden: "منتدى مخفي"
+
+    staff_only_section: "خاص بالإدارة فقط"
+    staff_only_hint: "متاح فقط للإدارة العامة للمشروع"
+    field_language: "لغة المنتدى"
 
   reports:
     title: "إدارة البلاغات"
@@ -87,12 +120,12 @@ admin:
     edit_title: "تعديل الدور"
     denied_title: "الوصول محدود"
     denied_subtitle: "ليس لديك صلاحيات لإدارة الأدوار"
-    empty_team: "لم يتم العثور على أعضاء الفريق"
+    empty_team: "لم يتم العثور على أعضاء في الفريق"
     field_role: "الدور"
-    field_tags: "الوسوم"
+    field_tags: "الوسوم (التاغات)"
     field_team_member: "عضو الفريق"
     role_label: "الدور المحدد"
-    role_administrator: "مسؤول"
+    role_administrator: "مدير"
     role_moderator: "منسق"
     role_staff: "فريق المشروع"
     role_user: "عضو"
@@ -101,30 +134,30 @@ admin:
     search_empty_placeholder: "لم يتم العثور على مستخدمين"
     success: "تم تحديث الدور بنجاح!"
     tab_current: "الفريق"
-    tab_search: "تعيين جديد"
+    tab_search: "تعيين عضو جديد"
     tags_label: "وسوم المستخدم"
-    tags_hint: "افصل بين الوسوم بفاصلة"
+    tags_hint: "افصل بين الوسوم بفواصل"
     field_verified: "حساب موثق"
 
   team:
     title: "فريقنا"
     empty: "قائمة الفريق فارغة"
     action:
-      amino: "ملف Amino الشخصي"
-      telegram: "مراسلة عبر تليجرام"
+      amino: "الملف الشخصي في Amino"
+      telegram: "مراسلة عبر Telegram"
     errors:
       open_amino: "فشل فتح ملف Amino الشخصي"
-      open_tg: "فشل فتح محادثة تليجرام"
+      open_tg: "فشل فتح محادثة Telegram"
 
   section:
     reports: "البلاغات"
     reports_desc: "مراجعة بلاغات المستخدمين ومهام التنسيق"
     roles: "صلاحيات الوصول"
-    roles_desc: "إدارة الأدوار والوسوم وصلاحيات الإدارة"
-    usr_moderation: "الرقابة"
-    usr_moderation_desc: "البحث عن المستخدمين، الحظر، كتم الصوت والتحذيرات"
+    roles_desc: "إدارة الأدوار، الوسوم، وصلاحيات الإدارة"
+    usr_moderation: "الرقابة والتنسيق"
+    usr_moderation_desc: "البحث عن المستخدمين، الحظر، الحجب، والتحذيرات"
     events: "الفعاليات"
-    events_desc: "إدارة الفعاليات والمسابقات وأنشطة المجتمع"
+    events_desc: "إدارة الأحداث، المسابقات، وأنشطة المنتدى"
 
 announcements:
   title: "الإعلانات"
@@ -141,10 +174,10 @@ announcements:
     background:
       add: "إضافة خلفية"
       attached: "تمت إضافة الخلفية"
-      uploaded_success: "تم تحميل الصورة بنجاح!"
+      uploaded_success: "تم رفع الصورة بنجاح!"
     format:
       bold: "عريض"
-      center: "في المنتصف"
+      center: "توسيط"
       italic: "مائل"
       link: "إدراج رابط"
   details:
@@ -180,22 +213,22 @@ common:
 
 drawer:
   profile: "الملف الشخصي"
-  admin: "لوحة الإدارة"
+  admin: "لوحة التحكم"
   alt_acm: "AltACM"
-  chats: "المحادثات"
+  chats: "الدردشات"
   reports: "البلاغات والاقتراحات"
   team: "الفريق"
   about_app: "حول التطبيق"
-  link_telegram: "ربط تليجرام"
-  unlink_telegram: "إلغاء ربط تليجرام"
+  link_telegram: "ربط Telegram"
+  unlink_telegram: "إلغاء ربط Telegram"
   about:
     version: "الإصدار {version}"
     title: "حول التطبيق"
-    description: "تم التطوير بواسطة alx0rr في عام 2026 خصيصاً لمشروع AltAmino."
+    description: "تم تطويره بواسطة alx0rr في عام 2026 خصيصاً لمشروع AltAmino."
     developer_link: "قناة المطور"
     close: "إغلاق"
   errors:
-    fail_open_telegram: "فشل تشغيل تليجرام"
+    fail_open_telegram: "فشل تشغيل Telegram"
 
 notifications:
   title: "الإشعارات"
@@ -208,15 +241,15 @@ profile:
   theme: "المظهر"
   logout: "تسجيل الخروج"
   info:
-    created: "التسجيل"
-    modified: "تم التحديث"
+    created: "تاريخ التسجيل"
+    modified: "آخر تحديث"
   role:
     system: "النظام"
     platform_staff: "فريق المشروع"
-    admin: "مسؤول"
+    admin: "مدير"
     moderator: "منسق"
     staff: "إدارة"
-    feed: "الخلاصة"
+    feed: "الرئيسية"
     member: "عضو"
 
 reports:
@@ -227,9 +260,9 @@ reports:
     empty: "لم تقم بإرسال أي بلاغات بعد"
   write:
     title: "إنشاء بلاغ"
-    description: "يرجى تقديم أدلة حقيقية فقط. البلاغات الكاذبة قد تؤدي إلى حظر الحساب."
-    target_label: "موضوع البلاغ"
-    target_hint: "معرف المستخدم، رابط المدونة أو المحادثة"
+    description: "يرجى تقديم أدلة حقيقية فقط. البلاغات الكاذبة قد تؤدي إلى حظر حسابك."
+    target_label: "محل البلاغ"
+    target_hint: "معرف المستخدم، رابط المدونة أو الدردشة"
     reason_label: "السبب"
     reason_hint: "صف المخالفة بالتفصيل..."
     fill_required: "يرجى ملء الحقول المطلوبة"
@@ -239,11 +272,11 @@ reports:
 theme:
   light: "فاتح"
   dark: "داكن"
-  system: "تلقائي (النظام)"
+  system: "تلقائي (حسب النظام)"
 
 ndc:
   details:
     delete: "حذف"
-    delete_dialog_title: "حذف المجتمع"
-    delete_dialog_message: "هل أنت متأكد أنك تريد حذف هذا المجتمع؟ لا يمكن التراجع عن هذا الإجراء."
-    deleted_success: "تم حذف المجتمع بنجاح."
+    delete_dialog_title: "حذف المنتدى"
+    delete_dialog_message: "هل أنت متأكد أنك تريد حذف هذا المنتدى؟ لا يمكن التراجع عن هذا الإجراء."
+    deleted_success: "تم حذف المنتدى بنجاح."

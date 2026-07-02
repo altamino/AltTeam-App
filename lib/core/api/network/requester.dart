@@ -1,6 +1,5 @@
-
 import 'dart:convert';
-import 'dart:typed_data'; 
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import '../helpers/generator.dart';
 import 'exceptions.dart';
@@ -13,7 +12,6 @@ class Requester {
   final String language;
   String? sid;
   String? userId;
-
   late final Dio _dio;
 
   Requester({
@@ -30,20 +28,18 @@ class Requester {
     ));
   }
 
-
   Map<String, String> _buildHeaders({dynamic data, Map<String, String>? extraHeaders}) {
     final headers = Map<String, String>.from(basicHeaders);
-
     headers['NDCLANG'] = language;
     headers['User-Agent'] = userAgent;
     headers['NDCDEVICEID'] = deviceId;
 
     if (data != null) {
       if (data is Uint8List) {
-
+        // Бинарные данные (картинки, архивы тем и т.д.) — подписываем
+        // и считаем длину по реальным байтам, без какой-либо сериализации.
         headers['Content-Length'] = data.length.toString();
-
-        headers['NDC-MSG-SIG'] = Generator.signature(data); 
+        headers['NDC-MSG-SIG'] = Generator.signature(data);
       } else {
         // Логика для обычного JSON/Текста
         final encoded = data is String ? data : jsonEncode(data);
@@ -53,54 +49,58 @@ class Requester {
     }
 
     if (sid != null) {
-      if (userId != null){
+      if (userId != null) {
         headers['AUID'] = userId ?? "";
       }
       headers['NDCAUTH'] = 'sid=$sid';
     }
 
-
     if (extraHeaders != null) headers.addAll(extraHeaders);
-
     return headers;
   }
 
-Future<Map<String, dynamic>> request(
-  String method,
-  String endpoint, {
-  dynamic body,
-  Map<String, String>? extraHeaders,
-  List<int> allowedCodes = const [200],
-}) async {
-  if (body is Map<String, dynamic>) {
-    body = {
-      ...body,
-      'timestamp': Generator.reqTime(),
-    };
+  Future<Map<String, dynamic>> request(
+    String method,
+    String endpoint, {
+    dynamic body,
+    Map<String, String>? extraHeaders,
+    List<int> allowedCodes = const [200],
+  }) async {
+    // Бинарное тело (Uint8List / List<int>) — картинки, zip-архивы тем и т.п.
+    // Такие данные никогда не должны проходить через jsonEncode.
+    final bool isBinary = body is Uint8List || body is List<int>;
+
+    if (!isBinary && body is Map<String, dynamic>) {
+      body = {
+        ...body,
+        'timestamp': Generator.reqTime(),
+      };
+    }
+
+    final dynamic encodedBody = isBinary
+        ? (body is Uint8List ? body : Uint8List.fromList(body as List<int>))
+        : body is String
+            ? body
+            : body != null
+                ? jsonEncode(body)
+                : null;
+
+    final headers = _buildHeaders(data: encodedBody, extraHeaders: extraHeaders);
+
+    final response = await _dio.request(
+      endpoint,
+      data: encodedBody,
+      options: Options(method: method, headers: headers),
+    );
+
+    if (!allowedCodes.contains(response.statusCode)) {
+      _checkException(response);
+    }
+
+    return response.data is Map<String, dynamic>
+        ? response.data
+        : {'data': response.data};
   }
-
-  final encodedBody = body is String
-      ? body
-      : body != null
-          ? jsonEncode(body)
-          : null;
-
-  final headers = _buildHeaders(data: encodedBody, extraHeaders: extraHeaders);
-
-  final response = await _dio.request(
-    endpoint,
-    data: encodedBody,
-    options: Options(method: method, headers: headers),
-  );
-
-  if (!allowedCodes.contains(response.statusCode)) {
-    _checkException(response);
-  }
-
-  return response.data is Map<String, dynamic>
-      ? response.data
-      : {'data': response.data};
-}
 
   void _checkException(Response response) {
     final data = response.data;

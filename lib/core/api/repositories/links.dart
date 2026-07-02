@@ -19,6 +19,24 @@ class LinksRepository {
     return await Api.get('/g/s/link-resolution?q=${link}');
   }
 
+
+Future<Map<String, dynamic>> uploadThemeArchive({
+  required Uint8List zipBytes,
+  required int ndcId,
+}) async {
+  final response = await Api.post(
+    '/x$ndcId/s/media/upload/target/theme',
+    body: zipBytes,
+    headers: {
+      'Content-Type': 'application/octet-stream',
+    },
+  );
+
+  return response;
+}
+
+
+
   Future<Map<String, dynamic>> uploadMedia({
     required XFile file,
     String? mimeType,
@@ -38,6 +56,7 @@ class LinksRepository {
 
     return response;
   }
+
 
   String _guessMimeType(String fileName) {
     final ext = p.extension(fileName).toLowerCase();
