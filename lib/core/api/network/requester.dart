@@ -102,10 +102,20 @@ class Requester {
         : {'data': response.data};
   }
 
-  void _checkException(Response response) {
+void _checkException(Response response) {
     final data = response.data;
-    final code = data?['api:statuscode']?.toString() ?? 'unknown';
-    final message = data?['api:message']?.toString() ?? 'Unknown error';
+    
+    String code = 'unknown';
+    String message = 'Unknown error';
+
+    // Проверяем, что сервер вернул именно JSON-карту, а не сырую строку/HTML
+    if (data is Map<String, dynamic>) {
+      code = data['api:statuscode']?.toString() ?? 'unknown';
+      message = data['api:message']?.toString() ?? 'Unknown error';
+    } else if (data != null) {
+      // Если пришла строка (например, текст ошибки от сервера)
+      message = data.toString();
+    }
 
     if (response.statusCode == 401) {
       throw UnauthorizedException(code: code, message: message);
@@ -117,7 +127,6 @@ class Requester {
       statusCode: response.statusCode,
     );
   }
-
   Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? headers}) =>
       request('GET', endpoint, extraHeaders: headers);
 

@@ -83,6 +83,7 @@ admin:
     tab_staff: "Стафф"
 
     field_cover: "Обложка сообщества"
+    field_cover_hint: "Выберите изображение для обложки"
 
     field_description: "Описание"
     field_description_hint: "Расскажите, о чём сообщество"
@@ -92,9 +93,14 @@ admin:
     field_welcome_message_hint: "Текст, который увидит новый участник"
 
     field_theme: "Настроить тему"
-    field_theme_background: "Фон сообщества"
-    field_theme_sidebar_logo: "Лого в боковой панели"
+    field_theme_background: "Фон"
+    field_theme_sidebar_bg: "Фон"
+    field_theme_sidebar_logo: "Лого"
     field_theme_color: "Акцентный цвет"
+    theme_loading: "Загрузка темы..."
+    theme_load_failed: "Не удалось загрузить тему"
+    theme_preview_hint: "Предварительный просмотр темы"
+    theme_revision: "Ревизия темы"
     err_invalid_color: "Введите цвет в формате #RRGGBB"
 
     # --- Вступление и видимость (доступно лидерам, не только стаффу) ---
@@ -103,7 +109,6 @@ admin:
     join_type_approval_required: "По заявке"
     join_type_invite_only: "Только по приглашению"
     field_hidden: "Скрытое сообщество"
-
 
     staff_only_section: "Только для стаффа"
     staff_only_hint: "Доступно только глобальному стаффу"

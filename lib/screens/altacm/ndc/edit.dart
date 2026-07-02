@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,16 +16,21 @@ import '../../../core/api/repositories/theme_editor.dart';
 import '../../../core/storage.dart';
 import '../../../core/api/objects/args/roles.dart';
 
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
 /// Редактирование настроек сообщества (ACM).
 ///
-/// Важно про тему (.ndthemepack):
-/// - "background"  -> фон community-хаба
-/// - "titlebar"    -> ЛОГО В БОКОВОЙ ПАНЕЛИ (то, что видно слева при входе
-///                    в комьюнити). Это НЕ основная иконка сообщества —
-///                    основная иконка (avatar) грузится отдельно и
-///                    отправляется как обычный `icon` в /altacm/.../edit.
-///   (в decompiled-клиенте это поле titlebar-background-image, путают
-///    с "logo" потому что выглядит как лого, но по факту titlebar)
+/// Слоты темы (.ndthemepack) и как они реально рендерятся в приложении:
+/// - "background"   -> фон БОКОВОЙ ПАНЕЛИ
+/// - "titlebarbg"   -> фон ГЛАВНОЙ страницы сообщества
+/// - "titlebar"     -> длинное лого В боковой панели, поверх её фона
+/// themeColor рисуется на главной странице СНИЗУ градиентом:
+/// прозрачный сверху -> полный цвет внизу.
+///
+/// Основная иконка сообщества грузится отдельно (вкладка "Основное") и
+/// уходит как обычный `icon` в /altacm/.../edit — она НЕ часть темы.
 class AltAcmEditCommunityScreen extends StatefulWidget {
   final Map<String, dynamic>? communityData;
 
@@ -50,7 +56,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
   late TextEditingController _descriptionController;
   late TextEditingController _guidelinesController;
   late TextEditingController _welcomeMessageController;
-  late TextEditingController _themeColorController;
 
   XFile? _selectedIconFile;
   String? _currentIconUrl;
@@ -71,10 +76,37 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
   late String _language;
   static const List<String> _availableLanguages = ['en', 'ru', 'es', 'ar'];
 
-  // Тема — собирается с нуля, без выбора существующего .ndthemepack
+  // ---------------- Тема ----------------
   bool _themeEditingEnabled = false;
-  XFile? _selectedThemeBackgroundFile; // background-image
-  XFile? _selectedThemeTitlebarFile; // лого в боковой панели (titlebar)
+
+  // Существующий пак с сервера. Скачивается лениво при включении свитча,
+  // чтобы новая тема собиралась ПОВЕРХ старой (старые картинки/поля json
+  // сохраняются, если пользователь их не менял).
+  String? _themePackUrl;
+  int _serverThemeRevision = 0;
+  ThemeEditor? _themeEditor;
+  bool _themeLoading = false;
+  String? _themeLoadError;
+
+  // Новые выбранные картинки (перекрывают то, что лежит в старом паке).
+  XFile? _selectedThemeBackgroundFile; // слот 'background' = фон БОКОВОЙ панели
+  XFile? _selectedThemeTitlebarBgFile; // слот 'titlebarbg' = фон ГЛАВНОЙ страницы
+  XFile? _selectedThemeTitlebarFile; // слот 'titlebar'   = лого в боковой панели
+
+  // Флаги удаления слотов (удалить, а не заменить).
+  bool _removeThemeBackground = false;
+  bool _removeThemeTitlebarBg = false;
+  bool _removeThemeTitlebar = false;
+
+  // Цвет темы — выбирается из палитры, не вводом.
+  String _themeColorHex = '';
+  static const List<String> _palette = [
+    '#780000', '#C1121F', '#E63946', '#F77F00', '#FCBF49',
+    '#2A9D8F', '#43AA8B', '#90BE6D', '#4D908E', '#277DA1',
+    '#118AB2', '#0077B6', '#3A0CA3', '#7209B7', '#B5179E',
+    '#F72585', '#FF6B6B', '#6D6875', '#3D405B', '#264653',
+    '#1B263B', '#000000', '#2B2D42', '#5F0F40',
+  ];
 
   bool _isLoading = false;
 
@@ -82,7 +114,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
         Tab(text: AppLocalizations.t('admin.community.tab_general'), icon: const Icon(Icons.tune_rounded, size: 20)),
         Tab(text: AppLocalizations.t('admin.community.tab_media'), icon: const Icon(Icons.image_rounded, size: 20)),
         Tab(text: AppLocalizations.t('admin.community.tab_content'), icon: const Icon(Icons.article_rounded, size: 20)),
-        Tab(text: AppLocalizations.t('admin.community.tab_theme'), icon: const Icon(Icons.palette_rounded, size: 20)),
         if (_isStaff)
           Tab(text: AppLocalizations.t('admin.community.tab_staff'), icon: const Icon(Icons.verified_user_rounded, size: 20)),
       ];
@@ -92,30 +123,49 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     super.initState();
 
     _isStaff = RoleTypes.isStaffRole(Storage.role);
-    _tabController = TabController(length: _isStaff ? 5 : 4, vsync: this);
+    _tabController = TabController(length: _isStaff ? 4 : 3, vsync: this);
 
     final data = widget.communityData;
 
     _nameController = TextEditingController(text: data?['name'] ?? '');
     _taglineController = TextEditingController(text: data?['tagline'] ?? '');
     _aminoIdController = TextEditingController(text: data?['endpoint'] ?? data?['aminoId'] ?? '');
-    _descriptionController = TextEditingController(text: data?['description'] ?? '');
+    // Описание сообщества приходит в поле `content`.
+    _descriptionController = TextEditingController(text: data?['content'] ?? data?['description'] ?? '');
     _guidelinesController = TextEditingController(text: data?['guidelines'] ?? '');
-    _themeColorController = TextEditingController(text: data?['themeColor'] ?? '');
 
+    // Тема: цвет/URL/ревизия лежат внутри themePack, а не в корне.
+    final themePack = (data?['themePack'] as Map?)?.cast<String, dynamic>() ?? {};
+    _themeColorHex = (themePack['themeColor'] ?? data?['themeColor'] ?? '').toString();
+    _themePackUrl = themePack['themePackUrl'];
+    // Ревизия может прийти числом ИЛИ строкой — парсим безопасно,
+    // иначе "type 'String' is not a subtype of type 'int'".
+    _serverThemeRevision = int.tryParse('${themePack['themePackRevision'] ?? 0}') ?? 0;
+
+    // Приветственное сообщение — в advancedSettings.
+    final advanced = (data?['advancedSettings'] as Map?)?.cast<String, dynamic>() ?? {};
     final configuration = (data?['configuration'] as Map?)?.cast<String, dynamic>() ?? {};
-    _welcomeMessageController = TextEditingController(text: configuration['welcomeMessage'] ?? '');
-    _welcomeMessageEnabled = configuration['welcomeMessageEnabled'] == true;
+    _welcomeMessageController = TextEditingController(
+      text: advanced['welcomeMessageText'] ?? configuration['welcomeMessage'] ?? '',
+    );
+    _welcomeMessageEnabled =
+        (advanced['welcomeMessageEnabled'] ?? configuration['welcomeMessageEnabled']) == true;
 
     _currentIconUrl = data?['icon'];
-    _currentCoverUrl = data?['coverUrl'] ?? data?['cover'];
+    // Обложка: promotionalMediaList = [[100, url, ...], ...]
+    final promo = data?['promotionalMediaList'];
+    if (promo is List && promo.isNotEmpty && promo.first is List && (promo.first as List).length > 1) {
+      _currentCoverUrl = (promo.first as List)[1]?.toString();
+    }
+    _currentCoverUrl ??= data?['coverUrl'] ?? data?['cover'];
 
-    _joinType = (configuration['joinType'] ?? data?['joinType'] ?? 0) is int
-        ? (configuration['joinType'] ?? data?['joinType'] ?? 0)
-        : int.tryParse('${configuration['joinType'] ?? data?['joinType'] ?? 0}') ?? 0;
+    // joinType — в корне ответа.
+    final rawJoin = data?['joinType'] ?? configuration['joinType'] ?? 0;
+    _joinType = rawJoin is int ? rawJoin : int.tryParse('$rawJoin') ?? 0;
     _hidden = (configuration['hidden'] ?? data?['hidden']) == true;
 
-    final lang = (data?['lang'] ?? data?['language'])?.toString();
+    // Язык — primaryLanguage.
+    final lang = (data?['primaryLanguage'] ?? data?['lang'] ?? data?['language'])?.toString();
     _language = _availableLanguages.contains(lang) ? lang! : 'en';
   }
 
@@ -128,45 +178,101 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     _descriptionController.dispose();
     _guidelinesController.dispose();
     _welcomeMessageController.dispose();
-    _themeColorController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickIcon() async {
+  // ---------------- Пикеры ----------------
+
+  Future<void> _pickImageInto(void Function(XFile) assign, {double? maxWidth, double? maxHeight}) async {
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 512, maxHeight: 512);
-      if (image != null) setState(() => _selectedIconFile = image);
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: maxWidth ?? 1600,
+        maxHeight: maxHeight,
+      );
+      if (image != null) setState(() => assign(image));
     } catch (e) {
       if (mounted) AppSnackbar.show(context, e.toString(), type: SnackType.error);
     }
   }
 
-  Future<void> _pickCover() async {
+  Future<void> _pickIcon() => _pickImageInto((f) => _selectedIconFile = f, maxWidth: 512, maxHeight: 512);
+  Future<void> _pickCover() => _pickImageInto((f) => _selectedCoverFile = f);
+
+  // Выбор новой картинки в слот темы сбрасывает флаг удаления этого слота.
+  Future<void> _pickThemeBackground() => _pickImageInto((f) {
+        _selectedThemeBackgroundFile = f;
+        _removeThemeBackground = false;
+      });
+  Future<void> _pickThemeTitlebarBg() => _pickImageInto((f) {
+        _selectedThemeTitlebarBgFile = f;
+        _removeThemeTitlebarBg = false;
+      });
+  Future<void> _pickThemeTitlebar() => _pickImageInto((f) {
+        _selectedThemeTitlebarFile = f;
+        _removeThemeTitlebar = false;
+      });
+
+  // ---------------- Загрузка существующего пака ----------------
+
+  Future<void> _loadExistingThemePack() async {
+    if (_themeEditor != null || _themeLoading) return;
+    final url = _themePackUrl;
+    if (url == null || url.isEmpty) {
+      // Пака ещё нет — начинаем с чистой темы.
+      setState(() => _themeEditor = ThemeEditor.newTheme());
+      return;
+    }
+
+    setState(() {
+      _themeLoading = true;
+      _themeLoadError = null;
+    });
+
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 1600);
-      if (image != null) setState(() => _selectedCoverFile = image);
+      final bytes = await _downloadBytes(url);
+      final editor = ThemeEditor.fromBytes(bytes);
+      // Ревизия сервера — источник правды (в json пака она может отставать).
+      if (_serverThemeRevision > editor.revision) {
+        editor.revision = _serverThemeRevision;
+      }
+      if (!mounted) return;
+      setState(() => _themeEditor = editor);
     } catch (e) {
-      if (mounted) AppSnackbar.show(context, e.toString(), type: SnackType.error);
+      if (!mounted) return;
+      setState(() {
+        // Не смогли скачать старый пак — не блокируем работу,
+        // просто собираем тему с нуля, но с правильной ревизией.
+        _themeEditor = ThemeEditor.newTheme();
+        if (_serverThemeRevision > 0) {
+          _themeEditor!.revision = _serverThemeRevision;
+        }
+        _themeLoadError = e.toString();
+      });
+    } finally {
+      if (mounted) setState(() => _themeLoading = false);
     }
   }
 
-  Future<void> _pickThemeBackground() async {
+  Future<Uint8List> _downloadBytes(String url) async {
+    final client = HttpClient();
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 1600);
-      if (image != null) setState(() => _selectedThemeBackgroundFile = image);
-    } catch (e) {
-      if (mounted) AppSnackbar.show(context, e.toString(), type: SnackType.error);
+      final request = await client.getUrl(Uri.parse(url));
+      final response = await request.close();
+      if (response.statusCode != 200) {
+        throw Exception('Theme pack download failed: HTTP ${response.statusCode}');
+      }
+      final builder = BytesBuilder(copy: false);
+      await for (final chunk in response) {
+        builder.add(chunk);
+      }
+      return builder.takeBytes();
+    } finally {
+      client.close();
     }
   }
 
-  Future<void> _pickThemeTitlebar() async {
-    try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 1600);
-      if (image != null) setState(() => _selectedThemeTitlebarFile = image);
-    } catch (e) {
-      if (mounted) AppSnackbar.show(context, e.toString(), type: SnackType.error);
-    }
-  }
+  // ---------------- Сохранение ----------------
 
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
@@ -198,29 +304,60 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
         uploadedCoverUrl = res['mediaValue'];
       }
 
-      // 3. Тема — background + лого в боковой панели (titlebar).
-      //    Собирается с нуля прямо на клиенте, без выбора готового
-      //    .ndthemepack, и загружается как новый архив темы.
+      // 3. Тема. Берём СТАРЫЙ пак как основу (если он был скачан) и
+      //    накатываем поверх только то, что пользователь реально поменял:
+      //    новые картинки, удаления слотов, цвет.
       String? themeUrl;
       int? themeRevision;
-      if (_themeEditingEnabled &&
-          (_selectedThemeBackgroundFile != null || _selectedThemeTitlebarFile != null)) {
-        final themeEditor = ThemeEditor.newTheme();
+      final hasNewThemeImages = _selectedThemeBackgroundFile != null ||
+          _selectedThemeTitlebarBgFile != null ||
+          _selectedThemeTitlebarFile != null;
+      final hasRemovals = _removeThemeBackground || _removeThemeTitlebarBg || _removeThemeTitlebar;
+      final themeColor = _themeColorHex.isEmpty ? null : _themeColorHex;
+
+      if (_themeEditingEnabled && (hasNewThemeImages || hasRemovals || themeColor != null)) {
+        // Если пак ещё не скачан (пользователь сразу жмёт сохранить) — качаем.
+        if (_themeEditor == null) {
+          await _loadExistingThemePack();
+        }
+        final themeEditor = _themeEditor ?? ThemeEditor.newTheme();
+
+        // Удаления. Флаг взводится только когда новой картинки нет,
+        // но на всякий случай: новая картинка приоритетнее удаления.
+        if (_removeThemeBackground && _selectedThemeBackgroundFile == null) {
+          themeEditor.removeImage('background');
+        }
+        if (_removeThemeTitlebarBg && _selectedThemeTitlebarBgFile == null) {
+          themeEditor.removeImage('titlebarbg');
+        }
+        if (_removeThemeTitlebar && _selectedThemeTitlebarFile == null) {
+          themeEditor.removeImage('titlebar');
+        }
 
         if (_selectedThemeBackgroundFile != null) {
           themeEditor.injectImage(
-            forWhat: 'background',
+            forWhat: 'background', // фон боковой панели
             newImageData: await _selectedThemeBackgroundFile!.readAsBytes(),
+          );
+        }
+        if (_selectedThemeTitlebarBgFile != null) {
+          themeEditor.injectImage(
+            forWhat: 'titlebarbg', // фон главной страницы
+            newImageData: await _selectedThemeTitlebarBgFile!.readAsBytes(),
           );
         }
         if (_selectedThemeTitlebarFile != null) {
           themeEditor.injectImage(
-            forWhat: 'titlebar', // = лого в боковой панели
+            forWhat: 'titlebar', // лого в боковой панели
             newImageData: await _selectedThemeTitlebarFile!.readAsBytes(),
           );
         }
+        if (themeColor != null) {
+          themeEditor.setThemeColor(themeColor);
+        }
 
-        themeEditor.incrementRevision(); // 0 -> 1 для новой темы
+        // Ревизия = старая (сервер/пак) + 1.
+        themeEditor.incrementRevision();
         final zipBytes = themeEditor.rebuild();
 
         final uploadRes = await linksRepo.uploadThemeArchive(zipBytes: zipBytes, ndcId: ndcId);
@@ -241,7 +378,7 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
         icon: uploadedIconUrl,
         coverUrl: uploadedCoverUrl,
         themeUrl: themeUrl,
-        themeColor: _emptyToNull(_themeColorController.text),
+        themeColor: themeColor,
         themeRevision: themeRevision,
         welcomeMessage: _emptyToNull(_welcomeMessageController.text),
         welcomeMessageEnabled: _welcomeMessageEnabled,
@@ -259,7 +396,9 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
       );
 
       context.pop(true);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print('Что случилось: $e');
+      print('Где именно: $stackTrace'); // Показывает точную строку внутри try
       if (!mounted) return;
       AppSnackbar.show(context, e.toString(), type: SnackType.error);
     } finally {
@@ -301,7 +440,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
                             _tabScroll(_buildGeneralTab(colors)),
                             _tabScroll(_buildMediaTab(colors)),
                             _tabScroll(_buildContentTab(colors)),
-                            _tabScroll(_buildThemeTab(colors)),
                             if (_isStaff) _tabScroll(_buildStaffTab(colors)),
                           ],
                         ),
@@ -449,6 +587,7 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     );
   }
 
+  /// Аватарка — квадрат с закруглением (как в приложении), не круг.
   Widget _buildIconPicker(AppPalette colors) {
     ImageProvider? imageProvider;
 
@@ -461,29 +600,55 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     return GestureDetector(
       onTap: _pickIcon,
       child: Stack(
-        alignment: Alignment.bottomRight,
+        clipBehavior: Clip.none,
         children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: colors.textMuted.withOpacity(0.2),
-            backgroundImage: imageProvider,
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: colors.textMuted.withOpacity(0.2),
+              image: imageProvider != null
+                  ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
+                  : null,
+            ),
             child: imageProvider == null
                 ? Icon(Icons.add_photo_alternate_rounded, size: 40, color: colors.textSecondary)
                 : null,
           ),
-          CircleAvatar(
-            radius: 16,
-            backgroundColor: colors.accentPrimary,
-            child: const Icon(Icons.edit_rounded, size: 16, color: Colors.white),
+          Positioned(
+            right: -4,
+            bottom: -4,
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: colors.accentPrimary,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.edit_rounded, size: 16, color: Colors.white),
+            ),
           ),
         ],
       ),
     );
   }
 
-  // ---------------- Вкладка: Медиа ----------------
+  // ---------------- Вкладка: Медиа + Тема ----------------
 
   Widget _buildMediaTab(AppPalette colors) {
+    return Column(
+      children: [
+        _buildCoverSection(colors),
+        const SizedBox(height: 16),
+        _buildThemeSection(colors),
+      ],
+    );
+  }
+
+  /// Обложка — вертикальный прямоугольник (портретная ориентация,
+  /// как экран телефона).
+  Widget _buildCoverSection(AppPalette colors) {
     ImageProvider? imageProvider;
     if (_selectedCoverFile != null) {
       imageProvider = FileImage(File(_selectedCoverFile!.path));
@@ -498,22 +663,482 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
         children: [
           _fieldLabel(colors, AppLocalizations.t('admin.community.field_cover')),
           const SizedBox(height: 12),
-          GestureDetector(
-            onTap: _pickCover,
-            child: Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: colors.textMuted.withOpacity(0.15),
-                image: imageProvider != null ? DecorationImage(image: imageProvider, fit: BoxFit.cover) : null,
+          Center(
+            child: GestureDetector(
+              onTap: _pickCover,
+              child: Container(
+                width: 160,
+                height: 284, // ~9:16, портрет как телефон
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: colors.textMuted.withOpacity(0.15),
+                  border: Border.all(color: colors.textMuted.withOpacity(0.3)),
+                  image: imageProvider != null
+                      ? DecorationImage(image: imageProvider, fit: BoxFit.cover)
+                      : null,
+                ),
+                child: imageProvider == null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.add_photo_alternate_rounded, size: 32, color: colors.textSecondary),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppLocalizations.t('admin.community.field_cover_hint'),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: colors.textMuted, fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      )
+                    : null,
               ),
-              child: imageProvider == null
-                  ? Center(child: Icon(Icons.add_photo_alternate_rounded, size: 32, color: colors.textSecondary))
-                  : null,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ---------------- Секция: Тема ----------------
+
+  /// Провайдер картинки слота темы: приоритет — новая выбранная картинка,
+  /// затем картинка из старого пака (если слот не помечен на удаление).
+  ImageProvider? _themeSlotImage(XFile? picked, Uint8List? packBytes, bool removed) {
+    if (picked != null) return FileImage(File(picked.path));
+    if (removed) return null;
+    if (packBytes != null && packBytes.isNotEmpty) return MemoryImage(packBytes);
+    return null;
+  }
+
+  Color _parsedThemeColor(AppPalette colors) {
+    final hex = RegExp(r'^#([0-9a-fA-F]{6})$');
+    if (hex.hasMatch(_themeColorHex)) {
+      return Color(int.parse('FF${_themeColorHex.substring(1)}', radix: 16));
+    }
+    return colors.accentPrimary;
+  }
+
+  Widget _buildThemeSection(AppPalette colors) {
+    return _glassWrap(
+      colors,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: _fieldLabel(colors, AppLocalizations.t('admin.community.field_theme'))),
+              Switch(
+                value: _themeEditingEnabled,
+                activeColor: colors.accentPrimary,
+                onChanged: (val) {
+                  setState(() => _themeEditingEnabled = val);
+                  if (val) _loadExistingThemePack();
+                },
+              ),
+            ],
+          ),
+          if (_themeEditingEnabled) ...[
+            const SizedBox(height: 16),
+            if (_themeLoading)
+              SizedBox(
+                height: 260,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(color: colors.accentPrimary),
+                      const SizedBox(height: 12),
+                      Text(
+                        AppLocalizations.t('admin.community.theme_loading'),
+                        style: TextStyle(color: colors.textMuted, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else ...[
+              if (_themeLoadError != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.orange.withOpacity(0.12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          AppLocalizations.t('admin.community.theme_load_failed'),
+                          style: TextStyle(color: colors.textSecondary, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+              _buildThemePreview(colors),
+              const SizedBox(height: 8),
+              Center(
+                child: Text(
+                  AppLocalizations.t('admin.community.theme_preview_hint'),
+                  style: TextStyle(color: colors.textMuted, fontSize: 12),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _fieldLabel(colors, AppLocalizations.t('admin.community.field_theme_color')),
+              const SizedBox(height: 10),
+              _buildColorPalette(colors),
+              const SizedBox(height: 12),
+              // Инфо о ревизии: старая -> новая.
+              Row(
+                children: [
+                  Icon(Icons.history_rounded, size: 14, color: colors.textMuted),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${AppLocalizations.t('admin.community.theme_revision')}: '
+                    '${_themeEditor?.revision ?? _serverThemeRevision} → '
+                    '${(_themeEditor?.revision ?? _serverThemeRevision) + 1}',
+                    style: TextStyle(color: colors.textMuted, fontSize: 12),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Палитра выбора themeColor. Если текущий цвет сообщества нестандартный —
+  /// он добавляется в начало палитры, чтобы его можно было оставить.
+  Widget _buildColorPalette(AppPalette colors) {
+    final items = <String>[
+      if (_themeColorHex.isNotEmpty && !_palette.contains(_themeColorHex.toUpperCase()))
+        _themeColorHex.toUpperCase(),
+      ..._palette,
+    ];
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: items.map((hex) {
+        final color = Color(int.parse('FF${hex.substring(1)}', radix: 16));
+        final selected = _themeColorHex.toUpperCase() == hex.toUpperCase();
+
+        return GestureDetector(
+          onTap: () => setState(() => _themeColorHex = hex),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: selected ? Colors.white : Colors.white.withOpacity(0.15),
+                width: selected ? 2.5 : 1,
+              ),
+              boxShadow: selected
+                  ? [BoxShadow(color: color.withOpacity(0.6), blurRadius: 8, spreadRadius: 1)]
+                  : null,
+            ),
+            child: selected
+                ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
+                : null,
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  /// Превью "как в приложении":
+  /// - слева боковая панель: фон = слот 'background', лого 'titlebar' поверх
+  /// - справа главная страница: фон = слот 'titlebarbg',
+  ///   themeColor рисуется СНИЗУ градиентом (прозрачный -> полный цвет).
+  /// У каждого слота с картинкой есть кнопка удаления (крестик).
+  Widget _buildThemePreview(AppPalette colors) {
+    final themeColor = _parsedThemeColor(colors);
+
+    // 'background' = фон боковой панели
+    final sidebarBgImage = _themeSlotImage(
+      _selectedThemeBackgroundFile,
+      _themeEditor?.backgroundBytes,
+      _removeThemeBackground,
+    );
+    // 'titlebarbg' = фон главной страницы
+    final mainBgImage = _themeSlotImage(
+      _selectedThemeTitlebarBgFile,
+      _themeEditor?.titlebarBackgroundBytes,
+      _removeThemeTitlebarBg,
+    );
+    // 'titlebar' = лого в боковой панели
+    final sidebarLogoImage = _themeSlotImage(
+      _selectedThemeTitlebarFile,
+      _themeEditor?.titlebarBytes,
+      _removeThemeTitlebar,
+    );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        height: 300,
+        decoration: BoxDecoration(
+          border: Border.all(color: colors.textMuted.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            // ---------- Боковая панель ----------
+            SizedBox(
+              width: 110,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Фон панели = слот 'background'.
+                  GestureDetector(
+                    onTap: _pickThemeBackground,
+                    child: Container(
+                      color: const Color(0xFF1A1A2E),
+                      child: sidebarBgImage != null
+                          ? Image(image: sidebarBgImage, fit: BoxFit.cover)
+                          : null,
+                    ),
+                  ),
+                  // Лёгкое затемнение, чтобы контент панели читался.
+                  IgnorePointer(
+                    child: Container(color: Colors.black.withOpacity(0.25)),
+                  ),
+                  Column(
+                    children: [
+                      // Лого панели (слот 'titlebar') — поверх фона панели.
+                      GestureDetector(
+                        onTap: _pickThemeTitlebar,
+                        child: SizedBox(
+                          height: 56,
+                          width: double.infinity,
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: sidebarLogoImage != null
+                                    ? Image(image: sidebarLogoImage, fit: BoxFit.contain, width: double.infinity)
+                                    : _emptySlotHint(
+                                        icon: Icons.title_rounded,
+                                        label: AppLocalizations.t('admin.community.field_theme_sidebar_logo'),
+                                      ),
+                              ),
+                              if (sidebarLogoImage != null)
+                                Positioned(
+                                  top: 2,
+                                  right: 2,
+                                  child: _slotDeleteChip(
+                                    onTap: () => setState(() {
+                                      _selectedThemeTitlebarFile = null;
+                                      _removeThemeTitlebar = true;
+                                    }),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Мок пунктов меню панели, чисто визуал.
+                      ..._fakeSidebarItems(),
+                      const Spacer(),
+                      // Кнопки фона панели: сменить / удалить.
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _slotEditChip(
+                            onTap: _pickThemeBackground,
+                            label: AppLocalizations.t('admin.community.field_theme_sidebar_bg'),
+                          ),
+                          if (sidebarBgImage != null) ...[
+                            const SizedBox(width: 4),
+                            _slotDeleteChip(
+                              onTap: () => setState(() {
+                                _selectedThemeBackgroundFile = null;
+                                _removeThemeBackground = true;
+                              }),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // ---------- Главная страница ----------
+            Expanded(
+              child: GestureDetector(
+                onTap: _pickThemeTitlebarBg,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(
+                      color: const Color(0xFF16213E),
+                      child: mainBgImage != null
+                          ? Image(image: mainBgImage, fit: BoxFit.cover)
+                          : Center(
+                              child: _emptySlotHint(
+                                icon: Icons.wallpaper_rounded,
+                                label: AppLocalizations.t('admin.community.field_theme_background'),
+                              ),
+                            ),
+                    ),
+                    // themeColor: градиент СНИЗУ — прозрачный сверху,
+                    // полный цвет внизу (как в приложении).
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: IgnorePointer(
+                        child: Container(
+                          height: 140,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                themeColor.withOpacity(0.0),
+                                themeColor.withOpacity(0.55),
+                                themeColor,
+                              ],
+                            ),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
+                          alignment: Alignment.bottomLeft,
+                          child: Text(
+                            _nameController.text.isEmpty ? 'Community' : _nameController.text,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Кнопки фона главной страницы: сменить / удалить.
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _slotEditChip(
+                              onTap: _pickThemeTitlebarBg,
+                              label: AppLocalizations.t('admin.community.field_theme_background'),
+                            ),
+                            if (mainBgImage != null) ...[
+                              const SizedBox(width: 4),
+                              _slotDeleteChip(
+                                onTap: () => setState(() {
+                                  _selectedThemeTitlebarBgFile = null;
+                                  _removeThemeTitlebarBg = true;
+                                }),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _fakeSidebarItems() {
+    return List.generate(3, (i) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: IgnorePointer(
+          child: Container(
+            height: 10,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.35),
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _emptySlotHint({required IconData icon, required String label}) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white.withOpacity(0.7), size: 20),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 9),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _slotEditChip({required VoidCallback onTap, required String label}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.55),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.edit_rounded, color: Colors.white, size: 12),
+            const SizedBox(width: 4),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 80),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Кнопка удаления картинки слота (крестик).
+  Widget _slotDeleteChip({required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.75),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(Icons.close_rounded, color: Colors.white, size: 14),
       ),
     );
   }
@@ -585,107 +1210,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
           ),
         ),
       ],
-    );
-  }
-
-  // ---------------- Вкладка: Тема ----------------
-
-  Widget _buildThemeTab(AppPalette colors) {
-    return _glassWrap(
-      colors,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(child: _fieldLabel(colors, AppLocalizations.t('admin.community.field_theme'))),
-              Switch(
-                value: _themeEditingEnabled,
-                activeColor: colors.accentPrimary,
-                onChanged: (val) => setState(() => _themeEditingEnabled = val),
-              ),
-            ],
-          ),
-          if (_themeEditingEnabled) ...[
-            const SizedBox(height: 16),
-            _themeImageTile(
-              colors,
-              label: AppLocalizations.t('admin.community.field_theme_background'),
-              file: _selectedThemeBackgroundFile,
-              onTap: _pickThemeBackground,
-            ),
-            const SizedBox(height: 12),
-            // "titlebar" в theme-паке — это лого в боковой панели,
-            // не путать с основной иконкой сообщества (та во вкладке "Основное").
-            _themeImageTile(
-              colors,
-              label: AppLocalizations.t('admin.community.field_theme_sidebar_logo'),
-              file: _selectedThemeTitlebarFile,
-              onTap: _pickThemeTitlebar,
-            ),
-            const SizedBox(height: 20),
-            _fieldLabel(colors, AppLocalizations.t('admin.community.field_theme_color')),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _themeColorController,
-              style: TextStyle(color: colors.textPrimary),
-              decoration: InputDecoration(
-                hintText: '#RRGGBB',
-                hintStyle: TextStyle(color: colors.textMuted),
-              ),
-              validator: (val) {
-                if (val == null || val.trim().isEmpty) return null;
-                final hex = RegExp(r'^#([0-9a-fA-F]{6})$');
-                return hex.hasMatch(val.trim())
-                    ? null
-                    : AppLocalizations.t('admin.community.err_invalid_color');
-              },
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _themeImageTile(
-    AppPalette colors, {
-    required String label,
-    required XFile? file,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: colors.textMuted.withOpacity(0.12),
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: file != null
-                  ? Image.file(File(file.path), width: 44, height: 44, fit: BoxFit.cover)
-                  : Container(
-                      width: 44,
-                      height: 44,
-                      color: colors.textMuted.withOpacity(0.2),
-                      child: Icon(Icons.image_rounded, color: colors.textSecondary, size: 20),
-                    ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                file != null ? file.name : label,
-                style: TextStyle(color: colors.textPrimary, fontSize: 14),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded, color: colors.textMuted),
-          ],
-        ),
-      ),
     );
   }
 
