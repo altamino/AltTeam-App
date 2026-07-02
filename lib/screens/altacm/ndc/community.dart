@@ -410,7 +410,7 @@ class _AltAcmCommunityScreenState extends State<AltAcmCommunityScreen> {
       icon: const Icon(Icons.edit_outlined, size: 20),
       label: Text(AppLocalizations.t('common.edit'), style: const TextStyle(fontWeight: FontWeight.bold)),
       onPressed: () {
-        context.push('/altacm/edit', extra: _communityData);
+        context.push("/altacm/community/${_communityData?['ndcId']}/edit", extra: _communityData);
       },
     );
 

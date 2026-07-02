@@ -9,6 +9,7 @@ import '../screens/adm/team.dart';
 import '../screens/altacm/create.dart';
 import '../screens/altacm/main.dart';
 import '../screens/altacm/ndc/community.dart';
+import '../screens/altacm/ndc/edit.dart';
 import '../screens/login.dart';
 import '../screens/main/create_announcement.dart';
 import '../screens/main/notification.dart';
@@ -57,14 +58,13 @@ GoRouter buildRouter({
       GoRoute(path: '/notifications', builder: (context, state) => const NotificationsScreen()),
       GoRoute(path: '/reports', builder: (context, state) => const UserReportsScreen()),
       
-
-
+      // --- СЕКЦИЯ ALTACM (Сделана плоско, как и /admin) ---
       GoRoute(
         path: '/altacm', 
         builder: (context, state) => const AltAcmMainScreen(),
         routes: [
           GoRoute(
-            path: 'community/create',
+            path: 'create',
             builder: (context, state) => const AltAcmCreateCommunityScreen(),
           ),
           GoRoute(
@@ -74,8 +74,17 @@ GoRouter buildRouter({
               return AltAcmCommunityScreen(ndcId: ndcId);
             },
           ),
+          GoRoute(
+            path: 'community/:ndcId/edit',
+            builder: (context, state) {
+              final data = state.extra as Map<String, dynamic>?;
+              return AltAcmEditCommunityScreen(communityData: data);
+            },
+          ),
         ],
       ),
+
+      // --- СЕКЦИЯ ADMIN ---
       GoRoute(
         path: '/admin', 
         builder: (context, state) => const AdminDashboardScreen(),

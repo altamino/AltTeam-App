@@ -1,13 +1,58 @@
 admin:
   title: "Админ-панель"
+  
+  tabs:
+    search_and_manage: "Поиск и управление"
+    password_reset: "Сброс пароля"
+
+  password_reset:
+    title: "Сброс пароля"
+    description: "Введите Email пользователя, чтобы отправить ему инструкции и ссылку для восстановления доступа."
+    email_label: "Электронная почта"
+    button_submit: "Сбросить пароль"
+
+  labels:
+    unknown_user: "Неизвестный пользователь"
+    id_undefined: "ID не установлен"
+    account_actions: "Действия над аккаунтом"
+    user_communities_list: "Сообщества пользователя"
+    communities_not_found: "Пользователь не состоит ни в одном сообществе"
+    no_title: "Без названия"
+    community_staff: "Администрация"
+
+  buttons:
+    apply_sanctions: "Применить санкции"
+    show_communities: "Показать сообщества"
+    hide_communities: "Скрыть сообщества"
+
+  tooltips:
+    global_profile: "Открыть глобальный профиль"
+
+  errors:
+    invalid_profile_link: "Неверная ссылка на профиль"
+    communities_load_failed: "Не удалось загрузить сообщества пользователя"
+    invalid_email: "Введите корректный Email"
+    browser_launch_failed: "Не удалось открыть браузер"
+    link_open_failed: "Не удалось открыть ссылку"
+    not_implemented: "Функция еще не реализована"
+
+  success:
+    reset_instructions_sent: "Инструкции отправлены на адрес"
+  
   community:
+    edit_title: "Редактирование сообщества"
+    field_tagline: "Слоган"
+    field_tagline_hint: "Краткое описание или девиз"
+    save_success: "Изменения успешно сохранены!"
     create: "Создать сообщество"
     create_success: "Сообщество успешно создано!"
     create_title: "Новое сообщество"
+    default_title: "Информация о сообществе"
     denied_title: "Доступ запрещен"
     empty: "Сообщества не найдены"
     err_empty: "Это поле не может быть пустым"
     error_select_user: "Пожалуйста, выберите агента сообщества"
+    invalid_id: "Некорректный ID сообщества"
     field_amino_id: "Amino ID"
     field_amino_id_hint: "например, altamino"
     field_lang: "Язык"
@@ -18,11 +63,24 @@ admin:
     my: "Мои сообщества"
     search: "Поиск"
     search_hint: "Поиск сообществ..."
+    ndc_id: "Ndc ID"
+    agent_title: "Агент сообщества"
+    unknown_agent: "Неизвестный агент"
+    level: "Уровень"
+    amino_id: "Amino ID"
+    primary_lang: "Основной язык"
+    created_at: "Дата создания"
+    visibility_status: "Статус видимости"
+    status_listed: "В каталоге (Listed)"
+    status_unlisted: "Отсутствует в каталоге (Unlisted)"
+    disable_unavailable: "Отключение сообщества временно недоступно"
+
   reports:
     title: "Управление жалобами"
     empty: "Жалобы не найдены"
     filter_open: "Открытые"
     filter_resolved: "Решенные"
+
   roles:
     title: "Управление ролями"
     assign_title: "Назначить роль"
@@ -47,6 +105,7 @@ admin:
     tags_label: "Теги пользователя"
     tags_hint: "Разделяйте теги запятыми"
     field_verified: "Верифицированный аккаунт"
+
   team:
     title: "Наша команда"
     empty: "Список команды пуст"
@@ -56,6 +115,7 @@ admin:
     errors:
       open_amino: "Не удалось открыть профиль Amino"
       open_tg: "Не удалось открыть чат Telegram"
+
   section:
     reports: "Жалобы"
     reports_desc: "Разбор жалоб от пользователей и задачи модерации"
@@ -65,9 +125,6 @@ admin:
     usr_moderation_desc: "Поиск пользователей, выдача банов, мутов и предупреждений"
     events: "Ивенты"
     events_desc: "Управление событиями, конкурсами и активностями сообщества"
-
-    usr_moderation: "Модерация пользователей"
-    usr_moderation_desc: "Поиск по никнейму, @aminoId или ссылке на профиль"
 
 announcements:
   title: "Объявления"
@@ -117,6 +174,9 @@ common:
   cancel: "Отмена"
   error: "Произошла ошибка"
   save: "Сохранить"
+  unknown: "Неизвестно"
+  edit: "Редактировать"
+  disable: "Отключить"
 
 drawer:
   profile: "Профиль"

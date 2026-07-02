@@ -1,13 +1,58 @@
 admin:
   title: "Admin Panel"
+  
+  tabs:
+    search_and_manage: "Search & Manage"
+    password_reset: "Reset Password"
+
+  password_reset:
+    title: "Reset Password"
+    description: "Enter the user's email to send them recovery instructions and a link to restore access."
+    email_label: "Email Address"
+    button_submit: "Reset Password"
+
+  labels:
+    unknown_user: "Unknown User"
+    id_undefined: "ID not set"
+    account_actions: "Account Actions"
+    user_communities_list: "User Communities"
+    communities_not_found: "The user is not a member of any community"
+    no_title: "Untitled"
+    community_staff: "Administration"
+
+  buttons:
+    apply_sanctions: "Apply Sanctions"
+    show_communities: "Show Communities"
+    hide_communities: "Hide Communities"
+
+  tooltips:
+    global_profile: "Open Global Profile"
+
+  errors:
+    invalid_profile_link: "Invalid profile link"
+    communities_load_failed: "Failed to load user communities"
+    invalid_email: "Please enter a valid email"
+    browser_launch_failed: "Failed to open browser"
+    link_open_failed: "Failed to open link"
+    not_implemented: "Feature not implemented yet"
+
+  success:
+    reset_instructions_sent: "Instructions have been sent to"
+  
   community:
+    edit_title: "Edit Community"
+    field_tagline: "Tagline"
+    field_tagline_hint: "Short description or motto"
+    save_success: "Changes saved successfully!"
     create: "Create Community"
     create_success: "Community created successfully!"
     create_title: "New Community"
+    default_title: "Community Info"
     denied_title: "Access Denied"
     empty: "No communities found"
     err_empty: "This field cannot be empty"
     error_select_user: "Please select a community agent"
+    invalid_id: "Invalid community ID"
     field_amino_id: "Amino ID"
     field_amino_id_hint: "e.g., altamino"
     field_lang: "Language"
@@ -18,11 +63,24 @@ admin:
     my: "My Communities"
     search: "Search"
     search_hint: "Search communities..."
+    ndc_id: "Ndc ID"
+    agent_title: "Community Agent"
+    unknown_agent: "Unknown Agent"
+    level: "Level"
+    amino_id: "Amino ID"
+    primary_lang: "Primary Language"
+    created_at: "Creation Date"
+    visibility_status: "Visibility Status"
+    status_listed: "Listed"
+    status_unlisted: "Unlisted"
+    disable_unavailable: "Disabling community is temporarily unavailable"
+
   reports:
     title: "Report Management"
     empty: "No reports found"
     filter_open: "Open"
     filter_resolved: "Resolved"
+
   roles:
     title: "Role Management"
     assign_title: "Assign Role"
@@ -47,6 +105,7 @@ admin:
     tags_label: "User Tags"
     tags_hint: "Separate tags with commas"
     field_verified: "Verified Account"
+
   team:
     title: "Our Team"
     empty: "Team list is empty"
@@ -56,12 +115,13 @@ admin:
     errors:
       open_amino: "Failed to open Amino profile"
       open_tg: "Failed to open Telegram chat"
+
   section:
     reports: "Reports"
-    reports_desc: "Handling user reports and moderation tasks"
+    reports_desc: "Review user reports and moderation tasks"
     roles: "Access Rights"
-    roles_desc: "Managing roles, tags, and staff permissions"
-    usr_moderation: "User Moderation"
+    roles_desc: "Manage roles, tags, and staff permissions"
+    usr_moderation: "Moderation"
     usr_moderation_desc: "Search users, issue bans, mutes, and warnings"
     events: "Events"
     events_desc: "Manage events, contests, and community activities"
@@ -75,7 +135,7 @@ announcements:
     title_label: "Title"
     title_hint: "Enter announcement title"
     body_label: "Content"
-    body_hint: "Write text here..."
+    body_hint: "Write your text here..."
     publish: "Publish"
     save: "Save"
     background:
@@ -89,7 +149,7 @@ announcements:
       link: "Insert Link"
   details:
     title: "Announcement Details"
-    no_title: "No Title"
+    no_title: "Untitled"
     system_author: "System"
     edit_success: "Announcement updated!"
     delete: "Delete"
@@ -114,13 +174,16 @@ common:
   cancel: "Cancel"
   error: "An error occurred"
   save: "Save"
+  unknown: "Unknown"
+  edit: "Edit"
+  disable: "Disable"
 
 drawer:
   profile: "Profile"
   admin: "Admin Panel"
   alt_acm: "AltACM"
   chats: "Chats"
-  reports: "Reports & Feedback"
+  reports: "Reports & Suggestions"
   team: "Team"
   about_app: "About App"
   link_telegram: "Link Telegram"
@@ -158,14 +221,14 @@ profile:
 
 reports:
   tab_sent: "Sent Reports"
-  tab_write: "Write a Report"
+  tab_write: "File a Report"
   sent:
     title: "My Reports"
     empty: "You haven't submitted any reports yet"
   write:
     title: "Create Report"
-    description: "Please provide genuine evidence only. False reports may lead to an account ban."
-    target_label: "Report Target"
+    description: "Please provide valid evidence only. False reports may lead to account suspension."
+    target_label: "Report Object"
     target_hint: "User ID, blog link, or chat link"
     reason_label: "Reason"
     reason_hint: "Describe the violation in detail..."
