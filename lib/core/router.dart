@@ -58,13 +58,14 @@ GoRouter buildRouter({
       GoRoute(path: '/notifications', builder: (context, state) => const NotificationsScreen()),
       GoRoute(path: '/reports', builder: (context, state) => const UserReportsScreen()),
       
-      // --- СЕКЦИЯ ALTACM (Сделана плоско, как и /admin) ---
+
+
       GoRoute(
         path: '/altacm', 
         builder: (context, state) => const AltAcmMainScreen(),
         routes: [
           GoRoute(
-            path: 'create',
+            path: 'community/create',
             builder: (context, state) => const AltAcmCreateCommunityScreen(),
           ),
           GoRoute(
@@ -75,7 +76,7 @@ GoRouter buildRouter({
             },
           ),
           GoRoute(
-            path: 'community/:ndcId/edit',
+            path: 'edit',
             builder: (context, state) {
               final data = state.extra as Map<String, dynamic>?;
               return AltAcmEditCommunityScreen(communityData: data);
@@ -83,8 +84,6 @@ GoRouter buildRouter({
           ),
         ],
       ),
-
-      // --- СЕКЦИЯ ADMIN ---
       GoRoute(
         path: '/admin', 
         builder: (context, state) => const AdminDashboardScreen(),
