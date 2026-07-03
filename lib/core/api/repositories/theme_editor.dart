@@ -245,7 +245,7 @@ class ThemeEditor {
   ///   (прозрачность нужна для наложения на фон панели);
   /// Затем генерятся 2x (нормализованная) и 1x (вдвое меньше) варианты,
   /// имена файлов по конвенции, в json — оба энтри.
-  void injectImage({
+void injectImage({
     required String forWhat,
     required Uint8List newImageData,
   }) {
@@ -267,23 +267,29 @@ class ThemeEditor {
     bool asJpeg;
 
     if (isBackgroundSlot) {
+      // Фоны — строго под аспект Amino
       processed = _coverCrop(decoded, _bgWidth2x, _bgHeight2x);
       asJpeg = true; // фоны всегда jpeg — компактно, прозрачность не нужна
     } else if (canonical == "titlebar") {
+      // Титлбар вписываем в лимиты
       processed = _fitInside(decoded, _titlebarMaxW2x, _titlebarMaxH2x);
       asJpeg = false; // лого — png, сохраняем прозрачность
     } else {
-      // logo (иконка) — просто ограничиваем размер.
-      processed = _fitInside(decoded, 512, 512);
+      // logo (иконка) — уменьшаем до 256x256 (этого более чем достаточно для аватара сообщества)
+      processed = _fitInside(decoded, 256, 256);
       asJpeg = false;
     }
 
     final w2 = processed.width;
     final h2 = processed.height;
 
-    // 2x — нормализованная картинка.
+    // 2x — нормализованная картинка. 
+    // Для JPEG ставим качество 70 вместо 85 (сильное сжатие).
+    // Для PNG включаем максимальный уровень компрессии (level: 9).
     final bytes2x = Uint8List.fromList(
-      asJpeg ? img.encodeJpg(processed, quality: 85) : img.encodePng(processed),
+      asJpeg 
+          ? img.encodeJpg(processed, quality: 70) 
+          : img.encodePng(processed, level: 9),
     );
 
     // 1x — уменьшенная вдвое копия (минимум 1px).
@@ -295,8 +301,11 @@ class ThemeEditor {
       height: h1,
       interpolation: img.Interpolation.average,
     );
+    
     final bytes1x = Uint8List.fromList(
-      asJpeg ? img.encodeJpg(half, quality: 85) : img.encodePng(half),
+      asJpeg 
+          ? img.encodeJpg(half, quality: 70) 
+          : img.encodePng(half, level: 9),
     );
 
     final ext = asJpeg ? '.jpeg' : '.png';
@@ -309,6 +318,7 @@ class ThemeEditor {
     files
       ..clear()
       ..add(ThemeFile(path: path2x, data: bytes2x, width: w2, height: h2));
+      
     // Если картинка настолько мала, что 1x совпал с 2x — не дублируем.
     if (path1x != path2x) {
       files.add(ThemeFile(path: path1x, data: bytes1x, width: w1, height: h1));
@@ -319,7 +329,6 @@ class ThemeEditor {
         {"path": f.path, "width": f.width, "height": f.height, "x": 0, "y": 0}
     ];
   }
-
   /// Удаление слота: убираем файлы из архива и ключ из json.
   /// По правилам Amino отсутствие ключа = картинка удалена.
   void removeImage(String forWhat) {
