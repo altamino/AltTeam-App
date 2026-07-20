@@ -14,6 +14,15 @@ class Requester {
   String? userId;
   late final Dio _dio;
 
+  /// Выполняет рефреш сессии. Возвращает новый sid или null, если рефреш
+  /// не удался. Устанавливается снаружи (Api).
+  Future<String?> Function()? refreshSession;
+
+  /// Вызывается, когда сессию восстановить не удалось (рефреш провалился).
+  void Function()? onSessionExpired;
+
+  Future<String?>? _refreshInFlight;
+
   Requester({
     required this.deviceId,
     this.userAgent = UserAgent,
@@ -36,12 +45,9 @@ class Requester {
 
     if (data != null) {
       if (data is Uint8List) {
-        // Бинарные данные (картинки, архивы тем и т.д.) — подписываем
-        // и считаем длину по реальным байтам, без какой-либо сериализации.
         headers['Content-Length'] = data.length.toString();
         headers['NDC-MSG-SIG'] = Generator.signature(data);
       } else {
-        // Логика для обычного JSON/Текста
         final encoded = data is String ? data : jsonEncode(data);
         headers['NDC-MSG-SIG'] = Generator.signature(encoded);
         headers['Content-Length'] = utf8.encode(encoded).length.toString();
@@ -65,33 +71,30 @@ class Requester {
     dynamic body,
     Map<String, String>? extraHeaders,
     List<int> allowedCodes = const [200],
+    bool retryOnAuthFail = true,
   }) async {
-    // Бинарное тело (Uint8List / List<int>) — картинки, zip-архивы тем и т.п.
-    // Такие данные никогда не должны проходить через jsonEncode.
-    final bool isBinary = body is Uint8List || body is List<int>;
+    final response = await _send(method, endpoint, body: body, extraHeaders: extraHeaders);
 
-    if (!isBinary && body is Map<String, dynamic>) {
-      body = {
-        ...body,
-        'timestamp': Generator.reqTime(),
-      };
+    if (_isSessionExpired(response) && retryOnAuthFail && refreshSession != null) {
+      final newSid = await _refreshOnce();
+
+      if (newSid != null) {
+        sid = newSid;
+        // Повторяем исходный запрос один раз, уже без ретрая —
+        // если и с новым sid прилетит 440, значит что-то серьёзнее.
+        return request(
+          method,
+          endpoint,
+          body: body,
+          extraHeaders: extraHeaders,
+          allowedCodes: allowedCodes,
+          retryOnAuthFail: false,
+        );
+      }
+
+      onSessionExpired?.call();
+      _checkException(response);
     }
-
-    final dynamic encodedBody = isBinary
-        ? (body is Uint8List ? body : Uint8List.fromList(body as List<int>))
-        : body is String
-            ? body
-            : body != null
-                ? jsonEncode(body)
-                : null;
-
-    final headers = _buildHeaders(data: encodedBody, extraHeaders: extraHeaders);
-
-    final response = await _dio.request(
-      endpoint,
-      data: encodedBody,
-      options: Options(method: method, headers: headers),
-    );
 
     if (!allowedCodes.contains(response.statusCode)) {
       _checkException(response);
@@ -102,18 +105,74 @@ class Requester {
         : {'data': response.data};
   }
 
-void _checkException(Response response) {
+  Future<Response> _send(
+    String method,
+    String endpoint, {
+    dynamic body,
+    Map<String, String>? extraHeaders,
+  }) async {
+    final bool isBinary = body is Uint8List || body is List<int>;
+
+    dynamic preparedBody = body;
+    if (!isBinary && preparedBody is Map<String, dynamic>) {
+      // timestamp генерим на каждую отправку — при ретрае будет свежий.
+      preparedBody = {
+        ...preparedBody,
+        'timestamp': Generator.reqTime(),
+      };
+    }
+
+    final dynamic encodedBody = isBinary
+        ? (preparedBody is Uint8List ? preparedBody : Uint8List.fromList(preparedBody as List<int>))
+        : preparedBody is String
+            ? preparedBody
+            : preparedBody != null
+                ? jsonEncode(preparedBody)
+                : null;
+
+    final headers = _buildHeaders(data: encodedBody, extraHeaders: extraHeaders);
+
+    return _dio.request(
+      endpoint,
+      data: encodedBody,
+      options: Options(method: method, headers: headers),
+    );
+  }
+
+  bool _isSessionExpired(Response response) {
+    if (response.statusCode != 440) return false;
     final data = response.data;
-    
+    if (data is! Map<String, dynamic>) return false;
+    return '${data['api:statuscode']}' == '105';
+  }
+
+  /// Single-flight: если несколько запросов одновременно словили 440,
+  /// рефреш выполняется один раз, остальные ждут его результат.
+  Future<String?> _refreshOnce() {
+    return _refreshInFlight ??= _doRefresh();
+  }
+
+  Future<String?> _doRefresh() async {
+    try {
+      return await refreshSession!();
+    } catch (e) {
+      debugPrint('Session refresh failed: $e');
+      return null;
+    } finally {
+      _refreshInFlight = null;
+    }
+  }
+
+  void _checkException(Response response) {
+    final data = response.data;
+
     String code = 'unknown';
     String message = 'Unknown error';
 
-    // Проверяем, что сервер вернул именно JSON-карту, а не сырую строку/HTML
     if (data is Map<String, dynamic>) {
       code = data['api:statuscode']?.toString() ?? 'unknown';
       message = data['api:message']?.toString() ?? 'Unknown error';
     } else if (data != null) {
-      // Если пришла строка (например, текст ошибки от сервера)
       message = data.toString();
     }
 
@@ -127,6 +186,7 @@ void _checkException(Response response) {
       statusCode: response.statusCode,
     );
   }
+
   Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? headers}) =>
       request('GET', endpoint, extraHeaders: headers);
 

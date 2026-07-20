@@ -3,6 +3,11 @@ update_required_message: "Пожалуйста, обновите приложе�
 update_required_button: "Обновить"
 
 
+editor.insert: "Вставить"
+editor.link_dialog_title: "Вставить ссылку"
+editor.link_url_hint: "Введите ссылку..."
+editor.attached_images: "Прикрепленные изображения"
+
 admin:
   title: "Админ-панель"
   
@@ -64,6 +69,8 @@ admin:
     field_name: "Название сообщества"
     field_name_hint: "Введите название сообщества"
     field_user: "Агент (Не обязательно)"
+    field_theme_compress: "Сжимать изображения"
+    field_theme_compress_hint: "При отключении картинки загрузятся в оригинальном качестве — пак станет тяжелее"
     members: "участников"
     my: "Мои сообщества"
     search: "Поиск"
@@ -80,7 +87,6 @@ admin:
     status_unlisted: "Отсутствует в каталоге (Unlisted)"
     disable_unavailable: "Отключение сообщества временно недоступно"
 
-    # --- Вкладки экрана редактирования ---
     tab_general: "Основное"
     tab_media: "Медиа"
     tab_content: "Контент"
@@ -108,7 +114,6 @@ admin:
     theme_revision: "Ревизия темы"
     err_invalid_color: "Введите цвет в формате #RRGGBB"
 
-    # --- Вступление и видимость (доступно лидерам, не только стаффу) ---
     field_join_type: "Тип вступления"
     join_type_open: "Открытое"
     join_type_approval_required: "По заявке"
@@ -140,10 +145,15 @@ admin:
 
     ban: "Забанить"
     ban_dialog_title: "Забанить пользователя"
-    ban_dialog_message: "Вы уверены, что хотите забанить этого пользователя в этом сообществе?"
-    user_banned: "Пользователь забанен"
-    user_unbanned: "Пользователь разбанен"
+    ban_dialog_message: "Вы уверены, что хотите забанить этого пользователя?"
+    ban_reason_hint: "Укажите причину бана..."
 
+    unban: "Разбанить"
+    unban_dialog_title: "Разбанить пользователя"
+    unban_dialog_message: "Вы уверены, что хотите разбанить этого пользователя?"
+    unban_reason_hint: "Укажите причину разбана..."
+    user_banned: "Пользователь успешно забанен"
+    user_unbanned: "Пользователь успешно разбанен"
 
 
 

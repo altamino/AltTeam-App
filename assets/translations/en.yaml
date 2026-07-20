@@ -1,24 +1,33 @@
+update_required_title: "New version available"
+update_required_message: "Please update the application to continue using the service."
+update_required_button: "Update"
+
+editor.insert: "Insert"
+editor.link_dialog_title: "Insert link"
+editor.link_url_hint: "Enter URL..."
+editor.attached_images: "Attached images"
+
 admin:
   title: "Admin Panel"
   
   tabs:
     search_and_manage: "Search & Manage"
-    password_reset: "Reset Password"
+    password_reset: "Password Reset"
 
   password_reset:
-    title: "Reset Password"
-    description: "Enter the user's email to send them password recovery instructions and a reset link."
+    title: "Password Reset"
+    description: "Enter the user's email address to send them recovery instructions and a link."
     email_label: "Email Address"
     button_submit: "Reset Password"
 
   labels:
     unknown_user: "Unknown User"
-    id_undefined: "ID undefined"
+    id_undefined: "ID not set"
     account_actions: "Account Actions"
     user_communities_list: "User Communities"
-    communities_not_found: "The user is not a member of any community"
+    communities_not_found: "User is not a member of any community"
     no_title: "Untitled"
-    community_staff: "Staff"
+    community_staff: "Administration"
 
   buttons:
     apply_sanctions: "Apply Sanctions"
@@ -31,23 +40,23 @@ admin:
   errors:
     invalid_profile_link: "Invalid profile link"
     communities_load_failed: "Failed to load user communities"
-    invalid_email: "Please enter a valid email"
+    invalid_email: "Enter a valid email"
     browser_launch_failed: "Failed to launch browser"
     link_open_failed: "Failed to open link"
     not_implemented: "Feature not implemented yet"
 
   success:
-    reset_instructions_sent: "Instructions have been sent to"
+    reset_instructions_sent: "Instructions sent to"
   
   community:
     edit_title: "Edit Community"
     field_tagline: "Tagline"
-    field_tagline_hint: "Short description or motto"
+    field_tagline_hint: "Short description or slogan"
     save_success: "Changes saved successfully!"
     create: "Create Community"
     create_success: "Community created successfully!"
     create_title: "New Community"
-    default_title: "Community Info"
+    default_title: "Community Details"
     denied_title: "Access Denied"
     empty: "No communities found"
     err_empty: "This field cannot be empty"
@@ -59,6 +68,8 @@ admin:
     field_name: "Community Name"
     field_name_hint: "Enter community name"
     field_user: "Agent (Optional)"
+    field_theme_compress: "Compress images"
+    field_theme_compress_hint: "Disabling this will upload images in original quality — file size will be larger"
     members: "members"
     my: "My Communities"
     search: "Search"
@@ -69,13 +80,12 @@ admin:
     level: "Level"
     amino_id: "Amino ID"
     primary_lang: "Primary Language"
-    created_at: "Created At"
+    created_at: "Creation Date"
     visibility_status: "Visibility Status"
     status_listed: "Listed"
     status_unlisted: "Unlisted"
-    disable_unavailable: "Disabling the community is temporarily unavailable"
+    disable_unavailable: "Disabling community is temporarily unavailable"
 
-    # --- Edit Screen Tabs ---
     tab_general: "General"
     tab_media: "Media"
     tab_content: "Content"
@@ -86,16 +96,16 @@ admin:
     field_cover_hint: "Choose a cover image"
 
     field_description: "Description"
-    field_description_hint: "Tell us about the community"
+    field_description_hint: "Tell what the community is about"
     field_guidelines: "Guidelines"
-    field_guidelines_hint: "Describe the rules and guidelines"
+    field_guidelines_hint: "Describe rules and recommendations"
     field_welcome_message: "Welcome Message"
-    field_welcome_message_hint: "Text a new member will see"
+    field_welcome_message_hint: "Text that a new member will see"
 
     field_theme: "Customize Theme"
     field_theme_background: "Background"
-    field_theme_sidebar_bg: "Sidebar Background"
-    field_theme_sidebar_logo: "Logo"
+    field_theme_sidebar_bg: "Sidebar"
+    field_theme_sidebar_logo: "Sidebar Logo"
     field_theme_color: "Accent Color"
     theme_loading: "Loading theme..."
     theme_load_failed: "Failed to load theme"
@@ -103,7 +113,6 @@ admin:
     theme_revision: "Theme revision"
     err_invalid_color: "Enter color in #RRGGBB format"
 
-    # --- Join & Visibility ---
     field_join_type: "Join Type"
     join_type_open: "Open"
     join_type_approval_required: "Approval Required"
@@ -113,6 +122,37 @@ admin:
     staff_only_section: "Staff Only"
     staff_only_hint: "Available only to global staff"
     field_language: "Community Language"
+    tab_users: "Users"
+
+    field_search_users: "Search Users"
+    search_users_hint: "Enter username..."
+    search_users_empty: "No users found"
+
+    role_member: "Member"
+    role_curator: "Curator"
+    role_leader: "Leader"
+    role_owner: "Agent"
+    role_staff: "Staff"
+    role_unknown: "Unknown Role"
+    role_updated: "Role updated successfully!"
+
+    transfer_agent_title: "Transfer Agent Status"
+    transfer_agent_message: "Are you sure you want to transfer agent status to this user? The current agent will lose rights. This action cannot be undone."
+    transfer_agent_confirm: "Transfer"
+    transfer_agent_tooltip: "Transfer agent status"
+    transfer_agent_success: "Agent status transferred successfully!"
+
+    ban: "Ban"
+    ban_dialog_title: "Ban User"
+    ban_dialog_message: "Are you sure you want to ban this user in this community?"
+    ban_reason_hint: "Provide a reason for the ban..."
+
+    unban: "Unban"
+    unban_dialog_title: "Unban User"
+    unban_dialog_message: "Are you sure you want to unban this user?"
+    unban_reason_hint: "Provide a reason for the unban..."
+    user_banned: "User banned successfully"
+    user_unbanned: "User unbanned successfully"
 
   reports:
     title: "Report Management"
@@ -157,13 +197,13 @@ admin:
 
   section:
     reports: "Reports"
-    reports_desc: "Handling user reports and moderation tasks"
+    reports_desc: "User reports review and moderation tasks"
     roles: "Access Rights"
-    roles_desc: "Managing roles, tags, and staff permissions"
+    roles_desc: "Manage roles, tags, and staff permissions"
     usr_moderation: "Moderation"
     usr_moderation_desc: "Search users, issue bans, mutes, and warnings"
     events: "Events"
-    events_desc: "Managing events, contests, and community activities"
+    events_desc: "Manage community events, contests, and activities"
 
 announcements:
   title: "Announcements"
@@ -206,7 +246,7 @@ auth:
     button: "Log In"
     fill_all_fields: "Please fill in all fields"
     access_denied: "Access Denied"
-    terms: "Terms of Use"
+    terms: "Terms of Service"
     privacy: "Privacy Policy"
 
 common:
@@ -222,7 +262,7 @@ drawer:
   admin: "Admin Panel"
   alt_acm: "AltACM"
   chats: "Chats"
-  reports: "Reports & Suggestions"
+  reports: "Reports & Feedback"
   team: "Team"
   about_app: "About App"
   link_telegram: "Link Telegram"
@@ -231,7 +271,7 @@ drawer:
     version: "Version {version}"
     title: "About App"
     description: "Created by alx0rr in 2026 specifically for the AltAmino project."
-    developer_link: "Developer's Channel"
+    developer_link: "Developer Channel"
     close: "Close"
   errors:
     fail_open_telegram: "Failed to launch Telegram"
@@ -247,7 +287,7 @@ profile:
   theme: "Theme"
   logout: "Log Out"
   info:
-    created: "Registered"
+    created: "Joined"
     modified: "Updated"
   role:
     system: "System"
@@ -259,20 +299,20 @@ profile:
     member: "Member"
 
 reports:
-  tab_sent: "Sent Reports"
-  tab_write: "File a Report"
+  tab_sent: "Submitted Reports"
+  tab_write: "Submit Report"
   sent:
     title: "My Reports"
     empty: "You haven't submitted any reports yet"
   write:
     title: "Create Report"
-    description: "Please provide genuine evidence only. False reports may result in account suspension."
-    target_label: "Report Object"
+    description: "Please provide genuine proof only. False reports may lead to account suspension."
+    target_label: "Report Subject"
     target_hint: "User ID, blog link, or chat link"
     reason_label: "Reason"
     reason_hint: "Describe the violation in detail..."
-    fill_required: "Please fill in the required fields"
-    not_ready: "The form is incomplete"
+    fill_required: "Please fill in required fields"
+    not_ready: "Form is incomplete"
     submit: "Submit Report"
 
 theme:
@@ -285,4 +325,4 @@ ndc:
     delete: "Delete"
     delete_dialog_title: "Delete Community"
     delete_dialog_message: "Are you sure you want to delete this community? This action cannot be undone."
-    deleted_success: "Community successfully deleted."
+    deleted_success: "Community deleted successfully."

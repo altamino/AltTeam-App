@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import '../helpers/generator.dart';
 import 'requester.dart';
 import '../../storage.dart';
@@ -6,6 +5,14 @@ import '../constants.dart';
 
 class Api {
   static late final Requester _requester;
+
+  /// Вешается один раз при старте приложения, например в main.dart:
+  ///   Api.onSessionExpired = () => router.go('/login');
+  static void Function()? onSessionExpired;
+
+  // Защита от многократного срабатывания: если 5 параллельных запросов
+  // словили 440 и рефреш провалился, на логин кидаем один раз.
+  static bool _sessionExpiredFired = false;
 
   static Future<void> init() async {
     var deviceId = Storage.deviceId;
@@ -19,12 +26,75 @@ class Api {
       deviceId: deviceId,
     );
 
+    _requester.refreshSession = _refreshSession;
+    _requester.onSessionExpired = () {
+      if (_sessionExpiredFired) return;
+      _sessionExpiredFired = true;
+      clearSession();
+      onSessionExpired?.call();
+    };
+
     final sid = Storage.sid;
     final userId = Storage.userId;
     if (sid != null && userId != null) {
       _requester.sid = sid;
       _requester.userId = userId;
     }
+  }
+
+  /// Релогин сохранённым secret'ом. Возвращает новый sid или null.
+  static Future<String?> _refreshSession() async {
+    final email = Storage.email;
+    final secret = Storage.secret;
+    if (email == null || email.isEmpty || secret == null || secret.isEmpty) {
+      return null;
+    }
+
+    final res = await _requester.request(
+      'POST',
+      '/g/s/auth/login',
+      body: {
+        'email': email,
+        'secret': secret,
+        'deviceID': _requester.deviceId,
+        'clientType': 100,
+      },
+      retryOnAuthFail: false,
+    );
+
+    final newSid = res['sid']?.toString();
+    if (newSid == null || newSid.isEmpty) return null;
+
+    _applyLoginResponse(res);
+    return newSid;
+  }
+
+  /// Общая обработка ответа логина/релогина: sid, профиль, новый secret.
+  static void _applyLoginResponse(Map<String, dynamic> res) {
+    final sid = res['sid']?.toString();
+    if (sid == null || sid.isEmpty) return;
+
+    final profile = (res['userProfile'] as Map?)?.cast<String, dynamic>();
+
+    setSid(
+      sid,
+      res['auid'],
+      profile?['role'],
+      profile?['aminoId'],
+      profile?['telegramId'],
+    );
+
+    // Сервер может выдать новый secret — обновляем, старый может протухнуть.
+    final newSecret = res['secret']?.toString();
+    if (newSecret != null && newSecret.isNotEmpty) {
+      Storage.setSecret(newSecret);
+    }
+  }
+
+  /// Вызывается из репозитория логина после успешного входа.
+  static void saveLoginResult(String email, Map<String, dynamic> res) {
+    Storage.setEmail(email);
+    _applyLoginResponse(res);
   }
 
   static Future<Map<String, dynamic>> get(
@@ -40,7 +110,6 @@ class Api {
   }) =>
       _requester.post(endpoint, body: body, headers: headers);
 
-
   static Future<Map<String, dynamic>> delete(
     String endpoint, {
     Map<String, dynamic>? body,
@@ -48,18 +117,19 @@ class Api {
   }) =>
       _requester.delete(endpoint, body: body, headers: headers);
 
-  static void setSid(String sid, userId, int role,  String aminoId, int? telegramId) {
+  static void setSid(String sid, userId, role, aminoId, telegramId) {
+    _sessionExpiredFired = false;
     Storage.setSid(sid);
     Storage.setUserId(userId);
-    Storage.setRole(role);
-    Storage.setAminoId(aminoId);
-    Storage.setTelegramId(telegramId);
+    Storage.setRole(role is int ? role : int.tryParse('$role') ?? 0);
+    Storage.setAminoId(aminoId?.toString() ?? '');
+    Storage.setTelegramId(telegramId is int ? telegramId : int.tryParse('$telegramId'));
     _requester.sid = sid;
-    _requester.userId = userId;
+    _requester.userId = userId?.toString();
   }
 
   static String getDeviceId() {
-    return _requester.deviceId ?? Generator.genDeviceId();
+    return _requester.deviceId;
   }
 
   static void clearSession() {

@@ -39,10 +39,24 @@ run-ios:
 run-macos:
 	cd $(PROJECT) && flutter run -d macos
 
+
+
 apk:
 	@mkdir -p $(OUT)
+	cd $(PROJECT) && flutter build apk --release --split-per-abi
+	@cp -f $(PROJECT)/build/app/outputs/flutter-apk/*.apk $(OUT)/ 2>/dev/null || true
+
+apk-universal:
+	@mkdir -p $(OUT)
 	cd $(PROJECT) && flutter build apk --release
-	@cp -f $(PROJECT)/build/app/outputs/flutter-apk/app-release.apk $(OUT)/ 2>/dev/null || true
+	@cp -f $(PROJECT)/build/app/outputs/flutter-apk/app-release.apk $(OUT)/app-universal-release.apk 2>/dev/null || true
+
+apk-all: apk-universal
+	@mkdir -p $(OUT)
+	cd $(PROJECT) && flutter build apk --release --split-per-abi
+	@cp -f $(PROJECT)/build/app/outputs/flutter-apk/*.apk $(OUT)/ 2>/dev/null || true
+
+
 
 appbundle:
 	@mkdir -p $(OUT)

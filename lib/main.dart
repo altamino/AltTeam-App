@@ -88,6 +88,7 @@ class _AltTeamAppState extends State<AltTeamApp> {
     ]);
     _themeMode = Storage.themeMode;
     _locale = Locale(Storage.locale);
+    Api.onSessionExpired = () => _router.go('/login');
     _checkVersion();
   }
 

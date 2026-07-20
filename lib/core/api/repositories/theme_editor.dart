@@ -5,24 +5,6 @@ import 'package:archive/archive.dart';
 import 'package:image/image.dart' as img;
 import 'package:uuid/uuid.dart';
 
-/// Слоты изображений внутри .ndthemepack:
-///
-/// | canonical   | папка в архиве             | ключ в theme_info.json      |
-/// |-------------|----------------------------|------------------------------|
-/// | logo        | images/logo                | "logo"                       |
-/// | background  | images/background          | "background-image"           |
-/// | titlebar    | images/titlebar            | "titlebar-image"             |
-/// | titlebarbg  | images/titlebarBackground  | "titlebar-background-image"  |
-///
-/// ВАЖНО про формат (по докам aminofixfix и оригинальным пакам):
-/// - у каждого слота ДВА варианта картинки: 2x и 1x, имена по конвенции
-///   `<prefix>_<w>x<h>.<ext>` (например titlebar_640x128.png), в json —
-///   массив из двух энтри (сначала 2x);
-/// - фоны нормализуются под аспект 375x667: произвольные фотки с камеры
-///   (4000x3000 и т.п.) центр-кропаются и сжимаются, иначе пак раздувается,
-///   сервер может отбивать загрузку, а фон в приложении "уезжает";
-/// - "revision" в старых паках может лежать СТРОКОЙ — парсим безопасно;
-/// - EXIF-ориентация запекается, иначе фото с камеры лягут боком.
 class ThemeFile {
   String path;
   Uint8List data;
@@ -34,7 +16,6 @@ class ThemeFile {
 class ThemeEditor {
   ThemeFile? info;
 
-  // Каждый слот — список вариантов (2x, 1x). Порядок: сначала бОльшая.
   List<ThemeFile> background = [];
   List<ThemeFile> titlebar = [];
   List<ThemeFile> icon = [];
@@ -49,7 +30,6 @@ class ThemeEditor {
     'titlebarbg': 'images/titlebarBackground',
   };
 
-  // Префикс имени файла по конвенции оригинальных паков.
   static const Map<String, String> _filePrefixes = {
     'logo': 'logo',
     'titlebar': 'titlebar',
@@ -64,9 +44,6 @@ class ThemeEditor {
     'titlebarbg': 'titlebar-background-image',
   };
 
-  // Целевые размеры 2x-варианта. Фоны — строго 750x1334 (аспект 375x667
-  // из доки). Titlebar-лого не кропается (жалко логотипы), но вписывается
-  // в максимум 640x256, чтобы не тащить огромные png.
   static const int _bgWidth2x = 750;
   static const int _bgHeight2x = 1334;
   static const int _titlebarMaxW2x = 640;
@@ -74,7 +51,6 @@ class ThemeEditor {
 
   ThemeEditor._();
 
-  /// Загрузка существующего .ndthemepack.
   static ThemeEditor fromBytes(Uint8List archiveBytes) {
     final editor = ThemeEditor._();
     final archive = ZipDecoder().decodeBytes(archiveBytes);
@@ -103,7 +79,6 @@ class ThemeEditor {
       }
     }
 
-    // Сортируем варианты по убыванию размера файла (первый ~ 2x).
     int bySize(ThemeFile a, ThemeFile b) => b.data.length.compareTo(a.data.length);
     editor.background.sort(bySize);
     editor.titlebarBackground.sort(bySize);
@@ -112,7 +87,6 @@ class ThemeEditor {
 
     editor.themeJson["author"] ??= "AltTeam";
     editor.themeJson["format-version"] ??= "1.0";
-    // Нормализуем ревизию сразу: в старых паках бывает строкой.
     editor.themeJson["revision"] = editor.revision;
     if (editor.themeJson["id"] == "oled-black-theme" || editor.themeJson["id"] == null) {
       editor.themeJson["id"] = const Uuid().v4();
@@ -121,7 +95,6 @@ class ThemeEditor {
     return editor;
   }
 
-  /// Создание новой темы "с нуля".
   static ThemeEditor newTheme({String? themeId}) {
     final editor = ThemeEditor._();
     editor.themeJson = {
@@ -134,7 +107,6 @@ class ThemeEditor {
     return editor;
   }
 
-  /// Безопасный парсинг ревизии: int, строка, num, null — что угодно.
   int get revision {
     final r = themeJson["revision"];
     if (r is int) return r;
@@ -149,8 +121,6 @@ class ThemeEditor {
     themeJson["revision"] = revision + 1;
   }
 
-  /// "theme-color" ДОЛЖЕН быть валидным #RRGGBB — сервер это не проверяет,
-  /// а невалидный цвет роняет клиент при открытии сообщества.
   void setThemeColor(String hexColor) {
     final hex = RegExp(r'^#([0-9a-fA-F]{6})$');
     if (!hex.hasMatch(hexColor)) {
@@ -159,7 +129,6 @@ class ThemeEditor {
     themeJson["theme-color"] = hexColor;
   }
 
-  // Удобный доступ к байтам самого крупного варианта слота (для превью).
   Uint8List? get backgroundBytes => background.isEmpty ? null : background.first.data;
   Uint8List? get titlebarBytes => titlebar.isEmpty ? null : titlebar.first.data;
   Uint8List? get logoBytes => icon.isEmpty ? null : icon.first.data;
@@ -204,8 +173,6 @@ class ThemeEditor {
     }
   }
 
-  /// Масштабирует так, чтобы картинка ПОКРЫВАЛА целевой прямоугольник,
-  /// затем центр-кроп до точных размеров (аналог BoxFit.cover).
   img.Image _coverCrop(img.Image src, int tw, int th) {
     final scale = math.max(tw / src.width, th / src.height);
     final rw = math.max(tw, (src.width * scale).ceil());
@@ -222,8 +189,6 @@ class ThemeEditor {
     return out;
   }
 
-  /// Вписывает картинку в максимум maxW x maxH без кропа (уменьшение
-  /// с сохранением пропорций; маленькие не трогаем).
   img.Image _fitInside(img.Image src, int maxW, int maxH) {
     if (src.width <= maxW && src.height <= maxH) return src;
     final scale = math.min(maxW / src.width, maxH / src.height);
@@ -235,47 +200,83 @@ class ThemeEditor {
     );
   }
 
-  /// Внедрение картинки в слот.
-  ///
-  /// Картинка нормализуется под слот:
-  /// - фоны (background/titlebarbg): EXIF-ориентация, центр-кроп под
-  ///   750x1334 (аспект Amino), сжатие в jpeg — любые фотки с камеры
-  ///   превращаются в компактный фон правильной формы;
-  /// - titlebar-лого: вписывается в 640x256 без кропа, остаётся png
-  ///   (прозрачность нужна для наложения на фон панели);
-  /// Затем генерятся 2x (нормализованная) и 1x (вдвое меньше) варианты,
-  /// имена файлов по конвенции, в json — оба энтри.
-void injectImage({
+  bool _isJpegBytes(Uint8List bytes) {
+    return bytes.length > 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF;
+  }
+
+  bool _isPngBytes(Uint8List bytes) {
+    return bytes.length > 8 &&
+        bytes[0] == 0x89 &&
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
+        bytes[3] == 0x47;
+  }
+
+  void _writeSlot(String canonical, List<ThemeFile> files) {
+    themeJson[_jsonKeys[canonical]!] = [
+      for (final f in files)
+        {"path": f.path, "width": f.width, "height": f.height, "x": 0, "y": 0}
+    ];
+  }
+
+  void injectImage({
     required String forWhat,
     required Uint8List newImageData,
+    bool compress = true,
   }) {
     final canonical = _canonicalKey(forWhat);
 
     var decoded = img.decodeImage(newImageData);
     if (decoded == null) throw Exception("Invalid image data");
 
-    // Запекаем EXIF-ориентацию (фото с камеры иначе лягут боком).
     decoded = img.bakeOrientation(decoded);
 
     if (canonical == "logo" && decoded.width != decoded.height) {
       throw Exception("Logo should be square!");
     }
 
-    // --- Нормализация под слот ---
+    final folder = _folders[canonical]!;
+    final prefix = _filePrefixes[canonical]!;
+    final files = _slotList(canonical);
+
+    if (!compress || canonical == "logo") {
+      Uint8List outBytes;
+      String ext;
+
+      if (_isJpegBytes(newImageData)) {
+        outBytes = newImageData;
+        ext = '.jpeg';
+      } else if (_isPngBytes(newImageData)) {
+        outBytes = newImageData;
+        ext = '.png';
+      } else {
+        outBytes = Uint8List.fromList(img.encodePng(decoded));
+        ext = '.png';
+      }
+
+      final w = decoded.width;
+      final h = decoded.height;
+      final path = "$folder/${prefix}_${w}x$h$ext";
+
+      files
+        ..clear()
+        ..add(ThemeFile(path: path, data: outBytes, width: w, height: h));
+
+      _writeSlot(canonical, files);
+      return;
+    }
+
     final bool isBackgroundSlot = canonical == "background" || canonical == "titlebarbg";
     img.Image processed;
     bool asJpeg;
 
     if (isBackgroundSlot) {
-      // Фоны — строго под аспект Amino
       processed = _coverCrop(decoded, _bgWidth2x, _bgHeight2x);
-      asJpeg = true; // фоны всегда jpeg — компактно, прозрачность не нужна
+      asJpeg = true;
     } else if (canonical == "titlebar") {
-      // Титлбар вписываем в лимиты
       processed = _fitInside(decoded, _titlebarMaxW2x, _titlebarMaxH2x);
-      asJpeg = false; // лого — png, сохраняем прозрачность
+      asJpeg = false;
     } else {
-      // logo (иконка) — уменьшаем до 256x256 (этого более чем достаточно для аватара сообщества)
       processed = _fitInside(decoded, 256, 256);
       asJpeg = false;
     }
@@ -283,16 +284,12 @@ void injectImage({
     final w2 = processed.width;
     final h2 = processed.height;
 
-    // 2x — нормализованная картинка. 
-    // Для JPEG ставим качество 70 вместо 85 (сильное сжатие).
-    // Для PNG включаем максимальный уровень компрессии (level: 9).
     final bytes2x = Uint8List.fromList(
-      asJpeg 
-          ? img.encodeJpg(processed, quality: 70) 
+      asJpeg
+          ? img.encodeJpg(processed, quality: 70)
           : img.encodePng(processed, level: 9),
     );
 
-    // 1x — уменьшенная вдвое копия (минимум 1px).
     final w1 = math.max(1, (w2 / 2).round());
     final h1 = math.max(1, (h2 / 2).round());
     final half = img.copyResize(
@@ -301,48 +298,38 @@ void injectImage({
       height: h1,
       interpolation: img.Interpolation.average,
     );
-    
+
     final bytes1x = Uint8List.fromList(
-      asJpeg 
-          ? img.encodeJpg(half, quality: 70) 
+      asJpeg
+          ? img.encodeJpg(half, quality: 70)
           : img.encodePng(half, level: 9),
     );
 
     final ext = asJpeg ? '.jpeg' : '.png';
-    final folder = _folders[canonical]!;
-    final prefix = _filePrefixes[canonical]!;
     final path2x = "$folder/${prefix}_${w2}x$h2$ext";
     final path1x = "$folder/${prefix}_${w1}x$h1$ext";
 
-    final files = _slotList(canonical);
     files
       ..clear()
       ..add(ThemeFile(path: path2x, data: bytes2x, width: w2, height: h2));
-      
-    // Если картинка настолько мала, что 1x совпал с 2x — не дублируем.
+
     if (path1x != path2x) {
       files.add(ThemeFile(path: path1x, data: bytes1x, width: w1, height: h1));
     }
 
-    themeJson[_jsonKeys[canonical]!] = [
-      for (final f in files)
-        {"path": f.path, "width": f.width, "height": f.height, "x": 0, "y": 0}
-    ];
+    _writeSlot(canonical, files);
   }
-  /// Удаление слота: убираем файлы из архива и ключ из json.
-  /// По правилам Amino отсутствие ключа = картинка удалена.
+
   void removeImage(String forWhat) {
     final canonical = _canonicalKey(forWhat);
     _slotList(canonical).clear();
     themeJson.remove(_jsonKeys[canonical]);
   }
 
-  /// Пересборка всех файлов обратно в zip-архив.
   Uint8List rebuild() {
     final encoder = ZipEncoder();
     final archive = Archive();
 
-    // Ревизия могла быть нормализована — гарантируем int в выходном json.
     themeJson["revision"] = revision;
 
     final jsonStr = jsonEncode(themeJson);

@@ -58,6 +58,7 @@ class AppLocalizations {
       LocaleInfo(code: 'ru', name: 'Русский'),
       LocaleInfo(code: 'es', name: 'Español'),
       LocaleInfo(code: 'ar', name: 'العربية'),
+      LocaleInfo(code: 'pt', name: 'Português'),
     ];
   }
 }

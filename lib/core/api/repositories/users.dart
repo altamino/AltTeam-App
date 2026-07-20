@@ -13,4 +13,50 @@ class UsersRepository {
   }
 
 
+
+
+
+Future<Map<String, dynamic>> banUser({
+    String? userId,
+    int? ndcId,
+    String? reason,
+    int? banType,
+  }) async {
+
+    final Map<String, dynamic> data = {
+      if (banType != null) "reasonType": banType,
+      "note": {
+        "content": reason ?? "No reason provided.",
+      },
+    };
+
+    final res = await Api.post(
+      '/${(ndcId == 0) ? 'g' : 'x$ndcId'}/s/user-profile/$userId/ban',
+      body: data,
+    );
+    
+    return (res as Map<String, dynamic>?) ?? <String, dynamic>{};
+  }
+
+  Future<Map<String, dynamic>> unbanUser({
+    String? userId,
+    int? ndcId,
+    String? reason,
+  }) async {
+
+    
+    final Map<String, dynamic> data = {
+      "note": {
+        "content": reason ?? "No reason provided.",
+      },
+      "timestamp": DateTime.now().millisecondsSinceEpoch,
+    };
+
+    final res = await Api.post(
+      '/${(ndcId == 0) ? 'g' : 'x$ndcId'}/s/user-profile/$userId/unban',
+      body: data,
+    );
+
+    return (res as Map<String, dynamic>?) ?? <String, dynamic>{};
+  }
 }

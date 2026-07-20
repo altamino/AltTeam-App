@@ -1,0 +1,328 @@
+update_required_title: "Nova versão disponível"
+update_required_message: "Por favor, atualize o aplicativo para continuar utilizando o serviço."
+update_required_button: "Atualizar"
+
+editor.insert: "Inserir"
+editor.link_dialog_title: "Inserir link"
+editor.link_url_hint: "Insira o URL..."
+editor.attached_images: "Imagens anexadas"
+
+admin:
+  title: "Painel de Administração"
+  
+  tabs:
+    search_and_manage: "Pesquisar e Gerenciar"
+    password_reset: "Redefinir Senha"
+
+  password_reset:
+    title: "Redefinir Senha"
+    description: "Insira o e-mail do usuário para enviar as instruções e o link de recuperação."
+    email_label: "E-mail"
+    button_submit: "Redefinir Senha"
+
+  labels:
+    unknown_user: "Usuário desconhecido"
+    id_undefined: "ID não definido"
+    account_actions: "Ações da conta"
+    user_communities_list: "Comunidades do usuário"
+    communities_not_found: "O usuário não participa de nenhuma comunidade"
+    no_title: "Sem título"
+    community_staff: "Administração"
+
+  buttons:
+    apply_sanctions: "Aplicar sanções"
+    show_communities: "Mostrar comunidades"
+    hide_communities: "Ocultar comunidades"
+
+  tooltips:
+    global_profile: "Abrir perfil global"
+
+  errors:
+    invalid_profile_link: "Link de perfil inválido"
+    communities_load_failed: "Falha ao carregar comunidades do usuário"
+    invalid_email: "Insira um e-mail válido"
+    browser_launch_failed: "Falha ao abrir o navegador"
+    link_open_failed: "Falha ao abrir o link"
+    not_implemented: "Recurso ainda não implementado"
+
+  success:
+    reset_instructions_sent: "Instruções enviadas para"
+  
+  community:
+    edit_title: "Editar Comunidade"
+    field_tagline: "Slogan"
+    field_tagline_hint: "Descrição curta ou slogan"
+    save_success: "Alterações salvas com sucesso!"
+    create: "Criar Comunidade"
+    create_success: "Comunidade criada com sucesso!"
+    create_title: "Nova Comunidade"
+    default_title: "Detalhes da Comunidade"
+    denied_title: "Acesso Negado"
+    empty: "Nenhuma comunidade encontrada"
+    err_empty: "Este campo não pode ficar vazio"
+    error_select_user: "Por favor, selecione um agente para a comunidade"
+    invalid_id: "ID de comunidade inválido"
+    field_amino_id: "Amino ID"
+    field_amino_id_hint: "ex: altamino"
+    field_lang: "Idioma"
+    field_name: "Nome da comunidade"
+    field_name_hint: "Insira o nome da comunidade"
+    field_user: "Agente (Opcional)"
+    field_theme_compress: "Comprimir imagens"
+    field_theme_compress_hint: "Se desativado, as imagens serão enviadas na qualidade original — o tamanho do arquivo será maior"
+    members: "membros"
+    my: "Minhas Comunidades"
+    search: "Pesquisar"
+    search_hint: "Pesquisar comunidades..."
+    ndc_id: "Ndc ID"
+    agent_title: "Agente da Comunidade"
+    unknown_agent: "Agente desconhecido"
+    level: "Nível"
+    amino_id: "Amino ID"
+    primary_lang: "Idioma principal"
+    created_at: "Data de criação"
+    visibility_status: "Status de visibilidade"
+    status_listed: "Listada"
+    status_unlisted: "Não listada"
+    disable_unavailable: "Desativar a comunidade está temporariamente indisponível"
+
+    tab_general: "Geral"
+    tab_media: "Mídia"
+    tab_content: "Conteúdo"
+    tab_theme: "Tema"
+    tab_staff: "Staff"
+
+    field_cover: "Capa da Comunidade"
+    field_cover_hint: "Escolha uma imagem de capa"
+
+    field_description: "Descrição"
+    field_description_hint: "Descreva do que se trata a comunidade"
+    field_guidelines: "Diretrizes"
+    field_guidelines_hint: "Escreva as regras e recomendações"
+    field_welcome_message: "Mensagem de Boas-vindas"
+    field_welcome_message_hint: "Texto que o novo membro verá"
+
+    field_theme: "Personalizar Tema"
+    field_theme_background: "Fundo"
+    field_theme_sidebar_bg: "Fundo"
+    field_theme_sidebar_logo: "Logo da barra lateral"
+    field_theme_color: "Cor de destaque"
+    theme_loading: "Carregando tema..."
+    theme_load_failed: "Falha ao carregar o tema"
+    theme_preview_hint: "Pré-visualização do tema"
+    theme_revision: "Revisão do tema"
+    err_invalid_color: "Insira a cor no formato #RRGGBB"
+
+    field_join_type: "Tipo de Entrada"
+    join_type_open: "Aberta"
+    join_type_approval_required: "Requer Aprovação"
+    join_type_invite_only: "Apenas Convite"
+    field_hidden: "Comunidade Oculta"
+
+    staff_only_section: "Apenas para Staff"
+    staff_only_hint: "Disponível apenas para a equipe global"
+    field_language: "Idioma da Comunidade"
+    tab_users: "Usuários"
+
+    field_search_users: "Pesquisar Usuários"
+    search_users_hint: "Digite o nome de usuário..."
+    search_users_empty: "Nenhum usuário encontrado"
+
+    role_member: "Membro"
+    role_curator: "Curador"
+    role_leader: "Líder"
+    role_owner: "Agente"
+    role_staff: "Staff"
+    role_unknown: "Cargo desconhecido"
+    role_updated: "Cargo atualizado com sucesso!"
+
+    transfer_agent_title: "Transferir Agente"
+    transfer_agent_message: "Tem certeza de que deseja transferir os direitos de agente para este usuário? O agente atual perderá suas permissões. Esta ação não pode ser desfeita."
+    transfer_agent_confirm: "Transferir"
+    transfer_agent_tooltip: "Transferir direitos de agente"
+    transfer_agent_success: "Direitos de agente transferidos com sucesso!"
+
+    ban: "Banir"
+    ban_dialog_title: "Banir Usuário"
+    ban_dialog_message: "Tem certeza de que deseja banir este usuário nesta comunidade?"
+    ban_reason_hint: "Informe o motivo do banimento..."
+
+    unban: "Desbanir"
+    unban_dialog_title: "Desbanir Usuário"
+    unban_dialog_message: "Tem certeza de que deseja desbanir este usuário?"
+    unban_reason_hint: "Informe o motivo do desbanimento..."
+    user_banned: "Usuário banido com sucesso"
+    user_unbanned: "Usuário desbanido com sucesso"
+
+  reports:
+    title: "Gerenciamento de Denúncias"
+    empty: "Nenhuma denúncia encontrada"
+    filter_open: "Abertas"
+    filter_resolved: "Resolvidas"
+
+  roles:
+    title: "Gerenciamento de Cargos"
+    assign_title: "Atribuir Cargo"
+    edit_title: "Editar Cargo"
+    denied_title: "Acesso Restrito"
+    denied_subtitle: "Você não tem permissão para gerenciar cargos"
+    empty_team: "Nenhum membro da equipe encontrado"
+    field_role: "Cargo"
+    field_tags: "Tags"
+    field_team_member: "Membro da Equipe"
+    role_label: "Cargo Selecionado"
+    role_administrator: "Administrador"
+    role_moderator: "Moderador"
+    role_staff: "Equipe do Projeto"
+    role_user: "Membro"
+    role_not_editable: "Este cargo não pode ser editado"
+    search_hint: "Pesquisar usuários..."
+    search_empty_placeholder: "Nenhum usuário encontrado"
+    success: "Cargo atualizado com sucesso!"
+    tab_current: "Equipe"
+    tab_search: "Atribuir Novo"
+    tags_label: "Tags do Usuário"
+    tags_hint: "Separe as tags com vírgulas"
+    field_verified: "Conta Verificada"
+
+  team:
+    title: "Nossa Equipe"
+    empty: "A lista da equipe está vazia"
+    action:
+      amino: "Perfil do Amino"
+      telegram: "Enviar mensagem no Telegram"
+    errors:
+      open_amino: "Falha ao abrir perfil do Amino"
+      open_tg: "Falha ao abrir chat do Telegram"
+
+  section:
+    reports: "Denúncias"
+    reports_desc: "Análise de denúncias e tarefas de moderação"
+    roles: "Permissões"
+    roles_desc: "Gerenciamento de cargos, tags e permissões da equipe"
+    usr_moderation: "Moderação"
+    usr_moderation_desc: "Pesquisa de usuários, aplicação de banimentos, silenciamentos e avisos"
+    events: "Eventos"
+    events_desc: "Gerenciamento de eventos, concursos e atividades da comunidade"
+
+announcements:
+  title: "Anúncios"
+  empty: "Nenhum anúncio ainda"
+  create:
+    title: "Criar Anúncio"
+    edit_title: "Editar Anúncio"
+    title_label: "Título"
+    title_hint: "Insira o título do anúncio"
+    body_label: "Conteúdo"
+    body_hint: "Escreva o texto aqui..."
+    publish: "Publicar"
+    save: "Salvar"
+    background:
+      add: "Adicionar Fundo"
+      attached: "Fundo adicionado"
+      uploaded_success: "Imagem enviada com sucesso!"
+    format:
+      bold: "Negrito"
+      center: "Centralizado"
+      italic: "Itálico"
+      link: "Inserir Link"
+  details:
+    title: "Detalhes do Anúncio"
+    no_title: "Sem título"
+    system_author: "Sistema"
+    edit_success: "Anúncio atualizado!"
+    delete: "Excluir"
+    cancel: "Cancelar"
+    delete_dialog_title: "Excluir Anúncio"
+    delete_dialog_message: "Tem certeza de que deseja excluir este anúncio? Esta ação não pode ser desfeita."
+    deleted_success: "Anúncio excluído com sucesso."
+
+auth:
+  login:
+    brand: "AltAmino Team"
+    subtitle: "Bem-vindo de volta! Faça login em sua conta"
+    email_hint: "E-mail"
+    password_hint: "Senha"
+    button: "Entrar"
+    fill_all_fields: "Por favor, preencha todos os campos"
+    access_denied: "Acesso Negado"
+    terms: "Termos de Serviço"
+    privacy: "Política de Privacidade"
+
+common:
+  cancel: "Cancelar"
+  error: "Ocorreu um erro"
+  save: "Salvar"
+  unknown: "Desconhecido"
+  edit: "Editar"
+  disable: "Desativar"
+
+drawer:
+  profile: "Perfil"
+  admin: "Painel de Admin"
+  alt_acm: "AltACM"
+  chats: "Chats"
+  reports: "Denúncias e Sugestões"
+  team: "Equipe"
+  about_app: "Sobre o App"
+  link_telegram: "Vincular Telegram"
+  unlink_telegram: "Desvincular Telegram"
+  about:
+    version: "Versão {version}"
+    title: "Sobre o App"
+    description: "Criado por alx0rr em 2026 especialmente para o projeto AltAmino."
+    developer_link: "Canal do Desenvolvedor"
+    close: "Fechar"
+  errors:
+    fail_open_telegram: "Falha ao abrir o Telegram"
+
+notifications:
+  title: "Notificações"
+  empty: "Nenhuma notificação ainda"
+
+profile:
+  title: "Meu Perfil"
+  settings: "Configurações"
+  language: "Idioma"
+  theme: "Tema"
+  logout: "Sair da conta"
+  info:
+    created: "Cadastrado em"
+    modified: "Atualizado"
+  role:
+    system: "Sistema"
+    platform_staff: "Equipe do Projeto"
+    admin: "Administrador"
+    moderator: "Moderador"
+    staff: "Staff"
+    feed: "Feed"
+    member: "Membro"
+
+reports:
+  tab_sent: "Denúncias Enviadas"
+  tab_write: "Enviar Denúncia"
+  sent:
+    title: "Minhas Denúncias"
+    empty: "Você ainda não enviou nenhuma denúncia"
+  write:
+    title: "Criar Denúncia"
+    description: "Por favor, forneça apenas provas reais. Denúncias falsas podem levar à suspensão da conta."
+    target_label: "Objeto da Denúncia"
+    target_hint: "ID de usuário, link de blog ou chat"
+    reason_label: "Motivo"
+    reason_hint: "Descreva a infração em detalhes..."
+    fill_required: "Por favor, preencha os campos obrigatórios"
+    not_ready: "Formulário incompleto"
+    submit: "Enviar Denúncia"
+
+theme:
+  light: "Claro"
+  dark: "Escuro"
+  system: "Sistema"
+
+ndc:
+  details:
+    delete: "Excluir"
+    delete_dialog_title: "Excluir Comunidade"
+    delete_dialog_message: "Tem certeza de que deseja excluir esta comunidade? Esta ação não pode ser desfeita."
+    deleted_success: "Comunidade excluída com sucesso."
