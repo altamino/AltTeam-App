@@ -4,6 +4,7 @@ import 'core/router.dart';
 import 'core/l10n/app_localizations.dart';
 import 'core/storage.dart';
 import 'core/api/network/api.dart';
+import 'core/api/repositories/version_check.dart';
 import 'package:flutter/services.dart';
 
 void main() {
@@ -11,10 +12,8 @@ void main() {
   runApp(const _Bootstrap());
 }
 
-/// Показывается, пока идёт инициализация приложения.
 class _Bootstrap extends StatefulWidget {
   const _Bootstrap();
-
   @override
   State<_Bootstrap> createState() => _BootstrapState();
 }
@@ -47,10 +46,8 @@ class _BootstrapState extends State<_Bootstrap> {
   }
 }
 
-/// Твой кастомный splash-экран.
 class _SplashScreen extends StatelessWidget {
   const _SplashScreen();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +56,7 @@ class _SplashScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/images/logo.png', width: 120), // твой лого
+            Image.asset('assets/images/logo.png', width: 120),
             const SizedBox(height: 24),
             const CircularProgressIndicator(color: Colors.white),
           ],
@@ -91,7 +88,18 @@ class _AltTeamAppState extends State<AltTeamApp> {
     ]);
     _themeMode = Storage.themeMode;
     _locale = Locale(Storage.locale);
+    _checkVersion();
   }
+
+Future<void> _checkVersion() async {
+  final result = await VersionCheck.check();
+  final parsedOk = result.latestVersion.isNotEmpty;
+  if (parsedOk && !result.isUpToDate) {
+    if (mounted) {
+      _router.go('/update-required', extra: result.downloadPage);
+    }
+  }
+}
 
   void _setTheme(ThemeMode mode) {
     setState(() => _themeMode = mode);

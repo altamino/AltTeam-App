@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../screens/update.dart';
 import '../screens/adm/chats.dart';
 import '../screens/adm/dashboard/admin_dashboard.dart';
 import '../screens/adm/dashboard/report.dart';
@@ -43,6 +44,15 @@ GoRouter buildRouter({
       return null;
     },
     routes: [
+
+      GoRoute(
+        path: '/update-required',
+        builder: (context, state) {
+          final downloadPage = state.extra as String? ?? '';
+          return UpdateRequiredPage(downloadPage: downloadPage);
+        },
+      ),
+
       GoRoute(
         path: '/login',
         builder: (context, state) => LoginScreen(

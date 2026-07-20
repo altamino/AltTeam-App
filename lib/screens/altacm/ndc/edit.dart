@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cross_file/cross_file.dart';
+import '../../../core/api/repositories/search.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
@@ -16,21 +17,16 @@ import '../../../core/api/repositories/theme_editor.dart';
 import '../../../core/storage.dart';
 import '../../../core/api/objects/args/roles.dart';
 
-
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-
 /// Редактирование настроек сообщества (ACM).
 ///
-/// Слоты темы (.ndthemepack) и как они реально рендерятся в приложении:
-/// - "background"   -> фон БОКОВОЙ ПАНЕЛИ
-/// - "titlebarbg"   -> фон ГЛАВНОЙ страницы сообщества
-/// - "titlebar"     -> длинное лого В боковой панели, поверх её фона
-/// themeColor рисуется на главной странице СНИЗУ градиентом:
-/// прозрачный сверху -> полный цвет внизу.
+/// Слоты темы (.ndthemepack):
+/// - "background"  -> фон боковой панели
+/// - "titlebarbg"  -> фон главной страницы
+/// - "titlebar"    -> лого в боковой панели
+/// themeColor рисуется на главной странице градиентом снизу вверх.
 ///
-/// Основная иконка сообщества грузится отдельно (вкладка "Основное") и
-/// уходит как обычный `icon` в /altacm/.../edit — она НЕ часть темы.
+/// Основная иконка сообщества грузится на вкладке "Основное" отдельно
+/// от темы и уходит как обычный `icon` в /altacm/.../edit.
 class AltAcmEditCommunityScreen extends StatefulWidget {
   final Map<String, dynamic>? communityData;
 
@@ -49,13 +45,17 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
   final _picker = ImagePicker();
   late final TabController _tabController;
 
-  // Базовые поля
+  final _altAcmRepo = AltACMRepository();
+  final _searchRepo = SearchRepository();
+
   late TextEditingController _nameController;
   late TextEditingController _taglineController;
   late TextEditingController _aminoIdController;
   late TextEditingController _descriptionController;
   late TextEditingController _guidelinesController;
   late TextEditingController _welcomeMessageController;
+
+  bool get _canTransferAgent => _isStaff || Storage.role == RoleTypes.roleAgent;
 
   XFile? _selectedIconFile;
   String? _currentIconUrl;
@@ -65,13 +65,10 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
 
   bool _welcomeMessageEnabled = false;
 
-  // Настройки вступления/видимости — доступны лидеру/куратору,
-  // НЕ являются staff-only.
   int _joinType = 0; // 0 - Open, 1 - ApprovalRequired, 2 - InviteOnly
   bool _hidden = false;
 
-  // Единственное, что реально требует глобального стаффа — смена языка
-  // сообщества (влияет на глобальные листинги/поиск).
+  // Смена языка сообщества — единственное поле, требующее глобального стаффа.
   late bool _isStaff;
   late String _language;
   static const List<String> _availableLanguages = ['en', 'ru', 'es', 'ar'];
@@ -79,26 +76,20 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
   // ---------------- Тема ----------------
   bool _themeEditingEnabled = false;
 
-  // Существующий пак с сервера. Скачивается лениво при включении свитча,
-  // чтобы новая тема собиралась ПОВЕРХ старой (старые картинки/поля json
-  // сохраняются, если пользователь их не менял).
   String? _themePackUrl;
   int _serverThemeRevision = 0;
   ThemeEditor? _themeEditor;
   bool _themeLoading = false;
   String? _themeLoadError;
 
-  // Новые выбранные картинки (перекрывают то, что лежит в старом паке).
-  XFile? _selectedThemeBackgroundFile; // слот 'background' = фон БОКОВОЙ панели
-  XFile? _selectedThemeTitlebarBgFile; // слот 'titlebarbg' = фон ГЛАВНОЙ страницы
-  XFile? _selectedThemeTitlebarFile; // слот 'titlebar'   = лого в боковой панели
+  XFile? _selectedThemeBackgroundFile;
+  XFile? _selectedThemeTitlebarBgFile;
+  XFile? _selectedThemeTitlebarFile;
 
-  // Флаги удаления слотов (удалить, а не заменить).
   bool _removeThemeBackground = false;
   bool _removeThemeTitlebarBg = false;
   bool _removeThemeTitlebar = false;
 
-  // Цвет темы — выбирается из палитры, не вводом.
   String _themeColorHex = '';
   static const List<String> _palette = [
     '#780000', '#C1121F', '#E63946', '#F77F00', '#FCBF49',
@@ -110,39 +101,50 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
 
   bool _isLoading = false;
 
+  // true, если что-то реально сохранилось/поменялось — чтобы предыдущие
+  // экраны знали, что нужно перезапросить данные.
+  bool _dataChanged = false;
+
+  // ---------------- Пользователи ----------------
+
+  final _userSearchController = TextEditingController();
+  List<dynamic> _communityUsers = [];
+  bool _usersLoading = false;
+  String _usersQuery = '';
+
   List<Tab> get _tabs => [
         Tab(text: AppLocalizations.t('admin.community.tab_general'), icon: const Icon(Icons.tune_rounded, size: 20)),
         Tab(text: AppLocalizations.t('admin.community.tab_media'), icon: const Icon(Icons.image_rounded, size: 20)),
         Tab(text: AppLocalizations.t('admin.community.tab_content'), icon: const Icon(Icons.article_rounded, size: 20)),
-        if (_isStaff)
-          Tab(text: AppLocalizations.t('admin.community.tab_staff'), icon: const Icon(Icons.verified_user_rounded, size: 20)),
+        Tab(text: AppLocalizations.t('admin.community.tab_users'), icon: const Icon(Icons.people_alt_rounded, size: 20)),
       ];
+
+  int get _ndcId {
+    final raw = widget.communityData?['ndcId'] ?? widget.communityData?['id'];
+    if (raw == null) throw Exception("ndcId / id not found in communityData");
+    return int.parse(raw.toString());
+  }
 
   @override
   void initState() {
     super.initState();
 
     _isStaff = RoleTypes.isStaffRole(Storage.role);
-    _tabController = TabController(length: _isStaff ? 4 : 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
 
     final data = widget.communityData;
 
     _nameController = TextEditingController(text: data?['name'] ?? '');
     _taglineController = TextEditingController(text: data?['tagline'] ?? '');
     _aminoIdController = TextEditingController(text: data?['endpoint'] ?? data?['aminoId'] ?? '');
-    // Описание сообщества приходит в поле `content`.
     _descriptionController = TextEditingController(text: data?['content'] ?? data?['description'] ?? '');
     _guidelinesController = TextEditingController(text: data?['guidelines'] ?? '');
 
-    // Тема: цвет/URL/ревизия лежат внутри themePack, а не в корне.
     final themePack = (data?['themePack'] as Map?)?.cast<String, dynamic>() ?? {};
     _themeColorHex = (themePack['themeColor'] ?? data?['themeColor'] ?? '').toString();
     _themePackUrl = themePack['themePackUrl'];
-    // Ревизия может прийти числом ИЛИ строкой — парсим безопасно,
-    // иначе "type 'String' is not a subtype of type 'int'".
     _serverThemeRevision = int.tryParse('${themePack['themePackRevision'] ?? 0}') ?? 0;
 
-    // Приветственное сообщение — в advancedSettings.
     final advanced = (data?['advancedSettings'] as Map?)?.cast<String, dynamic>() ?? {};
     final configuration = (data?['configuration'] as Map?)?.cast<String, dynamic>() ?? {};
     _welcomeMessageController = TextEditingController(
@@ -152,19 +154,17 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
         (advanced['welcomeMessageEnabled'] ?? configuration['welcomeMessageEnabled']) == true;
 
     _currentIconUrl = data?['icon'];
-    // Обложка: promotionalMediaList = [[100, url, ...], ...]
+    // promotionalMediaList = [[100, url, ...], ...]
     final promo = data?['promotionalMediaList'];
     if (promo is List && promo.isNotEmpty && promo.first is List && (promo.first as List).length > 1) {
       _currentCoverUrl = (promo.first as List)[1]?.toString();
     }
     _currentCoverUrl ??= data?['coverUrl'] ?? data?['cover'];
 
-    // joinType — в корне ответа.
     final rawJoin = data?['joinType'] ?? configuration['joinType'] ?? 0;
     _joinType = rawJoin is int ? rawJoin : int.tryParse('$rawJoin') ?? 0;
     _hidden = (configuration['hidden'] ?? data?['hidden']) == true;
 
-    // Язык — primaryLanguage.
     final lang = (data?['primaryLanguage'] ?? data?['lang'] ?? data?['language'])?.toString();
     _language = _availableLanguages.contains(lang) ? lang! : 'en';
   }
@@ -178,6 +178,7 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     _descriptionController.dispose();
     _guidelinesController.dispose();
     _welcomeMessageController.dispose();
+    _userSearchController.dispose();
     super.dispose();
   }
 
@@ -199,7 +200,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
   Future<void> _pickIcon() => _pickImageInto((f) => _selectedIconFile = f, maxWidth: 512, maxHeight: 512);
   Future<void> _pickCover() => _pickImageInto((f) => _selectedCoverFile = f);
 
-  // Выбор новой картинки в слот темы сбрасывает флаг удаления этого слота.
   Future<void> _pickThemeBackground() => _pickImageInto((f) {
         _selectedThemeBackgroundFile = f;
         _removeThemeBackground = false;
@@ -219,7 +219,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     if (_themeEditor != null || _themeLoading) return;
     final url = _themePackUrl;
     if (url == null || url.isEmpty) {
-      // Пака ещё нет — начинаем с чистой темы.
       setState(() => _themeEditor = ThemeEditor.newTheme());
       return;
     }
@@ -232,7 +231,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     try {
       final bytes = await _downloadBytes(url);
       final editor = ThemeEditor.fromBytes(bytes);
-      // Ревизия сервера — источник правды (в json пака она может отставать).
       if (_serverThemeRevision > editor.revision) {
         editor.revision = _serverThemeRevision;
       }
@@ -241,8 +239,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        // Не смогли скачать старый пак — не блокируем работу,
-        // просто собираем тему с нуля, но с правильной ревизией.
         _themeEditor = ThemeEditor.newTheme();
         if (_serverThemeRevision > 0) {
           _themeEditor!.revision = _serverThemeRevision;
@@ -281,32 +277,23 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     setState(() => _isLoading = true);
 
     try {
-      final rawNdcId = widget.communityData?['ndcId'] ?? widget.communityData?['id'];
-      if (rawNdcId == null) {
-        throw Exception("ndcId / id not found in communityData");
-      }
-      final ndcId = int.parse(rawNdcId.toString());
-
-      final acmRepo = AltACMRepository();
+      final ndcId = _ndcId;
       final linksRepo = LinksRepository();
 
-      // 1. Иконка (основная, НЕ из темы)
       String? uploadedIconUrl;
       if (_selectedIconFile != null) {
         final res = await linksRepo.uploadMedia(file: _selectedIconFile!);
         uploadedIconUrl = res['mediaValue'];
       }
 
-      // 2. Обложка
       String? uploadedCoverUrl;
       if (_selectedCoverFile != null) {
         final res = await linksRepo.uploadMedia(file: _selectedCoverFile!);
         uploadedCoverUrl = res['mediaValue'];
       }
 
-      // 3. Тема. Берём СТАРЫЙ пак как основу (если он был скачан) и
-      //    накатываем поверх только то, что пользователь реально поменял:
-      //    новые картинки, удаления слотов, цвет.
+      // Тема собирается поверх старого пака: меняем только то, что
+      // реально тронул пользователь (новые картинки/удаления/цвет).
       String? themeUrl;
       int? themeRevision;
       final hasNewThemeImages = _selectedThemeBackgroundFile != null ||
@@ -316,14 +303,11 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
       final themeColor = _themeColorHex.isEmpty ? null : _themeColorHex;
 
       if (_themeEditingEnabled && (hasNewThemeImages || hasRemovals || themeColor != null)) {
-        // Если пак ещё не скачан (пользователь сразу жмёт сохранить) — качаем.
         if (_themeEditor == null) {
           await _loadExistingThemePack();
         }
         final themeEditor = _themeEditor ?? ThemeEditor.newTheme();
 
-        // Удаления. Флаг взводится только когда новой картинки нет,
-        // но на всякий случай: новая картинка приоритетнее удаления.
         if (_removeThemeBackground && _selectedThemeBackgroundFile == null) {
           themeEditor.removeImage('background');
         }
@@ -336,19 +320,19 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
 
         if (_selectedThemeBackgroundFile != null) {
           themeEditor.injectImage(
-            forWhat: 'background', // фон боковой панели
+            forWhat: 'background',
             newImageData: await _selectedThemeBackgroundFile!.readAsBytes(),
           );
         }
         if (_selectedThemeTitlebarBgFile != null) {
           themeEditor.injectImage(
-            forWhat: 'titlebarbg', // фон главной страницы
+            forWhat: 'titlebarbg',
             newImageData: await _selectedThemeTitlebarBgFile!.readAsBytes(),
           );
         }
         if (_selectedThemeTitlebarFile != null) {
           themeEditor.injectImage(
-            forWhat: 'titlebar', // лого в боковой панели
+            forWhat: 'titlebar',
             newImageData: await _selectedThemeTitlebarFile!.readAsBytes(),
           );
         }
@@ -356,7 +340,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
           themeEditor.setThemeColor(themeColor);
         }
 
-        // Ревизия = старая (сервер/пак) + 1.
         themeEditor.incrementRevision();
         final zipBytes = themeEditor.rebuild();
 
@@ -365,10 +348,7 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
         themeRevision = themeEditor.revision;
       }
 
-      // 4. Отправляем изменения сообщества.
-      //    joinType/hidden — доступны любому лидеру, не гейтятся стаффом.
-      //    language — единственное поле, требующее глобального стаффа.
-      await acmRepo.editCommunity(
+      await _altAcmRepo.editCommunity(
         ndcId,
         name: _nameController.text.trim(),
         aminoId: _aminoIdController.text.trim(),
@@ -389,6 +369,8 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
 
       if (!mounted) return;
 
+      _dataChanged = true;
+
       AppSnackbar.show(
         context,
         AppLocalizations.t('admin.community.save_success'),
@@ -398,7 +380,7 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
       context.pop(true);
     } catch (e, stackTrace) {
       print('Что случилось: $e');
-      print('Где именно: $stackTrace'); // Показывает точную строку внутри try
+      print('Где именно: $stackTrace');
       if (!mounted) return;
       AppSnackbar.show(context, e.toString(), type: SnackType.error);
     } finally {
@@ -411,42 +393,189 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     return trimmed.isEmpty ? null : trimmed;
   }
 
+  // ---------------- Пользователи сообщества ----------------
+
+  Future<void> _searchCommunityUsers(String q) async {
+    _usersQuery = q;
+    if (q.trim().isEmpty) {
+      setState(() => _communityUsers = []);
+      return;
+    }
+
+    setState(() => _usersLoading = true);
+    try {
+      final res = await _searchRepo.searchUser(ndcId: _ndcId, q: q);
+      if (!mounted || _usersQuery != q) return;
+      setState(() {
+        _communityUsers = res['userProfileList'] ?? [];
+        _usersLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _usersLoading = false);
+      AppSnackbar.show(context, e.toString(), type: SnackType.error);
+    }
+  }
+
+  Future<void> _changeUserRole(Map<String, dynamic> user, int? newRole) async {
+    final previousRole = user['role'];
+    setState(() => user['role'] = newRole ?? RoleTypes.roleUser);
+    try {
+      if (newRole == null || newRole == RoleTypes.roleUser) {
+        await _altAcmRepo.unpromoteUser(user['uid'], _ndcId);
+      } else {
+        await _altAcmRepo.promoteUser(user['uid'], _ndcId, newRole);
+      }
+      if (!mounted) return;
+      _dataChanged = true;
+      AppSnackbar.show(context, AppLocalizations.t('admin.community.role_updated'), type: SnackType.success);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => user['role'] = previousRole);
+      AppSnackbar.show(context, e.toString(), type: SnackType.error);
+    }
+  }
+
+  Future<bool?> _confirmDialog({
+    required AppPalette colors,
+    required String title,
+    required String message,
+    required String confirmLabel,
+    required Color confirmColor,
+  }) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: AlertDialog(
+          backgroundColor: colors.glassFillStrong,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(title, style: TextStyle(color: colors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+          content: Text(message, style: TextStyle(color: colors.textMuted, fontSize: 14)),
+          actions: [
+            TextButton(
+              onPressed: () => context.pop(false),
+              child: Text(AppLocalizations.t('common.cancel'), style: TextStyle(color: colors.textMuted)),
+            ),
+            TextButton(
+              onPressed: () => context.pop(true),
+              child: Text(confirmLabel, style: TextStyle(color: confirmColor, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Передача прав агента (владельца) другому пользователю. Отдельное
+  /// опасное действие вне обычного дропдауна ролей: после него текущий
+  /// агент теряет свои права.
+  Future<void> _transferAgent(Map<String, dynamic> user) async {
+    final colors = AppColors.of(context);
+    final confirmed = await _confirmDialog(
+      colors: colors,
+      title: AppLocalizations.t('admin.community.transfer_agent_title'),
+      message: AppLocalizations.t('admin.community.transfer_agent_message'),
+      confirmLabel: AppLocalizations.t('admin.community.transfer_agent_confirm'),
+      confirmColor: colors.error,
+    );
+    if (confirmed != true) return;
+
+    try {
+      await _altAcmRepo.promoteUser(user['uid'], _ndcId, RoleTypes.roleAgent);
+      if (!mounted) return;
+      setState(() => user['role'] = RoleTypes.roleAgent);
+      _dataChanged = true;
+      AppSnackbar.show(context, AppLocalizations.t('admin.community.transfer_agent_success'), type: SnackType.success);
+      // После передачи агента список может быть неактуален (сменился
+      // владелец) — проще перезапросить тот же поиск.
+      _searchCommunityUsers(_usersQuery);
+    } catch (e) {
+      if (!mounted) return;
+      AppSnackbar.show(context, e.toString(), type: SnackType.error);
+    }
+  }
+
+  Future<void> _banUser(Map<String, dynamic> user) async {
+    final colors = AppColors.of(context);
+    final confirmed = await _confirmDialog(
+      colors: colors,
+      title: AppLocalizations.t('admin.community.ban_dialog_title'),
+      message: AppLocalizations.t('admin.community.ban_dialog_message'),
+      confirmLabel: AppLocalizations.t('admin.community.ban'),
+      confirmColor: colors.error,
+    );
+    if (confirmed != true) return;
+
+    try {
+      await _altAcmRepo.banUser(user['uid'], _ndcId);
+      if (!mounted) return;
+      setState(() => user['membershipStatus'] = 3);
+      _dataChanged = true;
+      AppSnackbar.show(context, AppLocalizations.t('admin.community.user_banned'), type: SnackType.success);
+    } catch (e) {
+      if (!mounted) return;
+      AppSnackbar.show(context, e.toString(), type: SnackType.error);
+    }
+  }
+
+  Future<void> _unbanUser(Map<String, dynamic> user) async {
+    try {
+      await _altAcmRepo.unbanUser(user['uid'], _ndcId);
+      if (!mounted) return;
+      setState(() => user['membershipStatus'] = 0);
+      _dataChanged = true;
+      AppSnackbar.show(context, AppLocalizations.t('admin.community.user_unbanned'), type: SnackType.success);
+    } catch (e) {
+      if (!mounted) return;
+      AppSnackbar.show(context, e.toString(), type: SnackType.error);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: colors.bgGradient,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        context.pop(_dataChanged);
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: colors.bgGradient,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildAppBar(colors),
-              _buildTabBar(colors),
-              Expanded(
-                child: _isLoading
-                    ? Center(child: CircularProgressIndicator(color: colors.accentPrimary))
-                    : Form(
-                        key: _formKey,
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [
-                            _tabScroll(_buildGeneralTab(colors)),
-                            _tabScroll(_buildMediaTab(colors)),
-                            _tabScroll(_buildContentTab(colors)),
-                            if (_isStaff) _tabScroll(_buildStaffTab(colors)),
-                          ],
+          child: SafeArea(
+            child: Column(
+              children: [
+                _buildAppBar(colors),
+                _buildTabBar(colors),
+                Expanded(
+                  child: _isLoading
+                      ? Center(child: CircularProgressIndicator(color: colors.accentPrimary))
+                      : Form(
+                          key: _formKey,
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: [
+                              _tabScroll(_buildGeneralTab(colors)),
+                              _tabScroll(_buildMediaTab(colors)),
+                              _tabScroll(_buildContentTab(colors)),
+                              _tabScroll(_buildUsersTab(colors)),
+                            ],
+                          ),
                         ),
-                      ),
-              ),
-              if (!_isLoading) _buildSubmitButton(colors),
-            ],
+                ),
+                if (!_isLoading) _buildSubmitButton(colors),
+              ],
+            ),
           ),
         ),
       ),
@@ -467,7 +596,7 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
         children: [
           IconButton(
             icon: Icon(Icons.arrow_back_ios_new, color: colors.textPrimary, size: 20),
-            onPressed: () => context.pop(),
+            onPressed: () => context.pop(_dataChanged),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -583,11 +712,54 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
             ],
           ),
         ),
+        if (_isStaff) ...[
+          const SizedBox(height: 16),
+          _buildStaffSection(colors),
+        ],
       ],
     );
   }
 
-  /// Аватарка — квадрат с закруглением (как в приложении), не круг.
+  Widget _buildStaffSection(AppPalette colors) {
+    return _glassWrap(
+      colors,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.verified_user_rounded, size: 16, color: colors.accentPrimary),
+              const SizedBox(width: 6),
+              Text(
+                AppLocalizations.t('admin.community.staff_only_section'),
+                style: TextStyle(color: colors.accentPrimary, fontSize: 13, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            AppLocalizations.t('admin.community.staff_only_hint'),
+            style: TextStyle(color: colors.textMuted, fontSize: 12),
+          ),
+          const SizedBox(height: 16),
+          _fieldLabel(colors, AppLocalizations.t('admin.community.field_language')),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            initialValue: _language,
+            dropdownColor: colors.bgGradient.last,
+            style: TextStyle(color: colors.textPrimary),
+            items: _availableLanguages
+                .map((lang) => DropdownMenuItem(value: lang, child: Text(lang.toUpperCase())))
+                .toList(),
+            onChanged: (val) {
+              if (val != null) setState(() => _language = val);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildIconPicker(AppPalette colors) {
     ImageProvider? imageProvider;
 
@@ -646,8 +818,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     );
   }
 
-  /// Обложка — вертикальный прямоугольник (портретная ориентация,
-  /// как экран телефона).
   Widget _buildCoverSection(AppPalette colors) {
     ImageProvider? imageProvider;
     if (_selectedCoverFile != null) {
@@ -668,7 +838,7 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
               onTap: _pickCover,
               child: Container(
                 width: 160,
-                height: 284, // ~9:16, портрет как телефон
+                height: 284,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: colors.textMuted.withOpacity(0.15),
@@ -703,8 +873,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
 
   // ---------------- Секция: Тема ----------------
 
-  /// Провайдер картинки слота темы: приоритет — новая выбранная картинка,
-  /// затем картинка из старого пака (если слот не помечен на удаление).
   ImageProvider? _themeSlotImage(XFile? picked, Uint8List? packBytes, bool removed) {
     if (picked != null) return FileImage(File(picked.path));
     if (removed) return null;
@@ -794,7 +962,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
               const SizedBox(height: 10),
               _buildColorPalette(colors),
               const SizedBox(height: 12),
-              // Инфо о ревизии: старая -> новая.
               Row(
                 children: [
                   Icon(Icons.history_rounded, size: 14, color: colors.textMuted),
@@ -814,8 +981,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     );
   }
 
-  /// Палитра выбора themeColor. Если текущий цвет сообщества нестандартный —
-  /// он добавляется в начало палитры, чтобы его можно было оставить.
   Widget _buildColorPalette(AppPalette colors) {
     final items = <String>[
       if (_themeColorHex.isNotEmpty && !_palette.contains(_themeColorHex.toUpperCase()))
@@ -856,27 +1021,19 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     );
   }
 
-  /// Превью "как в приложении":
-  /// - слева боковая панель: фон = слот 'background', лого 'titlebar' поверх
-  /// - справа главная страница: фон = слот 'titlebarbg',
-  ///   themeColor рисуется СНИЗУ градиентом (прозрачный -> полный цвет).
-  /// У каждого слота с картинкой есть кнопка удаления (крестик).
   Widget _buildThemePreview(AppPalette colors) {
     final themeColor = _parsedThemeColor(colors);
 
-    // 'background' = фон боковой панели
     final sidebarBgImage = _themeSlotImage(
       _selectedThemeBackgroundFile,
       _themeEditor?.backgroundBytes,
       _removeThemeBackground,
     );
-    // 'titlebarbg' = фон главной страницы
     final mainBgImage = _themeSlotImage(
       _selectedThemeTitlebarBgFile,
       _themeEditor?.titlebarBackgroundBytes,
       _removeThemeTitlebarBg,
     );
-    // 'titlebar' = лого в боковой панели
     final sidebarLogoImage = _themeSlotImage(
       _selectedThemeTitlebarFile,
       _themeEditor?.titlebarBytes,
@@ -893,13 +1050,11 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
         ),
         child: Row(
           children: [
-            // ---------- Боковая панель ----------
             SizedBox(
               width: 110,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Фон панели = слот 'background'.
                   GestureDetector(
                     onTap: _pickThemeBackground,
                     child: Container(
@@ -909,13 +1064,11 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
                           : null,
                     ),
                   ),
-                  // Лёгкое затемнение, чтобы контент панели читался.
                   IgnorePointer(
                     child: Container(color: Colors.black.withOpacity(0.25)),
                   ),
                   Column(
                     children: [
-                      // Лого панели (слот 'titlebar') — поверх фона панели.
                       GestureDetector(
                         onTap: _pickThemeTitlebar,
                         child: SizedBox(
@@ -948,10 +1101,8 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      // Мок пунктов меню панели, чисто визуал.
                       ..._fakeSidebarItems(),
                       const Spacer(),
-                      // Кнопки фона панели: сменить / удалить.
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -976,7 +1127,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
                 ],
               ),
             ),
-            // ---------- Главная страница ----------
             Expanded(
               child: GestureDetector(
                 onTap: _pickThemeTitlebarBg,
@@ -994,8 +1144,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
                               ),
                             ),
                     ),
-                    // themeColor: градиент СНИЗУ — прозрачный сверху,
-                    // полный цвет внизу (как в приложении).
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: IgnorePointer(
@@ -1026,7 +1174,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
                         ),
                       ),
                     ),
-                    // Кнопки фона главной страницы: сменить / удалить.
                     Align(
                       alignment: Alignment.topRight,
                       child: Padding(
@@ -1127,7 +1274,6 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     );
   }
 
-  /// Кнопка удаления картинки слота (крестик).
   Widget _slotDeleteChip({required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -1143,7 +1289,7 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     );
   }
 
-  // ---------------- Вкладка: Контент (описание/приветствие) ----------------
+  // ---------------- Вкладка: Контент ----------------
 
   Widget _buildContentTab(AppPalette colors) {
     return Column(
@@ -1213,48 +1359,144 @@ class _AltAcmEditCommunityScreenState extends State<AltAcmEditCommunityScreen>
     );
   }
 
-  // ---------------- Вкладка: Стафф (только язык) ----------------
+  // ---------------- Вкладка: Пользователи ----------------
 
-  Widget _buildStaffTab(AppPalette colors) {
-    return _glassWrap(
-      colors,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+  Widget _buildUsersTab(AppPalette colors) {
+    return Column(
+      children: [
+        _glassWrap(
+          colors,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.verified_user_rounded, size: 16, color: colors.accentPrimary),
-              const SizedBox(width: 6),
-              Text(
-                AppLocalizations.t('admin.community.staff_only_section'),
-                style: TextStyle(color: colors.accentPrimary, fontSize: 13, fontWeight: FontWeight.bold),
+              _fieldLabel(colors, AppLocalizations.t('admin.community.field_search_users')),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _userSearchController,
+                style: TextStyle(color: colors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.t('admin.community.search_users_hint'),
+                  hintStyle: TextStyle(color: colors.textMuted),
+                  prefixIcon: Icon(Icons.search, color: colors.textMuted),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () => _searchCommunityUsers(_userSearchController.text),
+                  ),
+                ),
+                onSubmitted: _searchCommunityUsers,
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            AppLocalizations.t('admin.community.staff_only_hint'),
-            style: TextStyle(color: colors.textMuted, fontSize: 12),
-          ),
-          const SizedBox(height: 16),
-          _fieldLabel(colors, AppLocalizations.t('admin.community.field_language')),
-          const SizedBox(height: 8),
-          DropdownButtonFormField<String>(
-            initialValue: _language,
-            dropdownColor: colors.bgGradient.last,
-            style: TextStyle(color: colors.textPrimary),
-            items: _availableLanguages
-                .map((lang) => DropdownMenuItem(value: lang, child: Text(lang.toUpperCase())))
-                .toList(),
-            onChanged: (val) {
-              if (val != null) setState(() => _language = val);
-            },
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 16),
+        if (_usersLoading)
+          Padding(
+            padding: const EdgeInsets.only(top: 40),
+            child: Center(child: CircularProgressIndicator(color: colors.accentPrimary)),
+          )
+        else if (_communityUsers.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 40),
+            child: Center(
+              child: Text(
+                AppLocalizations.t('admin.community.search_users_empty'),
+                style: TextStyle(color: colors.textMuted),
+              ),
+            ),
+          )
+        else
+          ..._communityUsers.map((u) => _buildUserRow(colors, u as Map<String, dynamic>)),
+      ],
     );
   }
 
+Widget _buildUserRow(AppPalette colors, Map<String, dynamic> user) {
+    final rawRole = user['role'];
+    final role = rawRole is int ? rawRole : int.tryParse('$rawRole') ?? RoleTypes.roleUser;
+    final isOwner = role == RoleTypes.roleAgent;
+    // Стаффа нельзя трогать: ни менять роль, ни банить, ни передавать агента.
+    final isTargetStaff = RoleTypes.isStaffRole(role);
+    final isBanned = user['membershipStatus'] == 3;
+
+    // Дропдаун никогда не падает на незнакомом значении роли: если код
+    // не входит в известные — временно добавляем его как доп. пункт.
+    final roleLabels = <int, String>{
+      RoleTypes.roleUser: AppLocalizations.t('admin.community.role_member'),
+      RoleTypes.roleCurator: AppLocalizations.t('admin.community.role_curator'),
+      RoleTypes.roleLeader: AppLocalizations.t('admin.community.role_leader'),
+    };
+    if (!isOwner && !isTargetStaff && !roleLabels.containsKey(role)) {
+      roleLabels[role] = '${AppLocalizations.t('admin.community.role_unknown')} ($role)';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: _glassWrap(
+        colors,
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 22,
+              backgroundImage: user['icon'] != null ? NetworkImage(user['icon']) : null,
+              child: user['icon'] == null ? const Icon(Icons.person) : null,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user['nickname'] ?? '',
+                    style: TextStyle(color: colors.textPrimary, fontWeight: FontWeight.w600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  if (isTargetStaff)
+                    Text(
+                      AppLocalizations.t('admin.community.role_staff'),
+                      style: TextStyle(color: colors.accentPrimary, fontSize: 13, fontWeight: FontWeight.w600),
+                    )
+                  else if (isOwner)
+                    Text(
+                      AppLocalizations.t('admin.community.role_owner'),
+                      style: TextStyle(color: colors.accentPrimary, fontSize: 13, fontWeight: FontWeight.w600),
+                    )
+                  else
+                    DropdownButton<int>(
+                      value: role,
+                      isDense: true,
+                      dropdownColor: colors.bgGradient.last,
+                      underline: const SizedBox.shrink(),
+                      style: TextStyle(color: colors.textSecondary, fontSize: 13),
+                      items: roleLabels.entries
+                          .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
+                          .toList(),
+                      onChanged: (val) => _changeUserRole(user, val),
+                    ),
+                ],
+              ),
+            ),
+            if (!isOwner && !isTargetStaff) ...[
+              if (_canTransferAgent)
+                IconButton(
+                  tooltip: AppLocalizations.t('admin.community.transfer_agent_tooltip'),
+                  icon: Icon(Icons.workspace_premium_rounded, color: colors.textMuted),
+                  onPressed: () => _transferAgent(user),
+                ),
+              IconButton(
+                icon: Icon(
+                  isBanned ? Icons.lock_open_rounded : Icons.block_rounded,
+                  color: isBanned ? colors.accentPrimary : colors.error,
+                ),
+                onPressed: () => isBanned ? _unbanUser(user) : _banUser(user),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
   // ---------------- Общие вспомогательные виджеты ----------------
 
   Widget _glassWrap(AppPalette colors, {required Widget child}) {

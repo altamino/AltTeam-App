@@ -5,6 +5,7 @@ const String apiUrl = "https://dev-service.altamino.top/api/v1";
 const String UserAgent = 'Apple iPhone16,1 iOS v15.0 Main/3.22.0';
 const String tgBotUrl = 'https://t.me/alttrinity_bot';
 const String baseAltAminoUrl = 'https://altamino.top';
+const String altTeamPage = '$baseAltAminoUrl/altapp';
 const String termsUrl = '$baseAltAminoUrl/tos';
 const String privacyUrl = '$baseAltAminoUrl/privacy';
 

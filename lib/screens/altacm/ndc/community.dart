@@ -30,6 +30,11 @@ class _AltAcmCommunityScreenState extends State<AltAcmCommunityScreen> {
   bool _isLoading = true;
   bool _isDeleting = false;
 
+  // Помечается true, если данные сообщества реально поменялись (правка
+  // через /altacm/edit) — чтобы при выходе с этого экрана сказать
+  // предыдущему (списку сообществ), что надо перезапросить данные.
+  bool _dataChanged = false;
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +75,15 @@ class _AltAcmCommunityScreenState extends State<AltAcmCommunityScreen> {
       if (!mounted) return;
       setState(() => _isDeleting = false);
       AppSnackbar.show(context, e.toString(), type: SnackType.error);
+    }
+  }
+
+  Future<void> _openEditScreen() async {
+    // Экран редактирования возвращает true, если что-то реально сохранено.
+    final updated = await context.push<bool>("/altacm/edit", extra: _communityData);
+    if (updated == true) {
+      _dataChanged = true;
+      await _loadCommunityInfo();
     }
   }
 
@@ -118,47 +132,57 @@ class _AltAcmCommunityScreenState extends State<AltAcmCommunityScreen> {
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: colors.bgGradient,
+    // canPop: false + onPopInvokedWithResult гарантирует, что при ЛЮБОМ
+    // способе выйти с экрана (свайп назад, системная кнопка, кастомная
+    // AppBar-стрелка) наверх уйдёт актуальный _dataChanged, а не всегда null.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        context.pop(_dataChanged);
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: colors.bgGradient,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildAppBar(context, colors),
-              Expanded(
-                child: _isLoading || _isDeleting
-                    ? Center(child: CircularProgressIndicator(color: colors.accentPrimary))
-                    : _communityData == null
-                        ? Center(child: Text(AppLocalizations.t('common.error'), style: TextStyle(color: colors.textMuted)))
-                        : RefreshIndicator(
-                            onRefresh: _loadCommunityInfo,
-                            child: SingleChildScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                children: [
-                                  _buildMainInfoCard(colors),
-                                  const SizedBox(height: 16),
-                                  _buildStatsCard(colors),
-                                  const SizedBox(height: 16),
-                                  _buildAgentCard(colors),
-                                  const SizedBox(height: 16),
-                                  _buildMetaInfoCard(colors),
-                                  const SizedBox(height: 24),
-                                  _buildActionButtons(colors),
-                                  const SizedBox(height: 24),
-                                ],
+          child: SafeArea(
+            child: Column(
+              children: [
+                _buildAppBar(context, colors),
+                Expanded(
+                  child: _isLoading || _isDeleting
+                      ? Center(child: CircularProgressIndicator(color: colors.accentPrimary))
+                      : _communityData == null
+                          ? Center(child: Text(AppLocalizations.t('common.error'), style: TextStyle(color: colors.textMuted)))
+                          : RefreshIndicator(
+                              onRefresh: _loadCommunityInfo,
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    _buildMainInfoCard(colors),
+                                    const SizedBox(height: 16),
+                                    _buildStatsCard(colors),
+                                    const SizedBox(height: 16),
+                                    _buildAgentCard(colors),
+                                    const SizedBox(height: 16),
+                                    _buildMetaInfoCard(colors),
+                                    const SizedBox(height: 24),
+                                    _buildActionButtons(colors),
+                                    const SizedBox(height: 24),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -172,7 +196,7 @@ class _AltAcmCommunityScreenState extends State<AltAcmCommunityScreen> {
         children: [
           IconButton(
             icon: Icon(Icons.arrow_back_ios_new, color: colors.textPrimary, size: 20),
-            onPressed: () => context.pop(),
+            onPressed: () => context.pop(_dataChanged),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -409,9 +433,7 @@ class _AltAcmCommunityScreenState extends State<AltAcmCommunityScreen> {
       ),
       icon: const Icon(Icons.edit_outlined, size: 20),
       label: Text(AppLocalizations.t('common.edit'), style: const TextStyle(fontWeight: FontWeight.bold)),
-      onPressed: () {
-        context.push("/altacm/edit", extra: _communityData);
-      },
+      onPressed: _openEditScreen,
     );
 
     return Column(

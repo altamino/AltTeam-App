@@ -1,3 +1,8 @@
+update_required_title: "Доступна новая версия"
+update_required_message: "Пожалуйста, обновите приложение, чтобы продолжить пользоваться сервисом."
+update_required_button: "Обновить"
+
+
 admin:
   title: "Админ-панель"
   
@@ -113,6 +118,35 @@ admin:
     staff_only_section: "Только для стаффа"
     staff_only_hint: "Доступно только глобальному стаффу"
     field_language: "Язык сообщества"
+    tab_users: "Пользователи"
+
+    field_search_users: "Поиск пользователей"
+    search_users_hint: "Введите никнейм..."
+    search_users_empty: "Пользователи не найдены"
+
+    role_member: "Участник"
+    role_curator: "Куратор"
+    role_leader: "Лидер"
+    role_owner: "Агент"
+    role_staff: "Стафф"
+    role_unknown: "Неизвестная роль"
+    role_updated: "Роль успешно обновлена!"
+
+    transfer_agent_title: "Передать права агента"
+    transfer_agent_message: "Вы уверены, что хотите передать права агента этому пользователю? Текущий агент потеряет свои права. Это действие нельзя отменить."
+    transfer_agent_confirm: "Передать"
+    transfer_agent_tooltip: "Передать права агента"
+    transfer_agent_success: "Права агента успешно переданы!"
+
+    ban: "Забанить"
+    ban_dialog_title: "Забанить пользователя"
+    ban_dialog_message: "Вы уверены, что хотите забанить этого пользователя в этом сообществе?"
+    user_banned: "Пользователь забанен"
+    user_unbanned: "Пользователь разбанен"
+
+
+
+
 
   reports:
     title: "Управление жалобами"

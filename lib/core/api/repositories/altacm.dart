@@ -10,6 +10,15 @@ class AltACMRepository {
     });
   }
 
+
+  Future<void> banUser(String userId, int ndcId) async {
+    //await Api.post('/altacm/s/community/x${ndcId}/user/${userId}/ban');
+  }
+  Future<void> unbanUser(String userId, int ndcId) async {
+    //await Api.post('/altacm/s/community/x${ndcId}/user/${userId}/unban');
+  }
+
+
   Future<Map<String, dynamic>> createCommunity(String name, aminoId, lang, String? agentGlobalLink) async {
     return await Api.post('/altacm/s/community/create', body: {
 			"name": name,
