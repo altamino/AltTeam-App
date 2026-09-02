@@ -44,6 +44,80 @@ class _UserModerationScreenState extends State<UserModerationScreen> with Single
       _currentUserRole == RoleTypes.roleSystem ||
       _currentUserRole == RoleTypes.roleAltAminoStaff;
 
+
+
+
+bool get _isUserBanned => (_selectedUser?['status'] ?? 0) == 9;
+
+Future<void> _toggleGlobalBan() async {
+  final user = _selectedUser;
+  if (user == null) return;
+  final uid = user['uid'] as String?;
+  if (uid == null) return;
+
+  final willBan = !_isUserBanned;
+
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(willBan
+          ? AppLocalizations.t('admin.dialogs.ban_confirm_title')
+          : AppLocalizations.t('admin.dialogs.unban_confirm_title')),
+      content: Text(willBan
+          ? AppLocalizations.t('admin.dialogs.ban_confirm_body')
+          : AppLocalizations.t('admin.dialogs.unban_confirm_body')),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(AppLocalizations.t('common.cancel')),
+        ),
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: willBan ? Colors.red : null,
+          ),
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(willBan
+              ? AppLocalizations.t('admin.buttons.confirm_ban')
+              : AppLocalizations.t('admin.buttons.confirm_unban')),
+        ),
+      ],
+    ),
+  );
+
+  if (confirmed != true) return;
+
+  setState(() => _isLoading = true);
+  try {
+    await _altTeamRepo.setModerationStatus(
+      type: 'user',
+      objId: uid,
+      disable: willBan,
+    );
+    if (!mounted) return;
+    setState(() {
+      _selectedUser = {
+        ..._selectedUser!,
+        "status": willBan ? 9 : 0,
+      };
+    });
+    AppSnackbar.show(
+      context,
+      willBan
+          ? AppLocalizations.t('admin.success.user_banned')
+          : AppLocalizations.t('admin.success.user_unbanned'),
+      type: SnackType.success,
+    );
+  } catch (e) {
+    if (!mounted) return;
+    AppSnackbar.show(context, e.toString().replaceAll("Exception: ", ""), type: SnackType.error);
+  } finally {
+    if (mounted) setState(() => _isLoading = false);
+  }
+}
+
+
+
+
   @override
   void initState() {
     super.initState();
@@ -148,6 +222,7 @@ class _UserModerationScreenState extends State<UserModerationScreen> with Single
               "role": 0,
               "verified": false,
               "onlineStatus": null,
+              "status": 0,
               "tagList": const [],
             };
     });
@@ -185,11 +260,11 @@ class _UserModerationScreenState extends State<UserModerationScreen> with Single
       "role": p['role'] ?? 0,
       "verified": p['verified'] == true,
       "onlineStatus": p['onlineStatus'],
+      "status": p['status'] ?? 0,
       "tagList": (p['tagList'] as List?)?.cast<String>() ?? const [],
       "createdTime": p['createdTime'],
     };
   }
-
   String? _cleanIcon(dynamic raw) {
     if (raw is! String) return null;
     final v = raw.trim();
@@ -541,16 +616,15 @@ Widget _buildProfileContent(AppPalette colors) {
             alignment: WrapAlignment.center,
             children: [
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(backgroundColor: colors.errorBg, foregroundColor: colors.error),
-                icon: const Icon(Icons.shield_outlined, size: 16),
-                label: Text(AppLocalizations.t('admin.buttons.apply_sanctions')),
-                onPressed: () {
-                  AppSnackbar.show(
-                    context, 
-                    AppLocalizations.t('admin.errors.not_implemented'), 
-                    type: SnackType.error,
-                  );
-                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _isUserBanned ? colors.glassFill : colors.errorBg,
+                  foregroundColor: _isUserBanned ? colors.textPrimary : colors.error,
+                ),
+                icon: Icon(_isUserBanned ? Icons.lock_open_rounded : Icons.shield_outlined, size: 16),
+                label: Text(_isUserBanned
+                    ? AppLocalizations.t('admin.buttons.remove_ban')
+                    : AppLocalizations.t('admin.buttons.apply_sanctions')),
+                onPressed: _isLoading ? null : _toggleGlobalBan,
               ),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(

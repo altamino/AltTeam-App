@@ -113,7 +113,7 @@ void _showAboutDialog(BuildContext context, AppPalette colors) {
                 borderRadius: BorderRadius.circular(8),
                 onTap: () {
                   Navigator.of(context).pop();
-                  _openUrl('https://t.me/Alx0rrHub');
+                  _openUrl('https://github.com/alx0rr');
                 },
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -201,15 +201,6 @@ void _showAboutDialog(BuildContext context, AppPalette colors) {
                       onTap: () => context.push('/profile'),
                     ),
 
-                    if (showAdmin)
-                      _item(
-                        context,
-                        colors,
-                        Icons.chat_bubble_outline,
-                        AppLocalizations.t('drawer.chats'),
-                        onTap: () => context.push('/admin/chats'),
-                      ),
-
                     if (!isTelegramLinked)
                       _item(
                         context,
@@ -252,11 +243,7 @@ void _showAboutDialog(BuildContext context, AppPalette colors) {
                       Icons.report_gmailerrorred_outlined,
                       AppLocalizations.t('drawer.reports'),
                       onTap: () {
-                        if (showAdmin) {
-                          context.push('/admin/reports');
-                        } else {
-                          context.push('/reports');
-                        }
+                        _openUrl('https://support.altamino.top');
                       },
                     ),
                     _item(

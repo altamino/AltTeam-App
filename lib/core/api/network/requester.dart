@@ -190,9 +190,18 @@ class Requester {
   Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? headers}) =>
       request('GET', endpoint, extraHeaders: headers);
 
-  Future<Map<String, dynamic>> post(String endpoint, {dynamic body, Map<String, String>? headers}) =>
-      request('POST', endpoint, body: body, extraHeaders: headers);
+  Future<Map<String, dynamic>> post(
+    String endpoint, {
+    dynamic body,
+    Map<String, String>? headers,
+  }) {
 
+    final Map<String, dynamic> requestBody =
+        body is Map<String, dynamic> ? Map<String, dynamic>.from(body) : {};
+
+    requestBody['timestamp'] = Generator.reqTime();
+    return request('POST', endpoint, body: requestBody, extraHeaders: headers);
+  }
   Future<Map<String, dynamic>> delete(String endpoint, {dynamic body, Map<String, String>? headers}) =>
       request('DELETE', endpoint, body: body, extraHeaders: headers);
 }

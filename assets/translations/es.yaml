@@ -14,6 +14,12 @@ admin:
     search_and_manage: "Buscar y Gestionar"
     password_reset: "Restablecer Contraseña"
 
+  dialogs:
+    ban_confirm_title: "Confirmar bloqueo"
+    ban_confirm_body: "¿Estás seguro de que quieres bloquear a este usuario?"
+    unban_confirm_title: "Confirmar desbloqueo"
+    unban_confirm_body: "¿Estás seguro de que quieres desbloquear a este usuario?"
+
   password_reset:
     title: "Restablecer Contraseña"
     description: "Introduce el correo del usuario para enviarle las instrucciones y el enlace de recuperación."
@@ -33,6 +39,9 @@ admin:
     apply_sanctions: "Aplicar sanciones"
     show_communities: "Mostrar comunidades"
     hide_communities: "Ocultar comunidades"
+    confirm_ban: "Bloquear"
+    confirm_unban: "Desbloquear"
+    remove_ban: "Quitar bloqueo"
 
   tooltips:
     global_profile: "Abrir perfil global"
@@ -47,6 +56,8 @@ admin:
 
   success:
     reset_instructions_sent: "Instrucciones enviadas a"
+    user_banned: "Usuario bloqueado con éxito"
+    user_unbanned: "Usuario desbloqueado con éxito"
   
   community:
     edit_title: "Editar Comunidad"
@@ -271,7 +282,7 @@ drawer:
     version: "Versión {version}"
     title: "Sobre la App"
     description: "Creado por alx0rr en 2026 especialmente para el proyecto AltAmino."
-    developer_link: "Canal del Desarrollador"
+    developer_link: "Desarrollador"
     close: "Cerrar"
   errors:
     fail_open_telegram: "Error al abrir Telegram"

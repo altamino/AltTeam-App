@@ -14,6 +14,12 @@ admin:
     search_and_manage: "Search & Manage"
     password_reset: "Password Reset"
 
+  dialogs:
+    ban_confirm_title: "Confirm Ban"
+    ban_confirm_body: "Are you sure you want to ban this user?"
+    unban_confirm_title: "Confirm Unban"
+    unban_confirm_body: "Are you sure you want to unban this user?"
+
   password_reset:
     title: "Password Reset"
     description: "Enter the user's email address to send them recovery instructions and a link."
@@ -33,6 +39,9 @@ admin:
     apply_sanctions: "Apply Sanctions"
     show_communities: "Show Communities"
     hide_communities: "Hide Communities"
+    confirm_ban: "Ban"
+    confirm_unban: "Unban"
+    remove_ban: "Remove Ban"
 
   tooltips:
     global_profile: "Open Global Profile"
@@ -47,6 +56,8 @@ admin:
 
   success:
     reset_instructions_sent: "Instructions sent to"
+    user_banned: "User banned successfully"
+    user_unbanned: "User unbanned successfully"
   
   community:
     edit_title: "Edit Community"
@@ -271,7 +282,7 @@ drawer:
     version: "Version {version}"
     title: "About App"
     description: "Created by alx0rr in 2026 specifically for the AltAmino project."
-    developer_link: "Developer Channel"
+    developer_link: "Developer"
     close: "Close"
   errors:
     fail_open_telegram: "Failed to launch Telegram"

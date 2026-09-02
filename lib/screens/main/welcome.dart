@@ -142,11 +142,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             AppLocalizations.t('auth.login.brand'),
             style: TextStyle(color: colors.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
           ),
-          const Spacer(),
-          IconButton(
-            icon: Icon(Icons.notifications_outlined, color: colors.textPrimary, size: 22),
-            onPressed: () => context.push('/notifications'),
-          ),
+          const Spacer()
         ],
       ),
     );

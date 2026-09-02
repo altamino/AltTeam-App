@@ -2,7 +2,6 @@ update_required_title: "Доступна новая версия"
 update_required_message: "Пожалуйста, обновите приложение, чтобы продолжить пользоваться сервисом."
 update_required_button: "Обновить"
 
-
 editor.insert: "Вставить"
 editor.link_dialog_title: "Вставить ссылку"
 editor.link_url_hint: "Введите ссылку..."
@@ -14,6 +13,12 @@ admin:
   tabs:
     search_and_manage: "Поиск и управление"
     password_reset: "Сброс пароля"
+
+  dialogs:
+    ban_confirm_title: "Подтверждение блокировки"
+    ban_confirm_body: "Вы действительно хотите заблокировать этого пользователя?"
+    unban_confirm_title: "Подтверждение разблокировки"
+    unban_confirm_body: "Вы действительно хотите разблокировать этого пользователя?"
 
   password_reset:
     title: "Сброс пароля"
@@ -34,6 +39,9 @@ admin:
     apply_sanctions: "Применить санкции"
     show_communities: "Показать сообщества"
     hide_communities: "Скрыть сообщества"
+    confirm_ban: "Заблокировать"
+    confirm_unban: "Разблокировать"
+    remove_ban: "Снять бан"
 
   tooltips:
     global_profile: "Открыть глобальный профиль"
@@ -48,6 +56,8 @@ admin:
 
   success:
     reset_instructions_sent: "Инструкции отправлены на адрес"
+    user_banned: "Пользователь успешно забанен"
+    user_unbanned: "Пользователь успешно разбанен"
   
   community:
     edit_title: "Редактирование сообщества"
@@ -154,9 +164,6 @@ admin:
     unban_reason_hint: "Укажите причину разбана..."
     user_banned: "Пользователь успешно забанен"
     user_unbanned: "Пользователь успешно разбанен"
-
-
-
 
   reports:
     title: "Управление жалобами"
@@ -275,7 +282,7 @@ drawer:
     version: "Версия {version}"
     title: "О приложении"
     description: "Создано alx0rr в 2026 году специально для проекта AltAmino."
-    developer_link: "Канал разработчика"
+    developer_link: "Разработчик"
     close: "Закрыть"
   errors:
     fail_open_telegram: "Не удалось запустить Telegram"

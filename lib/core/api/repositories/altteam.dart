@@ -55,4 +55,14 @@ class AltTemRepository {
     return await Api.get('/g/s/altteam/user-profile/$userId/communities');
   }
 
+
+  Future<void> setModerationStatus({
+    required String type, // 'user' or 'community' ect
+    required String objId,
+    required bool disable,
+  }) async {
+    final action = disable ? 'disable' : 'enable';
+    await Api.post('/g/s/altteam/mod/$type/$action/$objId');
+  }
+
 }
