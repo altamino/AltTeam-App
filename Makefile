@@ -88,3 +88,16 @@ build-all: icons regen apk appbundle ios macos
 package:
 	@mkdir -p $(OUT)
 	@tar -czf $(OUT)/artifacts.tar.gz -C $(OUT) . 2>/dev/null || true
+
+
+
+
+ipa:
+	@mkdir -p $(OUT)
+	cd $(PROJECT) && flutter build ios --release --no-codesign
+	@rm -rf $(PROJECT)/build/ios/ipa_tmp
+	@mkdir -p $(PROJECT)/build/ios/ipa_tmp/Payload
+	@cp -r $(PROJECT)/build/ios/iphoneos/Runner.app $(PROJECT)/build/ios/ipa_tmp/Payload/
+	cd $(PROJECT)/build/ios/ipa_tmp && zip -r -q Runner.ipa Payload
+	@cp -f $(PROJECT)/build/ios/ipa_tmp/Runner.ipa $(OUT)/app-release.ipa
+	@rm -rf $(PROJECT)/build/ios/ipa_tmp
