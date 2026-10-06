@@ -190,11 +190,19 @@ class Requester {
   Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? headers}) =>
       request('GET', endpoint, extraHeaders: headers);
 
+
   Future<Map<String, dynamic>> post(
     String endpoint, {
     dynamic body,
     Map<String, String>? headers,
   }) {
+    if (body is Uint8List || body is List<int>) {
+      return request('POST', endpoint, body: body, extraHeaders: headers);
+    }
+
+    if (body is String) {
+      return request('POST', endpoint, body: body, extraHeaders: headers);
+    }
 
     final Map<String, dynamic> requestBody =
         body is Map<String, dynamic> ? Map<String, dynamic>.from(body) : {};
@@ -202,6 +210,10 @@ class Requester {
     requestBody['timestamp'] = Generator.reqTime();
     return request('POST', endpoint, body: requestBody, extraHeaders: headers);
   }
+
+  Future<Map<String, dynamic>> delete(String endpoint, {dynamic body, Map<String, String>? headers}) =>
+      request('DELETE', endpoint, body: body, extraHeaders: headers);
+}
   Future<Map<String, dynamic>> delete(String endpoint, {dynamic body, Map<String, String>? headers}) =>
       request('DELETE', endpoint, body: body, extraHeaders: headers);
 }
