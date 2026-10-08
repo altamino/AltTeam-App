@@ -1,9 +1,18 @@
-.PHONY: help get clean icons regen run \
-        apk appbundle ios macos windows linux \
+
+.PHONY: help get clean icons regen run run-ios run-macos \
+        apk apk-all appbundle ios ipa macos windows linux \
         build-all package
 
 PROJECT := .
-OUT := builds
+DIST := dist
+
+APK_UNIVERSAL_NAME := app-release.apk
+AAB_NAME := app.aab
+IPA_NAME := ios.ipa
+IOS_APP_NAME := ios.app
+MACOS_APP_NAME := mac.app
+WINDOWS_DIR_NAME := windows
+LINUX_DIR_NAME := linix
 
 help:
 	@echo "  get        — install dependencies"
@@ -14,7 +23,10 @@ help:
 	@echo "  apk        — build APK"
 	@echo "  appbundle  — build AAB"
 	@echo "  ios        — build iOS"
+	@echo "  ipa        — build IPA"
 	@echo "  macos      — build macOS"
+	@echo "  windows    — build Windows"
+	@echo "  linux      — build Linux"
 	@echo "  build-all  — build everything"
 	@echo "  package    — pack artifacts"
 
@@ -39,65 +51,91 @@ run-ios:
 run-macos:
 	cd $(PROJECT) && flutter run -d macos
 
-
-
 apk:
-	@mkdir -p $(OUT)
-	cd $(PROJECT) && flutter build apk --release --split-per-abi
-	@cp -f $(PROJECT)/build/app/outputs/flutter-apk/*.apk $(OUT)/ 2>/dev/null || true
-
-apk-universal:
-	@mkdir -p $(OUT)
+	@mkdir -p $(DIST)
 	cd $(PROJECT) && flutter build apk --release
-	@cp -f $(PROJECT)/build/app/outputs/flutter-apk/app-release.apk $(OUT)/app-universal-release.apk 2>/dev/null || true
+	@cp -f $(PROJECT)/build/app/outputs/flutter-apk/app-release.apk \
+		$(DIST)/$(APK_UNIVERSAL_NAME)
 
-apk-all: apk-universal
-	@mkdir -p $(OUT)
+apk-all:
+	@mkdir -p $(DIST)
 	cd $(PROJECT) && flutter build apk --release --split-per-abi
-	@cp -f $(PROJECT)/build/app/outputs/flutter-apk/*.apk $(OUT)/ 2>/dev/null || true
+	@for file in $(PROJECT)/build/app/outputs/flutter-apk/*-release.apk; do \
+		[ -f "$$file" ] || continue; \
+		name=$$(basename "$$file"); \
+		cp -f "$$file" "$(DIST)/$$name"; \
+	done
 
 
 
 appbundle:
-	@mkdir -p $(OUT)
+	@mkdir -p $(DIST)
 	cd $(PROJECT) && flutter build appbundle --release
-	@cp -f $(PROJECT)/build/app/outputs/bundle/release/*.aab $(OUT)/ 2>/dev/null || true
+	@cp -f $(PROJECT)/build/app/outputs/bundle/release/app-release.aab \
+		$(DIST)/$(AAB_NAME)
+
+
 
 ios:
-	@mkdir -p $(OUT)/ios
+	@mkdir -p $(DIST)
 	cd $(PROJECT) && flutter build ios --release --no-codesign
-	@cp -r $(PROJECT)/build/ios/iphoneos/Runner.app $(OUT)/ios/ 2>/dev/null || true
-
-macos:
-	@mkdir -p $(OUT)
-	cd $(PROJECT) && flutter build macos --release
-	@cp -r $(PROJECT)/build/macos/Build/Products/Release/*.app $(OUT)/ 2>/dev/null || true
-
-windows:
-	@mkdir -p $(OUT)
-	cd $(PROJECT) && flutter build windows --release
-	@cp -r $(PROJECT)/build/windows/x64/runner/Release $(OUT)/windows 2>/dev/null || true
-
-linux:
-	@mkdir -p $(OUT)
-	cd $(PROJECT) && flutter build linux --release
-	@cp -r $(PROJECT)/build/linux/x64/release/bundle $(OUT)/linux 2>/dev/null || true
-
-build-all: icons regen apk appbundle ios macos
-
-package:
-	@mkdir -p $(OUT)
-	@tar -czf $(OUT)/artifacts.tar.gz -C $(OUT) . 2>/dev/null || true
-
+	@rm -rf "$(DIST)/$(IOS_APP_NAME)"
+	@cp -r "$(PROJECT)/build/ios/iphoneos/Runner.app" \
+		"$(DIST)/$(IOS_APP_NAME)"
 
 
 
 ipa:
-	@mkdir -p $(OUT)
+	@mkdir -p $(DIST)
 	cd $(PROJECT) && flutter build ios --release --no-codesign
+
 	@rm -rf $(PROJECT)/build/ios/ipa_tmp
 	@mkdir -p $(PROJECT)/build/ios/ipa_tmp/Payload
-	@cp -r $(PROJECT)/build/ios/iphoneos/Runner.app $(PROJECT)/build/ios/ipa_tmp/Payload/
-	cd $(PROJECT)/build/ios/ipa_tmp && zip -r -q Runner.ipa Payload
-	@cp -f $(PROJECT)/build/ios/ipa_tmp/Runner.ipa $(OUT)/app-release.ipa
+
+	@cp -r $(PROJECT)/build/ios/iphoneos/Runner.app \
+		$(PROJECT)/build/ios/ipa_tmp/Payload/
+
+	@cd $(PROJECT)/build/ios/ipa_tmp && \
+		zip -r -q $(IPA_NAME) Payload
+
+	@cp -f $(PROJECT)/build/ios/ipa_tmp/$(IPA_NAME) \
+		$(DIST)/$(IPA_NAME)
+
 	@rm -rf $(PROJECT)/build/ios/ipa_tmp
+
+
+macos:
+	@mkdir -p $(DIST)
+	cd $(PROJECT) && flutter build macos --release
+	@rm -rf "$(DIST)/$(MACOS_APP_NAME)"
+	@cp -r "$(PROJECT)/build/macos/Build/Products/Release/"*.app \
+		"$(DIST)/$(MACOS_APP_NAME)"
+
+
+windows:
+	@mkdir -p $(DIST)
+	cd $(PROJECT) && flutter build windows --release
+	@rm -rf "$(DIST)/$(WINDOWS_DIR_NAME)"
+	@cp -r "$(PROJECT)/build/windows/x64/runner/Release" \
+		"$(DIST)/$(WINDOWS_DIR_NAME)"
+
+
+linux:
+	@mkdir -p $(DIST)
+	cd $(PROJECT) && flutter build linux --release
+	@rm -rf "$(DIST)/$(LINUX_DIR_NAME)"
+	@cp -r "$(PROJECT)/build/linux/x64/release/bundle" \
+		"$(DIST)/$(LINUX_DIR_NAME)"
+
+
+
+build-all: icons regen apk appbundle ipa macos windows linux
+
+build-mobile: icons regen apk-all ipa
+
+package:
+	@mkdir -p $(DIST)
+	@tar -czf $(DIST)/artifacts.tar.gz \
+		-C $(DIST) . \
+		--exclude=artifacts.tar.gz
+
