@@ -1,15 +1,20 @@
-# AltTeam App 🚀 `[Beta]`
+# AltTeam App 🚀
 
-### **Web page** [AltTeam](https://altamino.top/altapp)
+[![Release](https://img.shields.io/github/v/release/altamino/AltTeam-App?label=release\&style=flat-square)](https://github.com/altamino/AltTeam-App/releases)
+[![Release](https://img.shields.io/badge/status-Release-green?style=flat-square)](https://altamino.top/altapp)
+[![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter\&logoColor=white\&style=flat-square)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart\&logoColor=white\&style=flat-square)](https://dart.dev/)
+[![Android](https://img.shields.io/badge/Android-supported-3DDC84?logo=android\&logoColor=white\&style=flat-square)](#)
+[![iOS](https://img.shields.io/badge/iOS-supported-000000?logo=apple\&logoColor=white\&style=flat-square)](#)
+
+**Web page:** [AltTeam](https://altamino.top/altapp)
 
 Official mobile application for volunteers, moderators, and administrators of the **AltAmino** platform. A comprehensive tool for community management, content moderation, and user administration.
-
-> ⚠️ **This project is currently in Beta testing.** Some features may be unstable or actively under development.
 
 ---
 
 ## 🛠 Tech Stack
 
-- **Framework:** [Flutter](https://flutter.dev/) (Dart)
-- **Build Automation:** GNU Make (`Makefile`)
-- **Supported Platforms:** Android, iOS
+* **Framework:** [Flutter](https://flutter.dev/) (Dart)
+* **Build Automation:** GNU Make (`Makefile`)
+* **Supported Platforms:** Android, iOS
