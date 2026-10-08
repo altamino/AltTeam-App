@@ -3,10 +3,10 @@ description: "AltAmino Control Panel for Developers and Volunteers."
 
 
 publish_to: 'none'
-version: 1.0.4+1
+version: 1.2.0+3
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.10.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -45,10 +45,16 @@ dev_dependencies:
   riverpod_generator: ^2.4.0
   flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.13.1
-
 flutter_launcher_icons:
   android: true
   ios: true
+  image_path: "assets/icon/icon.png"
+  remove_alpha_ios: true
+  min_sdk_android: 21
+
+  adaptive_icon_background: "assets/icon/icon_background.png"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  adaptive_icon_foreground_inset: 0
 
   windows:
     generate: true
@@ -62,13 +68,13 @@ flutter_launcher_icons:
     generate: true
     image_path: "assets/icon/icon.png"
 
-  image_path: "assets/icon/icon.png"
+flutter_native_splash:
+  color: "#1A1470"
+  image: assets/icon/splash_logo.png
 
-  adaptive_icon_background: "#151f29"
-  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
-
-  min_sdk_android: 21
-  remove_alpha_ios: true
+  android_12:
+    color: "#1A1470"
+    image: assets/icon/splash_logo.png
 
 flutter:
   uses-material-design: true

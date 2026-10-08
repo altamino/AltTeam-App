@@ -11,6 +11,7 @@ class AppPalette {
     required this.accentPrimary,
     required this.accentPrimaryDim,
     required this.accentPrimaryGlow,
+    required this.onAccent,
     required this.textPrimary,
     required this.textSecondary,
     required this.textMuted,
@@ -19,6 +20,40 @@ class AppPalette {
     required this.errorBorder,
     required this.shadow,
   });
+
+
+  factory AppPalette.fromSeed({
+    required bool dark,
+    required List<Color> background,
+    required Color surface, 
+    required Color accent,
+    required Color accentDark,
+    required Color text,
+    required Color error,
+    Color? glow, 
+    Color onAccent = Colors.white, 
+  }) {
+    final base = dark ? Colors.white : Colors.black;
+    return AppPalette(
+      bgGradient: background,
+      ambientGlow: (glow ?? accent).withValues(alpha: dark ? 0.16 : 0.10),
+      glassFill: Colors.white.withValues(alpha: dark ? 0.06 : 0.80),
+      glassFillStrong: Colors.white.withValues(alpha: dark ? 0.09 : 0.95),
+      glassBorder: base.withValues(alpha: dark ? 0.12 : 0.08),
+      surfaceElevated: surface,
+      accentPrimary: accent,
+      accentPrimaryDim: accentDark,
+      accentPrimaryGlow: accent.withValues(alpha: dark ? 0.40 : 0.28),
+      onAccent: onAccent,
+      textPrimary: text,
+      textSecondary: text.withValues(alpha: dark ? 0.68 : 0.75),
+      textMuted: text.withValues(alpha: dark ? 0.42 : 0.52),
+      error: error,
+      errorBg: error.withValues(alpha: dark ? 0.12 : 0.10),
+      errorBorder: error.withValues(alpha: dark ? 0.28 : 0.25),
+      shadow: Colors.black.withValues(alpha: dark ? 0.25 : 0.08),
+    );
+  }
 
   final List<Color> bgGradient;
   final Color ambientGlow;
@@ -29,6 +64,7 @@ class AppPalette {
   final Color accentPrimary;
   final Color accentPrimaryDim;
   final Color accentPrimaryGlow;
+  final Color onAccent;
   final Color textPrimary;
   final Color textSecondary;
   final Color textMuted;
@@ -51,7 +87,11 @@ class AppPalette {
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: accentPrimaryDim),
         boxShadow: [
-          BoxShadow(color: accentPrimaryGlow, blurRadius: 16, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: accentPrimaryGlow,
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
         ],
       );
 }
@@ -60,44 +100,26 @@ class AppPalette {
 class AppColors {
   AppColors._();
 
-  static const AppPalette dark = AppPalette(
-      bgGradient: [Color(0xFF070A0E), Color(0xFF0D141A), Color(0xFF0A0E12)],
-      ambientGlow: Color(0x1A00E676), // Мятное свечение
-      glassFill: Color(0x0DFFFFFF),
-      glassFillStrong: Color(0x14FFFFFF),
-      glassBorder: Color(0x1AFFFFFF),
-      surfaceElevated: Color(0xFF16222C),
-      accentPrimary: Color(0xFF00BFA5), // Насыщенная бирюза/мята
-      accentPrimaryDim: Color(0xFF00897B),
-      accentPrimaryGlow: Color(0x5900BFA5),
-      textPrimary: Color(0xFFF0F5F5),
-      textSecondary: Color(0xA6FFFFFF),
-      textMuted: Color(0x61FFFFFF),
-      error: Color(0xFFFF5252),
-      errorBg: Color(0x1FFF5252),
-      errorBorder: Color(0x47FF5252),
-      shadow: Color(0x33000000),
-    );
-  static const AppPalette light = AppPalette(
-      bgGradient: [Color(0xFFF4F7F6), Color(0xFFEAF0EE), Color(0xFFE0E8E5)],
-      ambientGlow: Color(0x1400BFA5),
-      glassFill: Color(0xCCFFFFFF),
-      glassFillStrong: Color(0xF2FFFFFF),
-      glassBorder: Color(0x14000000),
-      surfaceElevated: Color(0xFFFFFFFF),
-      accentPrimary: Color(0xFF00796B),
-      accentPrimaryDim: Color(0xFF004D40),
-      accentPrimaryGlow: Color(0x4000796B),
-      textPrimary: Color(0xFF0B1412),
-      textSecondary: Color(0xFF42524E),
-      textMuted: Color(0xFF80948F),
-      error: Color(0xFFC62828),
-      errorBg: Color(0x1AC62828),
-      errorBorder: Color(0x40C62828),
-      shadow: Color(0x14051410),
-    );
+  static final AppPalette dark = AppPalette.fromSeed(
+    dark: true,
+    background: const [Color(0xFF080A24), Color(0xFF0E1140), Color(0xFF0A0C2E)],
+    surface: const Color(0xFF171B52),
+    accent: const Color.fromARGB(255, 86, 101, 237),
+    accentDark: const Color.fromARGB(255, 18, 15, 61),
+    text: const Color(0xFFF0F2FF),
+    error: const Color(0xFFFF5252),
+  );
 
-  static AppPalette of(BuildContext context) {
-    return Theme.of(context).brightness == Brightness.dark ? dark : light;
-  }
+  static final AppPalette light = AppPalette.fromSeed(
+    dark: false,
+    background: const [Color(0xFFF3F5FF), Color(0xFFE8ECFF), Color(0xFFDDE3FF)],
+    surface: const Color(0xFFFFFFFF),
+    accent: const Color(0xFF3B3BD6),
+    accentDark: const Color(0xFF1A1470),
+    text: const Color(0xFF0B0D2A),
+    error: const Color(0xFFC62828),
+  );
+
+  static AppPalette of(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? dark : light;
 }

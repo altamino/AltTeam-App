@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../core/l10n/app_localizations.dart';
+
 import '../core/api/constants.dart';
+import '../core/l10n/app_localizations.dart';
 import '../core/theme/app_colors.dart';
+import '../core/widgets/app_background.dart';
+import '../core/widgets/primary_button.dart';
 
 class UpdateRequiredPage extends StatefulWidget {
-  final String downloadPage;
-  final String? latestVersion;
-
   const UpdateRequiredPage({
     super.key,
     required this.downloadPage,
     this.latestVersion,
   });
+
+  final String downloadPage;
+  final String? latestVersion;
 
   @override
   State<UpdateRequiredPage> createState() => _UpdateRequiredPageState();
@@ -65,16 +68,10 @@ class _UpdateRequiredPageState extends State<UpdateRequiredPage>
   @override
   Widget build(BuildContext context) {
     final colors = AppColors.of(context);
+    final version = widget.latestVersion;
+
     return Scaffold(
-      backgroundColor: colors.bgGradient.first,
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: colors.bgGradient,
-          ),
-        ),
+      body: AppBackground(
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -112,44 +109,17 @@ class _UpdateRequiredPageState extends State<UpdateRequiredPage>
                           ),
                         ),
                         const SizedBox(height: 32),
-                        SizedBox(
-                          width: double.infinity,
+                        PrimaryButton(
+                          label: AppLocalizations.t('update_required_button'),
                           height: 52,
-                          child: ElevatedButton(
-                            onPressed: _openDownloadPage,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: colors.accentPrimary,
-                              foregroundColor: colors.surfaceElevated,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: _opening
-                                ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.4,
-                                      valueColor: AlwaysStoppedAnimation(
-                                        colors.surfaceElevated,
-                                      ),
-                                    ),
-                                  )
-                                : Text(
-                                    AppLocalizations.t('update_required_button'),
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                          ),
+                          radius: 14,
+                          loading: _opening,
+                          onPressed: _openDownloadPage,
                         ),
-                        if (widget.latestVersion != null &&
-                            widget.latestVersion!.isNotEmpty) ...[
+                        if (version != null && version.isNotEmpty) ...[
                           const SizedBox(height: 18),
                           Text(
-                            'v${widget.latestVersion}',
+                            'v$version',
                             style: TextStyle(
                               color: colors.textMuted,
                               fontSize: 12,
@@ -170,10 +140,9 @@ class _UpdateRequiredPageState extends State<UpdateRequiredPage>
   }
 }
 
-/// Circular icon badge with a soft glow ring, echoing the app's accent color.
 class _Badge extends StatelessWidget {
-  final Color accent;
   const _Badge({required this.accent});
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +157,7 @@ class _Badge extends StatelessWidget {
             height: 96,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: accent.withOpacity(0.08),
+              color: accent.withValues(alpha: 0.10),
             ),
           ),
           Container(
@@ -196,14 +165,10 @@ class _Badge extends StatelessWidget {
             height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: accent.withOpacity(0.14),
-              border: Border.all(color: accent.withOpacity(0.35), width: 1.2),
+              color: accent.withValues(alpha: 0.16),
+              border: Border.all(color: accent.withValues(alpha: 0.40), width: 1.2),
             ),
-            child: Icon(
-              Icons.system_update_alt_rounded,
-              color: accent,
-              size: 32,
-            ),
+            child: Icon(Icons.system_update_alt_rounded, color: accent, size: 32),
           ),
         ],
       ),

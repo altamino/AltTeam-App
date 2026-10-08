@@ -6,12 +6,8 @@ import '../constants.dart';
 class Api {
   static late final Requester _requester;
 
-  /// Вешается один раз при старте приложения, например в main.dart:
-  ///   Api.onSessionExpired = () => router.go('/login');
   static void Function()? onSessionExpired;
 
-  // Защита от многократного срабатывания: если 5 параллельных запросов
-  // словили 440 и рефреш провалился, на логин кидаем один раз.
   static bool _sessionExpiredFired = false;
 
   static Future<void> init() async {
@@ -42,7 +38,6 @@ class Api {
     }
   }
 
-  /// Релогин сохранённым secret'ом. Возвращает новый sid или null.
   static Future<String?> _refreshSession() async {
     final email = Storage.email;
     final secret = Storage.secret;
@@ -69,7 +64,7 @@ class Api {
     return newSid;
   }
 
-  /// Общая обработка ответа логина/релогина: sid, профиль, новый secret.
+ 
   static void _applyLoginResponse(Map<String, dynamic> res) {
     final sid = res['sid']?.toString();
     if (sid == null || sid.isEmpty) return;
@@ -84,18 +79,27 @@ class Api {
       profile?['telegramId'],
     );
 
-    // Сервер может выдать новый secret — обновляем, старый может протухнуть.
+  
     final newSecret = res['secret']?.toString();
     if (newSecret != null && newSecret.isNotEmpty) {
       Storage.setSecret(newSecret);
     }
   }
 
-  /// Вызывается из репозитория логина после успешного входа.
   static void saveLoginResult(String email, Map<String, dynamic> res) {
     Storage.setEmail(email);
     _applyLoginResponse(res);
   }
+
+
+static String get baseUrl => _requester.baseUrl;
+
+static void setBaseUrl(String url) {
+  _requester.baseUrl = url.endsWith('/') ? url.substring(0, url.length - 1) : url;
+}
+
+static void resetBaseUrl() => _requester.baseUrl = apiUrl;
+
 
   static Future<Map<String, dynamic>> get(
     String endpoint, {

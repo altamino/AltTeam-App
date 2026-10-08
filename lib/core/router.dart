@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../screens/update.dart';
-import '../screens/adm/chats.dart';
-import '../screens/adm/dashboard/admin_dashboard.dart';
-import '../screens/adm/dashboard/report.dart';
-import '../screens/adm/dashboard/roles.dart';
-import '../screens/adm/team.dart';
-import '../screens/altacm/create.dart';
-import '../screens/altacm/main.dart';
-import '../screens/altacm/ndc/community.dart';
-import '../screens/altacm/ndc/edit.dart';
+import '../screens/general.dart';
 import '../screens/login.dart';
-import '../screens/main/create_announcement.dart';
-import '../screens/main/notification.dart';
-import '../screens/main/profile.dart';
-import '../screens/main/welcome.dart';
-import '../screens/users/report.dart';
-import '../screens/adm/dashboard/user_moderation.dart';
-//import '../screens/adm/dashboard/events.dart';
+import '../screens/update.dart';
+import '../screens/debug.dart';
+import '../screens/profile.dart';
+import '../screens/admin/team.dart';
+import '../screens/admin/control_panel.dart';
+import '../screens/announcements/main.dart';
+import '../screens/announcements/create.dart';
+import '../screens/admin/reset_password.dart';
+import '../screens/admin/moderation_search.dart';
+import '../screens/admin/user_manage.dart'; 
+import '../screens/acm/create.dart';
+import '../screens/acm/edit.dart';
+import '../screens/acm/info.dart';
+
+
+import '../core/api/objects/args/roles.dart';
+
 import 'storage.dart';
 
 GoRouter buildRouter({
@@ -30,7 +31,7 @@ GoRouter buildRouter({
     
     errorBuilder: (context, state) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go('/welcome');
+        context.go('/general');
       });
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -40,18 +41,21 @@ GoRouter buildRouter({
     redirect: (context, state) {
       final sid = Storage.sid;
       final isLogin = state.matchedLocation == '/login';
-      if (sid != null && isLogin) return '/welcome';
+      if (sid != null && isLogin) return '/general';
       return null;
     },
     routes: [
 
-      GoRoute(
-        path: '/update-required',
-        builder: (context, state) {
-          final downloadPage = state.extra as String? ?? '';
-          return UpdateRequiredPage(downloadPage: downloadPage);
-        },
-      ),
+    GoRoute(
+      path: '/update-required',
+      builder: (context, state) {
+        final extra = state.extra is Map ? state.extra as Map : const {};
+        return UpdateRequiredPage(
+          downloadPage: extra['downloadPage'] as String? ?? '',
+          latestVersion: extra['latestVersion'] as String?,
+        );
+      },
+    ),
 
       GoRoute(
         path: '/login',
@@ -60,51 +64,80 @@ GoRouter buildRouter({
           onSetLocale: onSetLocale,
         ),
       ),
-      GoRoute(path: '/welcome', builder: (context, state) => const WelcomeScreen()),
+
       GoRoute(
-        path: '/profile', 
-        builder: (context, state) => ProfileScreen(onSetTheme: onSetTheme, onSetLocale: onSetLocale),
+        path: '/general',
+        builder: (context, state) => GeneralScreen(
+          onSetTheme: onSetTheme,
+          onSetLocale: onSetLocale,
+        ),
       ),
-      GoRoute(path: '/notifications', builder: (context, state) => const NotificationsScreen()),
-      GoRoute(path: '/reports', builder: (context, state) => const UserReportsScreen()),
       
+    
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
+      ),
+
+      GoRoute(
+        path: '/admin/debug',
+        builder: (context, state) => const DebugScreen(),
+      ),
+
+      GoRoute(
+        path: '/admin/team',
+        builder: (context, state) => const AdminTeamScreen(),
+      ),
+
+      GoRoute(path: "/admin/announcements/create", builder: (context, state) => const AdminCreateAnnouncementScreen()),
+      GoRoute(path: "/announcements", builder: (context, state) => const AnnouncementsScreen()),
+
+      GoRoute(
+        path: '/admin/control-panel',
+        builder: (context, state) => const AdminPanelScreen(),
+      ),
 
 
       GoRoute(
-        path: '/altacm', 
-        builder: (context, state) => const AltAcmMainScreen(),
+        path: '/admin/password-reset',
+        redirect: (context, state) =>
+            RoleTypes.isStaffRole(Storage.role) ? null : '/',
+        builder: (context, state) => const PasswordResetScreen(),
+      ),
+
+      GoRoute(
+        path: '/admin/moderation',
+        redirect: (context, state) =>
+            RoleTypes.isStaffRole(Storage.role) ? null : '/',
+        builder: (context, state) => const ModerationSearchScreen(),
+      ),
+      GoRoute(
+        path: '/user/:id',
+        redirect: (context, state) {
+          if (RoleTypes.isStaffRole(Storage.role)) return null;
+          return state.uri.queryParameters.containsKey('ndcId') ? null : '/';
+        },
+        builder: (context, state) => UserManageScreen(
+          uid: state.pathParameters['id']!,
+          initialProfile: state.extra is Map
+              ? Map<String, dynamic>.from(state.extra as Map)
+              : null,
+          ndcId: int.tryParse(state.uri.queryParameters['ndcId'] ?? ''),
+        ),
+      ),
+      GoRoute(path: "/altacm/community/create", builder: (context, state) => const AltAcmCreateCommunityScreen()),
+      GoRoute(
+        path: '/altacm/community/:ndcId',
+        builder: (c, s) => AltAcmCommunityScreen(
+          ndcId: s.pathParameters['ndcId']!,
+        ),
         routes: [
-          GoRoute(
-            path: 'community/create',
-            builder: (context, state) => const AltAcmCreateCommunityScreen(),
-          ),
-          GoRoute(
-            path: 'community/:ndcId',
-            builder: (context, state) {
-              final ndcId = state.pathParameters['ndcId'] ?? '0';
-              return AltAcmCommunityScreen(ndcId: ndcId);
-            },
-          ),
           GoRoute(
             path: 'edit',
-            builder: (context, state) {
-              final data = state.extra as Map<String, dynamic>?;
-              return AltAcmEditCommunityScreen(communityData: data);
-            },
+            builder: (c, s) => AltAcmEditCommunityScreen(
+              ndcId: int.parse(s.pathParameters['ndcId']!),
+            ),
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/admin', 
-        builder: (context, state) => const AdminDashboardScreen(),
-        routes: [
-          GoRoute(path: 'reports', builder: (context, state) => const AdminReportsScreen()),
-          GoRoute(path: 'roles', builder: (context, state) => const AdminRolesScreen()),
-          GoRoute(path: 'team', builder: (context, state) => const AdminTeamScreen()),
-          GoRoute(path: 'announcements/create', builder: (context, state) => const AdminCreateAnnouncementScreen()),   
-          GoRoute(path: 'chats', builder: (context, state) => const AdminChatsScreen()),
-          GoRoute(path: 'user/moderation', builder: (context, state) => const UserModerationScreen()),
-          //GoRoute(path: 'events', builder: (context, state) => const EventsModerationScreen()),
         ],
       ),
     ],
