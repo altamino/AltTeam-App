@@ -84,3 +84,5 @@ secrets.dart
 
 
 builds/
+/dist/
+dist/
