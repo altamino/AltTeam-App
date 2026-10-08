@@ -14,14 +14,13 @@ class Requester {
   String? userId;
   late final Dio _dio;
 
-  /// Выполняет рефреш сессии. Возвращает новый sid или null, если рефреш
-  /// не удался. Устанавливается снаружи (Api).
   Future<String?> Function()? refreshSession;
 
-  /// Вызывается, когда сессию восстановить не удалось (рефреш провалился).
   void Function()? onSessionExpired;
 
   Future<String?>? _refreshInFlight;
+  String get baseUrl => _dio.options.baseUrl;
+  set baseUrl(String v) => _dio.options.baseUrl = v;
 
   Requester({
     required this.deviceId,
@@ -80,8 +79,7 @@ class Requester {
 
       if (newSid != null) {
         sid = newSid;
-        // Повторяем исходный запрос один раз, уже без ретрая —
-        // если и с новым sid прилетит 440, значит что-то серьёзнее.
+
         return request(
           method,
           endpoint,
@@ -115,7 +113,6 @@ class Requester {
 
     dynamic preparedBody = body;
     if (!isBinary && preparedBody is Map<String, dynamic>) {
-      // timestamp генерим на каждую отправку — при ретрае будет свежий.
       preparedBody = {
         ...preparedBody,
         'timestamp': Generator.reqTime(),
@@ -146,8 +143,6 @@ class Requester {
     return '${data['api:statuscode']}' == '105';
   }
 
-  /// Single-flight: если несколько запросов одновременно словили 440,
-  /// рефреш выполняется один раз, остальные ждут его результат.
   Future<String?> _refreshOnce() {
     return _refreshInFlight ??= _doRefresh();
   }

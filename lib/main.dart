@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'core/router.dart';
-import 'core/l10n/app_localizations.dart';
-import 'core/storage.dart';
+
 import 'core/api/network/api.dart';
 import 'core/api/repositories/version_check.dart';
-import 'package:flutter/services.dart';
+import 'core/l10n/app_localizations.dart';
+import 'core/router.dart';
+import 'core/storage.dart';
+import 'core/theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +16,7 @@ void main() {
 
 class _Bootstrap extends StatefulWidget {
   const _Bootstrap();
+
   @override
   State<_Bootstrap> createState() => _BootstrapState();
 }
@@ -37,30 +40,50 @@ class _BootstrapState extends State<_Bootstrap> {
   @override
   Widget build(BuildContext context) {
     if (!_ready) {
-      return const MaterialApp(
+      return MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: _SplashScreen(),
+        theme: ThemeData(brightness: Brightness.dark),
+        home: const _BrandSplash(),
       );
     }
     return const AltTeamApp();
   }
 }
 
-class _SplashScreen extends StatelessWidget {
-  const _SplashScreen();
+class _BrandSplash extends StatelessWidget {
+  const _BrandSplash();
+
+  static const _bg = Color(0xFF1A1470);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.deepPurple,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/logo.png', width: 120),
-            const SizedBox(height: 24),
-            const CircularProgressIndicator(color: Colors.white),
-          ],
-        ),
+      backgroundColor: _bg,
+      body: Stack(
+        children: [
+          Center(
+            child: Image.asset(
+              'assets/icon/splash_logo.png',
+              width: 180,
+              errorBuilder: (context, error, stack) => const SizedBox.shrink(),
+            ),
+          ),
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 64,
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.4,
+                  color: Color(0x99FFFFFF),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -68,6 +91,7 @@ class _SplashScreen extends StatelessWidget {
 
 class AltTeamApp extends StatefulWidget {
   const AltTeamApp({super.key});
+
   @override
   State<AltTeamApp> createState() => _AltTeamAppState();
 }
@@ -83,24 +107,23 @@ class _AltTeamAppState extends State<AltTeamApp> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     _themeMode = Storage.themeMode;
     _locale = Locale(Storage.locale);
     Api.onSessionExpired = () => _router.go('/login');
     _checkVersion();
   }
 
-Future<void> _checkVersion() async {
-  final result = await VersionCheck.check();
-  final parsedOk = result.latestVersion.isNotEmpty;
-  if (parsedOk && !result.isUpToDate) {
-    if (mounted) {
-      _router.go('/update-required', extra: result.downloadPage);
+  Future<void> _checkVersion() async {
+    final result = await VersionCheck.check();
+    final parsedOk = result.latestVersion.isNotEmpty;
+    if (parsedOk && !result.isUpToDate && mounted) {
+      _router.go('/update-required', extra: <String, String?>{
+        'downloadPage': result.downloadPage,
+        'latestVersion': result.latestVersion,
+      });
     }
   }
-}
 
   void _setTheme(ThemeMode mode) {
     setState(() => _themeMode = mode);
@@ -120,17 +143,8 @@ Future<void> _checkVersion() async {
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       locale: _locale,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 181, 237, 240)),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 23, 39, 38),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       routerConfig: _router,
     );
   }

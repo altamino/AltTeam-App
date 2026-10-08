@@ -16,6 +16,7 @@ abstract class RoleTypes {
   static const List<int> rolesOfAnnouncements = [roleFeed, roleSystem, roleAltAminoStaff];
   static const List<int> adminRoles = [roleAltAminoMod, roleAltAminoAdmin, roleFeed, roleSystem, roleAltAminoStaff];
   static const List<int> ndcAdminRoles = [roleCurator, roleLeader, roleAgent];
+  static const List<int> ndcMainAdminRoles = [roleLeader, roleAgent];
 
   static bool isAnnouncementsRole(int? role) {
     return rolesOfAnnouncements.contains(role);
@@ -27,5 +28,9 @@ abstract class RoleTypes {
 
   static bool isNdcAdminRole(int? role) {
     return ndcAdminRoles.contains(role);
+  }
+
+  static bool isNdcMainAdminRole(int? role) {
+    return ndcMainAdminRoles.contains(role);
   }
 }

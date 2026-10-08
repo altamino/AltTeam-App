@@ -9,19 +9,12 @@ import '../theme/app_colors.dart';
 import '../widgets/app_snackbar.dart';
 import '../api/repositories/links.dart';
 
-/// Редактор текста в формате Amino:
-/// - строчные маркеры [B][I][U][S][C] (жирный/курсив/подчёркнутый/
-///   зачёркнутый/по центру), применяются к строкам под курсором/выделением;
-/// - инлайн-картинки [IMG=XXXX], где XXXX — ref в mediaList
-///   ([100, url, caption, "XXXX"]);
-/// - ссылки вставляются голым URL — клиент Amino подсвечивает их сам.
-///
-/// mediaList мутируется на месте, экран-владелец передаёт его в API.
 class AminoTextEditor extends StatefulWidget {
   final TextEditingController controller;
   final List<dynamic> mediaList;
   final String? hint;
   final int minLines;
+  final double maxHeight;
   final bool enabled;
 
   const AminoTextEditor({
@@ -30,12 +23,11 @@ class AminoTextEditor extends StatefulWidget {
     required this.mediaList,
     this.hint,
     this.minLines = 4,
+    this.maxHeight = 320,
     this.enabled = true,
   });
 
-  /// Убирает из mediaList инлайн-картинки, у которых ref больше не
-  /// встречается в тексте (пользователь стёр [IMG=...] руками).
-  /// Записи без ref (обычные вложения) не трогаем.
+  
   static List<dynamic> pruneMediaList(String content, List<dynamic> mediaList) {
     return mediaList.where((e) {
       if (e is List && e.length >= 4 && e[3] is String) {
@@ -58,7 +50,6 @@ class _AminoTextEditorState extends State<AminoTextEditor> {
 
   TextEditingController get _c => widget.controller;
 
-  // ---------------- Маркеры строк ----------------
 
   void _toggleLineFlag(String flag) {
     final text = _c.text;
@@ -74,7 +65,6 @@ class _AminoTextEditorState extends State<AminoTextEditor> {
     final block = text.substring(lineStart, lineEnd);
     final lines = block.split('\n');
 
-    // Если флаг уже есть на всех строках выделения — снимаем, иначе ставим.
     final allHave = lines.every((l) {
       final m = _lineMarker.firstMatch(l);
       return m != null && m.group(1)!.toUpperCase().contains(flag);
@@ -114,7 +104,6 @@ class _AminoTextEditorState extends State<AminoTextEditor> {
     return m != null && m.group(1)!.toUpperCase().contains(flag);
   }
 
-  // ---------------- Вставка ----------------
 
   void _insertAtCursor(String snippet) {
     final text = _c.text;
@@ -218,7 +207,6 @@ class _AminoTextEditorState extends State<AminoTextEditor> {
     });
   }
 
-  // ---------------- UI ----------------
 
   @override
   Widget build(BuildContext context) {
@@ -233,17 +221,20 @@ class _AminoTextEditorState extends State<AminoTextEditor> {
       children: [
         _buildToolbar(colors),
         const SizedBox(height: 8),
-        TextFormField(
-          controller: widget.controller,
-          enabled: widget.enabled,
-          minLines: widget.minLines,
-          maxLines: null,
-          onChanged: (_) => setState(() {}),
-          onTap: () => setState(() {}),
-          style: TextStyle(color: colors.textPrimary),
-          decoration: InputDecoration(
-            hintText: widget.hint,
-            hintStyle: TextStyle(color: colors.textMuted),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: widget.maxHeight),
+          child: TextFormField(
+            controller: widget.controller,
+            enabled: widget.enabled,
+            minLines: widget.minLines,
+            maxLines: null,
+            onChanged: (_) => setState(() {}),
+            onTap: () => setState(() {}),
+            style: TextStyle(color: colors.textPrimary),
+            decoration: InputDecoration(
+              hintText: widget.hint,
+              hintStyle: TextStyle(color: colors.textMuted),
+            ),
           ),
         ),
         if (inlineImages.isNotEmpty) ...[

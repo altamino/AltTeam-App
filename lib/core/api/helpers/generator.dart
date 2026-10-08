@@ -9,8 +9,6 @@ final Uint8List _sigKey = _hexToBytes(SigKey);
 final Uint8List _deviceKey = _hexToBytes(DeviceKey);
 
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
 Uint8List _hexToBytes(String hex) {
   final result = Uint8List(hex.length ~/ 2);
   for (int i = 0; i < hex.length; i += 2) {
@@ -24,7 +22,6 @@ Uint8List _hmacSha1(Uint8List key, Uint8List data) {
   return Uint8List.fromList(hmac.convert(data).bytes);
 }
 
-// ─── Generator ──────────────────────────────────────────────────────────────
 
 class Generator {
   static final Random _random = Random.secure();

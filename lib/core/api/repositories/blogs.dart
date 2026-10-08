@@ -22,76 +22,65 @@ class BlogsRepository {
     return await Api.get(uri.toString());
   }
 
+Future<Map<String, dynamic>> createBlog({
+  int? ndcId,
+  required String title,
+  required String content,
+  String language = 'en',
+  String? mediaUrl,
+  String? mediaFileName,
+  String? backgroundColor,
+  String? bgMediaUrl,
+  String? bgMediaFileName,
+  List<List<dynamic>>? mediaList,
+}) async {
+  final path = '/x${ndcId ?? 0}/s/blog';
 
-  Future<Map<String, dynamic>> createBlog({
-    int? ndcId,
-    required String title,
-    required String content,
-    String language = 'en',
-    String? mediaUrl,
-    String? mediaFileName,
-    String? backgroundColor,
-    String? bgMediaUrl,
-    String? bgMediaFileName,
-  }) async {
-    
-    final path = '/x${ndcId ?? 0}/s/blog';
-
-
-    List<dynamic>? formattedMediaList;
-    if (mediaUrl != null) {
-      formattedMediaList = [
-        [
-          100,
-          mediaUrl,
-          null,
-          null,
-          null,
-          if (mediaFileName != null) {'fileName': mediaFileName} else null,
-        ]
+  List<dynamic> mediaItem(String url, String? fileName) => [
+        100,
+        url,
+        null,
+        null,
+        null,
+        fileName != null ? {'fileName': fileName} : null,
       ];
-    }
-
-  
-    List<dynamic>? formattedBgMediaList;
-    if (bgMediaUrl != null) {
-      formattedBgMediaList = [
-        [
-          100,
-          bgMediaUrl,
-          null,
-          null,
-          null,
-          if (bgMediaFileName != null) {'fileName': bgMediaFileName} else null,
-        ]
-      ];
-    }
-
-    final Map<String, dynamic> requestBody = {
-      'title': title,
-      'content': content,
-      'type': 0,
-      'contentLanguage': language,
-      'address': null,
-      'latitude': 0,
-      'longitude': 0,
-      'promotedFrom': null,
-      'eventSource': 'GlobalComposeMenu',
-      'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'mediaList': formattedMediaList,
-      'extensions': {
-        'fansOnly': false,
-        'style': {
-          'backgroundColor': backgroundColor,
-          'backgroundMediaList': formattedBgMediaList,
-        }
-      },
-    };
 
 
-    return await Api.post(path, body: requestBody); 
-
+  List<dynamic>? formattedMediaList;
+  if (mediaList != null && mediaList.isNotEmpty) {
+    formattedMediaList = mediaList;
+  } else if (mediaUrl != null) {
+    formattedMediaList = [mediaItem(mediaUrl, mediaFileName)];
   }
+
+  List<dynamic>? formattedBgMediaList;
+  if (bgMediaUrl != null) {
+    formattedBgMediaList = [mediaItem(bgMediaUrl, bgMediaFileName)];
+  }
+
+  final Map<String, dynamic> requestBody = {
+    'title': title,
+    'content': content,
+    'type': 0,
+    'contentLanguage': language,
+    'address': null,
+    'latitude': 0,
+    'longitude': 0,
+    'promotedFrom': null,
+    'eventSource': 'GlobalComposeMenu',
+    'timestamp': DateTime.now().millisecondsSinceEpoch,
+    'mediaList': formattedMediaList,
+    'extensions': {
+      'fansOnly': false,
+      'style': {
+        'backgroundColor': backgroundColor,
+        'backgroundMediaList': formattedBgMediaList,
+      },
+    },
+  };
+
+  return await Api.post(path, body: requestBody);
+}
 
 
 Future<Map<String, dynamic>> editBlog({

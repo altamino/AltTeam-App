@@ -15,8 +15,8 @@ class GlassDropdown<T> extends StatelessWidget {
   final IconData icon;
   final T value;
   final List<T> items;
-  final String Function(T item) itemLabel;
-  final ValueChanged<T>? onChanged;
+  final String Function(T) itemLabel;
+  final ValueChanged<T> onChanged;
   final bool enabled;
 
   @override
@@ -26,55 +26,63 @@ class GlassDropdown<T> extends StatelessWidget {
     return PopupMenuButton<T>(
       enabled: enabled,
       initialValue: value,
+      onSelected: onChanged,
       color: colors.surfaceElevated,
-      surfaceTintColor: Colors.transparent,
       elevation: 8,
+      position: PopupMenuPosition.under,
+      offset: const Offset(0, 6),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
         side: BorderSide(color: colors.glassBorder),
       ),
-      onSelected: onChanged,
       itemBuilder: (context) => items.map((item) {
         final selected = item == value;
         return PopupMenuItem<T>(
           value: item,
-          height: 40,
           child: Row(
             children: [
               Expanded(
                 child: Text(
                   itemLabel(item),
                   style: TextStyle(
+                    fontSize: 14,
                     color: selected ? colors.accentPrimary : colors.textPrimary,
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                    fontSize: 13,
                   ),
                 ),
               ),
-              if (selected) Icon(Icons.check, size: 15, color: colors.accentPrimary),
+              if (selected)
+                Icon(Icons.check_rounded, size: 16, color: colors.accentPrimary),
             ],
           ),
         );
       }).toList(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: colors.glassFill,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colors.glassBorder),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 15, color: colors.textMuted),
-            const SizedBox(width: 6),
-            Text(
-              itemLabel(value),
-              style: TextStyle(color: colors.textSecondary, fontSize: 13),
-            ),
-            const SizedBox(width: 4),
-            Icon(Icons.expand_more, size: 14, color: colors.textMuted),
-          ],
+      child: Opacity(
+        opacity: enabled ? 1 : 0.5,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: colors.glassFillStrong,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: colors.glassBorder),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 16, color: colors.textMuted),
+              const SizedBox(width: 6),
+              Text(
+                itemLabel(value),
+                style: TextStyle(fontSize: 13, color: colors.textSecondary),
+              ),
+              const SizedBox(width: 2),
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 18,
+                color: colors.textMuted,
+              ),
+            ],
+          ),
         ),
       ),
     );
