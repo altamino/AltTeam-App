@@ -3,7 +3,7 @@ description: "AltAmino Control Panel for Developers and Volunteers."
 
 
 publish_to: 'none'
-version: 1.2.0+3
+version: 1.2.3+1
 
 environment:
   sdk: '>=3.10.0 <4.0.0'
@@ -37,6 +37,7 @@ dependencies:
   package_info_plus: ^9.0.1
   archive: ^3.6.1
   image: ^4.3.0
+  file_selector: ^1.0.3
 
 dev_dependencies:
   flutter_test:

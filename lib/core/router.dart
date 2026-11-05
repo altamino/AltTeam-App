@@ -8,10 +8,13 @@ import '../screens/debug.dart';
 import '../screens/profile.dart';
 import '../screens/admin/team.dart';
 import '../screens/admin/control_panel.dart';
+import '../screens/admin/online.dart';
+import '../screens/admin/discover.dart';
 import '../screens/announcements/main.dart';
 import '../screens/announcements/create.dart';
 import '../screens/admin/reset_password.dart';
 import '../screens/admin/moderation_search.dart';
+import '../screens/admin/store.dart';
 import '../screens/admin/user_manage.dart'; 
 import '../screens/acm/create.dart';
 import '../screens/acm/edit.dart';
@@ -85,6 +88,11 @@ GoRouter buildRouter({
       ),
 
       GoRoute(
+        path: '/admin/store',
+        builder: (context, state) => const StoreScreen(),
+      ),
+
+      GoRoute(
         path: '/admin/team',
         builder: (context, state) => const AdminTeamScreen(),
       ),
@@ -95,6 +103,17 @@ GoRouter buildRouter({
       GoRoute(
         path: '/admin/control-panel',
         builder: (context, state) => const AdminPanelScreen(),
+      ),
+
+      GoRoute(
+        path: '/admin/online',
+        builder: (context, state) => const OnlineUsersScreen(),
+      ),
+      GoRoute(
+        path: '/admin/discover',
+        redirect: (context, state) =>
+            RoleTypes.isStaffRole(Storage.role) ? null : '/general',
+        builder: (context, state) => const DiscoverAdminScreen(),
       ),
 
 

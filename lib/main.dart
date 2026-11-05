@@ -8,6 +8,7 @@ import 'core/l10n/app_localizations.dart';
 import 'core/router.dart';
 import 'core/storage.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/app_shell_scope.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -133,6 +134,7 @@ class _AltTeamAppState extends State<AltTeamApp> {
   void _setLocale(Locale locale) {
     setState(() => _locale = locale);
     Storage.setLocale(locale.languageCode);
+    Api.editLocale(locale.languageCode);
     AppLocalizations.load(locale.languageCode);
   }
 
@@ -146,6 +148,11 @@ class _AltTeamAppState extends State<AltTeamApp> {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: _router,
+      builder: (context, child) => AppShellScope(
+        onSetTheme: _setTheme,
+        onSetLocale: _setLocale,
+        child: child ?? const SizedBox.shrink(),
+      ),
     );
   }
 }
