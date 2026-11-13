@@ -7,7 +7,13 @@
 [![Android](https://img.shields.io/badge/Android-supported-3DDC84?logo=android\&logoColor=white\&style=flat-square)](#)
 [![iOS](https://img.shields.io/badge/iOS-supported-000000?logo=apple\&logoColor=white\&style=flat-square)](#)
 
-**Web page:** [AltTeam](https://altamino.top/altapp)
+**AltAmino Web page:** [AltTeam](https://altamino.top/altapp)
+
+**Repo Web page:** [AltTeam](https://alx0rr.github.io/AltTeam-App/) (all releases)
+
+**[Developer](https://alx0rr.github.io/)**
+
+# About app
 
 Official mobile application for volunteers, moderators, and administrators of the **AltAmino** platform. A comprehensive tool for community management, content moderation, and user administration.
 
